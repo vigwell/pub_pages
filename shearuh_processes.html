@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תרשימי תהליכים - נוהל פיתוח ותמיכה במקביל</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 21cm;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+        
+        h1 {
+            color: #0066cc;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            page-break-after: avoid;
+        }
+        
+        h2 {
+            color: #0052a3;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            page-break-after: avoid;
+        }
+        
+        h3 {
+            color: #444;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .diagram-container {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            page-break-inside: avoid;
+            text-align: center;
+        }
+        
+        .mermaid {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .process-description {
+            background: #e8f4f8;
+            border-right: 4px solid #0066cc;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .legend {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin: 5px 15px;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: right;
+        }
+        
+        th {
+            background-color: #0066cc;
+            color: white;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        ul, ol {
+            margin: 15px 0;
+            padding-right: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .arrow {
+            color: #0066cc;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                font-size: 11pt;
+            }
+            
+            .diagram-container {
+                background: white;
+                border: 1px solid #000;
+            }
+            
+            h1, h2 {
+                color: black;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                curve: 'basis',
+                padding: 20,
+                nodeSpacing: 50,
+                rankSpacing: 50
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>📊 תרשימי תהליכים - נוהל פיתוח ותמיכה במקביל</h1>
+
+    <h2>1. 🌳 אסטרטגיית Branches - GitFlow מותאם</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> מודל ניהול ענפים המאפשר פיתוח מקביל לתמיכה בייצור
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+gitGraph:
+    commit id: "Initial"
+    branch develop
+    checkout develop
+    commit id: "Dev Start"
+    
+    branch feature/CRM-123
+    checkout feature/CRM-123
+    commit id: "פיצ'ר חדש"
+    commit id: "בדיקות"
+    
+    checkout develop
+    merge feature/CRM-123
+    
+    branch release/1.0.0
+    checkout release/1.0.0
+    commit id: "הכנה לייצור"
+    
+    checkout main
+    merge release/1.0.0 tag: "v1.0.0"
+    
+    branch hotfix/1.0.1
+    checkout hotfix/1.0.1
+    commit id: "תיקון דחוף"
+    
+    checkout main
+    merge hotfix/1.0.1 tag: "v1.0.1"
+    
+    checkout develop
+    merge hotfix/1.0.1
+        </div>
+    </div>
+    
+    <h3>כללי עבודה עם Branches:</h3>
+    <ul>
+        <li><strong>main:</strong> קוד ייצור - מוגן מכתיבה ישירה</li>
+        <li><strong>develop:</strong> קו פיתוח ראשי לגרסה הבאה</li>
+        <li><strong>feature/*:</strong> פיתוח פיצ'רים חדשים</li>
+        <li><strong>release/*:</strong> הכנת גרסה לייצור</li>
+        <li><strong>hotfix/*:</strong> תיקוני חירום לייצור</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>2. 🔄 תהליך CI/CD מלא לפי סביבות</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> זרימת Build ו-Deploy אוטומטית מפיתוח עד ייצור
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+flowchart TB
+    subgraph "פיתוח"
+        A[מפתח מבצע Push] --> B[Pull Request]
+        B --> C{Code Review}
+        C -->|אישור| D[מיזוג ל-develop]
+    end
+    
+    subgraph "CI Pipeline"
+        D --> E[Build אוטומטי]
+        E --> F[בדיקות יחידה]
+        F --> G[סריקת SAST]
+        G --> H[יצירת Artifact]
+    end
+    
+    subgraph "CD - סביבת DEV"
+        H --> I[Deploy ל-DEV]
+        I --> J[מיגרציות DB]
+        J --> K[Smoke Tests]
+    end
+    
+    subgraph "CD - סביבת TEST"
+        K --> L[יצירת release/*]
+        L --> M[Deploy ל-TEST]
+        M --> N[בדיקות QA]
+        N --> O{אישור QA}
+    end
+    
+    subgraph "CD - סביבת PROD"
+        O -->|אישור| P[מיזוג ל-main]
+        P --> Q[Tag גרסה]
+        Q --> R[Backup DB]
+        R --> S[Deploy ל-PROD]
+        S --> T[Health Checks]
+        T --> U[ניטור]
+    end
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>3. 🚨 תהליך Hotfix - תיקוני חירום</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> טיפול מהיר בתקלות קריטיות בייצור תוך שמירה על רצף הפיתוח
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+flowchart LR
+    subgraph "זיהוי בעיה"
+        A[תקלה קריטית בייצור] --> B[פתיחת Work Item דחוף]
+        B --> C[הקצאת צוות תיקון]
+    end
+    
+    subgraph "תיקון"
+        C --> D[יצירת hotfix/* מ-main]
+        D --> E[פיתוח תיקון]
+        E --> F[בדיקות מקומיות]
+        F --> G{CI עובר?}
+        G -->|לא| E
+    end
+    
+    subgraph "פריסה"
+        G -->|כן| H[Deploy לסביבת TEST]
+        H --> I[בדיקת QA מזורזת]
+        I --> J[Deploy ל-PROD]
+        J --> K[אימות תיקון]
+    end
+    
+    subgraph "סנכרון"
+        K --> L[Tag: v1.0.1+hotfix1]
+        L --> M[Merge ל-main]
+        M --> N[Merge ל-develop]
+        N --> O[Merge ל-release פעיל]
+    end
+        </div>
+    </div>
+    
+    <table>
+        <tr>
+            <th>שלב</th>
+            <th>אחראי</th>
+            <th>SLA</th>
+            <th>אישורים נדרשים</th>
+        </tr>
+        <tr>
+            <td>זיהוי ופתיחת Work Item</td>
+            <td>תמיכה / Operations</td>
+            <td>15 דקות</td>
+            <td>מנהל תורן</td>
+        </tr>
+        <tr>
+            <td>פיתוח תיקון</td>
+            <td>צוות פיתוח</td>
+            <td>2-4 שעות</td>
+            <td>Tech Lead</td>
+        </tr>
+        <tr>
+            <td>בדיקות ואישור</td>
+            <td>QA</td>
+            <td>30 דקות</td>
+            <td>QA Lead</td>
+        </tr>
+        <tr>
+            <td>פריסה לייצור</td>
+            <td>DevOps</td>
+            <td>30 דקות</td>
+            <td>Change Manager</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h2>4. 🗄️ ניהול מיגרציות Database</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> ניהול שינויי סכימה ונתונים בכל הסביבות
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+flowchart TB
+    subgraph "פיתוח מיגרציה"
+        A[שינוי סכימה נדרש] --> B[יצירת קובץ מיגרציה]
+        B --> C[V2025_08_24__add_index.sql]
+        C --> D[בדיקת תאימות לאחור]
+    end
+    
+    subgraph "סביבת DEV"
+        D --> E[Apply אוטומטי ב-Deploy]
+        E --> F[בדיקת ביצועים]
+        F --> G[Rollback Script]
+    end
+    
+    subgraph "סביבת TEST"
+        G --> H[Apply עם Release]
+        H --> I[בדיקות רגרסיה]
+        I --> J[אישור DBA]
+    end
+    
+    subgraph "סביבת PROD"
+        J --> K[Backup מלא]
+        K --> L[חלון תחזוקה]
+        L --> M[Apply מיגרציה]
+        M --> N[Verification]
+        N --> O{הצלחה?}
+        O -->|לא| P[Rollback]
+        O -->|כן| Q[סיום]
+    end
+        </div>
+    </div>
+    
+    <h3>כללי מיגרציות:</h3>
+    <ul>
+        <li>תמיד תאימות לאחור לגרסה אחת לפחות</li>
+        <li>אסור למחוק עמודות - רק להוסיף ולסמן deprecated</li>
+        <li>כל מיגרציה חייבת Rollback script</li>
+        <li>בדיקת ביצועים על נפח נתונים דומה לייצור</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>5. 🚀 תהליך Release מלא</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> הכנה והעלאת גרסה חדשה לייצור
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+sequenceDiagram
+    participant PM as Product Manager
+    participant Dev as צוות פיתוח
+    participant QA as צוות QA
+    participant DevOps as צוות DevOps
+    participant DBA as DBA
+    participant Ops as Operations
+    
+    Note over PM,Dev: שלב תכנון
+    PM->>Dev: הגדרת תכולת Release
+    Dev->>PM: אישור היתכנות
+    
+    Note over Dev,QA: שלב פיתוח
+    Dev->>Dev: פיתוח פיצ'רים
+    Dev->>QA: יצירת release/1.2.0
+    
+    Note over QA,DevOps: שלב בדיקות
+    QA->>DevOps: Deploy ל-TEST
+    DevOps->>QA: סביבה מוכנה
+    QA->>QA: בדיקות רגרסיה
+    QA->>QA: בדיקות ביצועים
+    QA->>Dev: דיווח באגים
+    Dev->>QA: תיקונים
+    
+    Note over QA,DBA: שלב אישורים
+    QA->>PM: אישור QA
+    DBA->>DevOps: אישור מיגרציות
+    
+    Note over DevOps,Ops: שלב ייצור
+    DevOps->>Ops: תיאום חלון
+    DevOps->>DevOps: Backup
+    DevOps->>Ops: Deploy ל-PROD
+    Ops->>Ops: ניטור
+    Ops->>PM: אישור הצלחה
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>6. ↩️ תהליך Rollback</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> החזרה לגרסה קודמת במקרה של כשל
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+flowchart TD
+    A[זיהוי בעיה קריטית] --> B{סוג הבעיה}
+    
+    B -->|בעיית קוד| C[Rollback אפליקציה]
+    C --> D[חזרה ל-Artifact קודם]
+    D --> E[Restart שירותים]
+    
+    B -->|בעיית DB| F[Rollback Database]
+    F --> G[הרצת Rollback Scripts]
+    G --> H[אימות Data Integrity]
+    
+    B -->|בעיה משולבת| I[Full Rollback]
+    I --> J[Restore מ-Backup]
+    J --> K[אימות מלא]
+    
+    E --> L[בדיקות Post-Rollback]
+    H --> L
+    K --> L
+    
+    L --> M{הצלחה?}
+    M -->|כן| N[דיווח והמשך ניטור]
+    M -->|לא| O[הסלמה לניהול]
+    
+    style A fill:#ff6b6b
+    style O fill:#ff6b6b
+    style N fill:#51cf66
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>7. 🔄 מעגל חיים של Work Item</h2>
+    
+    <div class="process-description">
+        <strong>תיאור:</strong> זרימת עבודה מרגע פתיחת משימה ועד סגירתה
+    </div>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+stateDiagram-v2
+    [*] --> New: יצירת Work Item
+    New --> Approved: אישור PM
+    New --> Rejected: דחייה
+    
+    Approved --> InProgress: התחלת פיתוח
+    InProgress --> CodeReview: PR מוכן
+    CodeReview --> InProgress: נדרשים תיקונים
+    CodeReview --> ReadyForQA: אישור Review
+    
+    ReadyForQA --> Testing: QA מתחיל בדיקות
+    Testing --> Failed: נמצאו באגים
+    Failed --> InProgress: חזרה לפיתוח
+    Testing --> Passed: בדיקות עברו
+    
+    Passed --> ReadyForDeploy: מוכן לפריסה
+    ReadyForDeploy --> Deployed: נפרס לייצור
+    Deployed --> Verified: אומת בייצור
+    Verified --> Closed: סגירה
+    
+    Rejected --> [*]
+    Closed --> [*]
+        </div>
+    </div>
+
+</body>
+</html>
