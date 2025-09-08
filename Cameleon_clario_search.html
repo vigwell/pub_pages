@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Data Search System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #1565c0;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+        }
+
+        .panel h2 {
+            color: #1565c0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+        }
+
+        .patient-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input {
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: #1565c0;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0d47a1;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #1b5e20;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .patient-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #1565c0;
+        }
+
+        .patient-info h3 {
+            color: #1565c0;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .chunks-status {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .chunks-status.processing {
+            background: #fff3e0;
+            border-color: #ff9800;
+        }
+
+        .chunks-progress {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .chunks-progress-bar {
+            background: #4caf50;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .search-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .search-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        .search-results {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .search-status {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .search-status.searching {
+            color: #1565c0;
+        }
+
+        .result-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #4caf50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            animation: slideInRight 0.6s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chunk-id {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .match-indicator {
+            background: #4caf50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .result-content {
+            color: #333;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .highlighted-text {
+            background: #ffeb3b;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .search-summary {
+            background: #1565c0;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .demo-data {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏥 Patient Data Search System</h1>
+            <p>AI-Powered Medical Records Search</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Patient Data Loading Panel -->
+            <div class="panel">
+                <h2>👤 Patient Data Loader</h2>
+                
+                <div class="patient-form">
+                    <div class="form-group">
+                        <label for="patientId">Patient ID:</label>
+                        <input type="text" id="patientId" placeholder="Enter Patient ID (e.g., P-2024-001)" value="P-2024-001">
+                    </div>
+                    
+                    <button class="btn btn-primary" id="loadBtn" onclick="loadPatientData()">
+                        <span>📋 Load Patient Data</span>
+                    </button>
+                </div>
+
+                <!-- Patient Info Display -->
+                <div id="patientInfo" style="display: none;"></div>
+
+                <!-- Chunks Processing Status -->
+                <div id="chunksStatus" style="display: none;"></div>
+
+                <!-- Search Section -->
+                <div id="searchSection" class="search-section">
+                    <hr style="margin: 30px 0; border: 1px solid #e0e0e0;">
+                    <h3 style="color: #1565c0; margin-bottom: 20px;">🔍 Search Medical Records</h3>
+                    
+                    <div class="search-controls">
+                        <input type="text" id="searchPattern" class="search-input" placeholder="Enter medication, condition, or treatment (e.g., Acamol, diabetes)" value="Acamol">
+                        <button class="btn btn-success" id="searchBtn" onclick="performSearch()">
+                            <span>🔎 Search</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="demo-data">
+                    <strong>Demo Data:</strong> Try Patient IDs: P-2024-001, P-2024-002, P-2024-003<br>
+                    <strong>Search Examples:</strong> Acamol, diabetes, hypertension, surgery
+                </div>
+            </div>
+
+            <!-- Search Results Panel -->
+            <div class="panel">
+                <h2>📊 Search Results</h2>
+                
+                <div class="search-results" id="searchResults">
+                    <div class="search-status">
+                        Load patient data and enter a search pattern to begin searching medical records
+                    </div>
+                </div>
+
+                <div id="searchSummary" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPatientId = null;
+        let patientChunks = [];
+        let searchResults = [];
+        let isConnected = false;
+
+        // Sample patient data
+        const patientDatabase = {
+            'P-2024-001': {
+                name: 'John Smith',
+                age: 45,
+                gender: 'Male',
+                admissionDate: '2024-01-15',
+                data: [
+                    'Patient admitted with chest pain. Initial assessment shows elevated blood pressure 160/95. Prescribed Acamol 500mg for pain relief.',
+                    'Blood tests reveal cholesterol levels at 240 mg/dL. Patient has history of diabetes mellitus type 2. Current medications include Metformin 1000mg.',
+                    'Electrocardiogram shows normal sinus rhythm. No signs of myocardial infarction. Patient reports family history of cardiovascular disease.',
+                    'Discharge planning: Continue Acamol as needed for pain. Schedule follow-up with cardiologist in 2 weeks. Diet modification recommended.',
+                    'Patient education provided on diabetes management. Blood glucose monitoring schedule established. Emergency contact information updated.'
+                ]
+            },
+            'P-2024-002': {
+                name: 'Maria Garcia',
+                age: 32,
+                gender: 'Female',
+                admissionDate: '2024-01-20',
+                data: [
+                    'Patient presents with severe migraine headache lasting 3 days. Previous episodes treated with Acamol with moderate success.',
+                    'Neurological examination normal. No focal neurological deficits noted. Patient denies recent trauma or infection.',
+                    'MRI brain scan scheduled to rule out secondary causes. Patient has history of hormonal migraines related to menstrual cycle.',
+                    'Treatment plan includes prophylactic medication and trigger avoidance strategies. Patient counseled on medication overuse headache.',
+                    'Follow-up appointment scheduled in neurology clinic. Patient provided with headache diary for tracking patterns.'
+                ]
+            },
+            'P-2024-003': {
+                name: 'Robert Johnson',
+                age: 67,
+                gender: 'Male',
+                admissionDate: '2024-01-18',
+                data: [
+                    'Post-operative patient following knee replacement surgery. Pain management protocol includes Acamol and physical therapy.',
+                    'Vital signs stable. No signs of infection at surgical site. Patient mobilizing well with assistance from physiotherapy team.',
+                    'Hypertension well controlled with current medications. Patient has history of coronary artery disease with stent placement in 2020.',
+                    'Diabetes management ongoing with insulin therapy. Blood glucose levels within target range. Wound healing progressing normally.',
+                    'Discharge planning initiated. Home care services arranged. Patient education on post-surgical care and medication compliance.'
+                ]
+            }
+        };
+
+        async function loadPatientData() {
+            const patientId = document.getElementById('patientId').value.trim();
+            if (!patientId) {
+                alert('Please enter a Patient ID');
+                return;
+            }
+
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.innerHTML = '<div class="loading"></div> Loading Patient Data...';
+            loadBtn.disabled = true;
+
+            // Check if patient exists
+            const patientData = patientDatabase[patientId];
+            if (!patientData) {
+                alert('Patient not found. Try P-2024-001, P-2024-002, or P-2024-003');
+                resetLoadButton();
+                return;
+            }
+
+            // Display patient info
+            displayPatientInfo(patientId, patientData);
+            
+            // Process data into chunks
+            await processPatientChunks(patientId, patientData.data);
+            
+            currentPatientId = patientId;
+            resetLoadButton();
+            
+            // Show search section
+            document.getElementById('searchSection').classList.add('active');
+        }
+
+        function displayPatientInfo(patientId, patientData) {
+            const patientInfo = document.getElementById('patientInfo');
+            patientInfo.style.display = 'block';
+            patientInfo.innerHTML = `
+                <div class="patient-info">
+                    <h3>Patient Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Patient ID:</span>
+                        <span class="info-value">${patientId}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value">${patientData.name}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Age:</span>
+                        <span class="info-value">${patientData.age} years</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Gender:</span>
+                        <span class="info-value">${patientData.gender}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Admission Date:</span>
+                        <span class="info-value">${patientData.admissionDate}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function processPatientChunks(patientId, dataChunks) {
+            const chunksStatus = document.getElementById('chunksStatus');
+            chunksStatus.style.display = 'block';
+            chunksStatus.innerHTML = `
+                <div class="chunks-status processing">
+                    <strong>📤 Processing Patient Data</strong>
+                    <div class="chunks-progress">
+                        <div class="chunks-progress-bar" id="progressBar"></div>
+                    </div>
+                    <div>Sending chunks to server: <span id="chunkCounter">0</span> / ${dataChunks.length}</div>
+                </div>
+            `;
+
+            patientChunks = [];
+            
+            for (let i = 0; i < dataChunks.length; i++) {
+                // Simulate API call to sendTextChunk
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                const chunkId = `chunk-${patientId}-${i + 1}`;
+                const sessionId = patientId;
+                
+                // Simulate successful chunk storage
+                patientChunks.push({
+                    chunkId: chunkId,
+                    sessionId: sessionId,
+                    text: dataChunks[i]
+                });
+                
+                // Update progress
+                const progress = ((i + 1) / dataChunks.length) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+                document.getElementById('chunkCounter').textContent = i + 1;
+            }
+            
+            // Update status to complete
+            chunksStatus.innerHTML = `
+                <div class="chunks-status">
+                    <strong>✅ Patient Data Loaded Successfully</strong>
+                    <div>Total chunks created: ${dataChunks.length}</div>
+                </div>
+            `;
+        }
+
+        function resetLoadButton() {
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.innerHTML = '<span>📋 Load Patient Data</span>';
+            loadBtn.disabled = false;
+        }
+
+        async function performSearch() {
+            const searchPattern = document.getElementById('searchPattern').value.trim();
+            if (!searchPattern) {
+                alert('Please enter a search pattern');
+                return;
+            }
+
+            if (patientChunks.length === 0) {
+                alert('Please load patient data first');
+                return;
+            }
+
+            const searchBtn = document.getElementById('searchBtn');
+            searchBtn.innerHTML = '<div class="loading"></div> Searching...';
+            searchBtn.disabled = true;
+
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = `
+                <div class="search-status searching">
+                    🔍 Searching through ${patientChunks.length} medical record chunks for "${searchPattern}"...<br>
+                    <div style="margin-top: 15px; font-size: 14px;">AI analysis in progress - results will appear as they are found</div>
+                </div>
+            `;
+
+            searchResults = [];
+            let foundResults = 0;
+
+            // Simulate WebSocket connection and search
+            for (let i = 0; i < patientChunks.length; i++) {
+                // Random delay to simulate AI processing
+                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                
+                const chunk = patientChunks[i];
+                const chunkText = chunk.text.toLowerCase();
+                const searchLower = searchPattern.toLowerCase();
+                
+                const found = chunkText.includes(searchLower);
+                
+                if (found) {
+                    foundResults++;
+                    
+                    // Highlight the matching text
+                    const highlightedText = chunk.text.replace(
+                        new RegExp(searchPattern, 'gi'), 
+                        `<span class="highlighted-text">$&</span>`
+                    );
+                    
+                    if (foundResults === 1) {
+                        resultsContainer.innerHTML = '';
+                    }
+                    
+                    addSearchResult(chunk.chunkId, highlightedText);
+                }
+            }
+
+            // Show final results
+            if (foundResults === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="search-status">
+                        ❌ No results found for "${searchPattern}" in ${currentPatientId}'s medical records
+                    </div>
+                `;
+            } else {
+                displaySearchSummary(searchPattern, foundResults, patientChunks.length);
+            }
+
+            searchBtn.innerHTML = '<span>🔎 Search</span>';
+            searchBtn.disabled = false;
+        }
+
+        function addSearchResult(chunkId, highlightedText) {
+            const resultsContainer = document.getElementById('searchResults');
+            
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            resultItem.innerHTML = `
+                <div class="result-header">
+                    <span class="chunk-id">${chunkId}</span>
+                    <span class="match-indicator">✅ Match Found</span>
+                </div>
+                <div class="result-content">
+                    ${highlightedText}
+                </div>
+            `;
+            
+            resultsContainer.appendChild(resultItem);
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+        }
+
+        function displaySearchSummary(searchPattern, foundResults, totalChunks) {
+            const summaryContainer = document.getElementById('searchSummary');
+            summaryContainer.style.display = 'block';
+            summaryContainer.innerHTML = `
+                <div class="search-summary">
+                    <strong>🎯 Search Complete</strong><br>
+                    Found "${searchPattern}" in ${foundResults} out of ${totalChunks} medical record chunks<br>
+                    Patient: ${currentPatientId}
+                </div>
+            `;
+        }
+
+        // Initialize the interface
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-focus on patient ID field
+            document.getElementById('patientId').focus();
+        });
+    </script>
+</body>
+</html>
