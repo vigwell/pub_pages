@@ -1,0 +1,242 @@
+import React from 'react';
+import { Cloud, HardDrive, Cog, Shield, Activity, Database } from 'lucide-react';
+
+const InstallationDiagram = () => {
+  const components = [
+    {
+      id: 1,
+      title: "APIs to Enable",
+      icon: <Cog className="w-8 h-8" />,
+      color: "bg-blue-100 border-blue-400",
+      items: [
+        "Cloud Functions API",
+        "Cloud Build API",
+        "Document AI API",
+        "Cloud Storage API",
+        "Eventarc API",
+        "Cloud Run API"
+      ]
+    },
+    {
+      id: 2,
+      title: "Document AI Processor",
+      icon: <Database className="w-8 h-8" />,
+      color: "bg-purple-100 border-purple-400",
+      items: [
+        "Type: Invoice Parser",
+        "Location: us",
+        "Status: Active",
+        "Processor ID: Required"
+      ]
+    },
+    {
+      id: 3,
+      title: "Cloud Storage Buckets",
+      icon: <HardDrive className="w-8 h-8" />,
+      color: "bg-green-100 border-green-400",
+      items: [
+        "Input Bucket (upload PDFs)",
+        "Output Bucket (JSON results)",
+        "Done Bucket (processed PDFs)",
+        "Location: us-central1"
+      ]
+    },
+    {
+      id: 4,
+      title: "Service Accounts",
+      icon: <Shield className="w-8 h-8" />,
+      color: "bg-yellow-100 border-yellow-400",
+      items: [
+        "doc-ai-service-account",
+        "Eventarc service account",
+        "Pub/Sub service account",
+        "With IAM roles assigned"
+      ]
+    },
+    {
+      id: 5,
+      title: "Cloud Function",
+      icon: <Activity className="w-8 h-8" />,
+      color: "bg-red-100 border-red-400",
+      items: [
+        "Name: process-invoice",
+        "Runtime: Python 3.11",
+        "Region: us-central1",
+        "Trigger: Storage event",
+        "Memory: 512MB",
+        "Timeout: 540s"
+      ]
+    },
+    {
+      id: 6,
+      title: "Configuration Files",
+      icon: <Cloud className="w-8 h-8" />,
+      color: "bg-indigo-100 border-indigo-400",
+      items: [
+        "config/.env.yaml",
+        "src/main.py",
+        "src/requirements.txt",
+        "All values configured"
+      ]
+    }
+  ];
+
+  return (
+    <div className="w-full h-full bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            🚀 Gefen Invoice Processor Installation
+          </h1>
+          <p className="text-xl text-gray-600">
+            Complete GCP Infrastructure Setup
+          </p>
+          <div className="mt-4 inline-block bg-blue-500 text-white px-6 py-2 rounded-full text-lg font-semibold">
+            Total Time: ~30-40 minutes
+          </div>
+        </div>
+
+        {/* Main Architecture */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            Installation Components
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {components.map((component) => (
+              <div
+                key={component.id}
+                className={`${component.color} border-2 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
+              >
+                <div className="flex items-center mb-4">
+                  <div className="text-gray-700 mr-3">
+                    {component.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {component.title}
+                  </h3>
+                </div>
+                
+                <ul className="space-y-2">
+                  {component.items.map((item, idx) => (
+                    <li key={idx} className="flex items-start">
+                      <span className="text-green-600 mr-2 font-bold">✓</span>
+                      <span className="text-gray-700 text-sm">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Flow Diagram */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            Installation Flow
+          </h2>
+          
+          <div className="flex flex-col items-center space-y-4">
+            {/* Step 1 */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-blue-500 text-white rounded-lg p-4 text-center font-semibold text-lg">
+                1. Enable APIs
+              </div>
+              <div className="flex justify-center my-2">
+                <div className="w-1 h-8 bg-gray-400"></div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-purple-500 text-white rounded-lg p-4 text-center font-semibold text-lg">
+                2. Create Document AI Processor
+              </div>
+              <div className="flex justify-center my-2">
+                <div className="w-1 h-8 bg-gray-400"></div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-green-500 text-white rounded-lg p-4 text-center font-semibold text-lg">
+                3. Create Storage Buckets (x3)
+              </div>
+              <div className="flex justify-center my-2">
+                <div className="w-1 h-8 bg-gray-400"></div>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-yellow-500 text-white rounded-lg p-4 text-center font-semibold text-lg">
+                4. Create Service Accounts & Grant Permissions
+              </div>
+              <div className="flex justify-center my-2">
+                <div className="w-1 h-8 bg-gray-400"></div>
+              </div>
+            </div>
+
+            {/* Step 5 */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-indigo-500 text-white rounded-lg p-4 text-center font-semibold text-lg">
+                5. Configure Environment Files
+              </div>
+              <div className="flex justify-center my-2">
+                <div className="w-1 h-8 bg-gray-400"></div>
+              </div>
+            </div>
+
+            {/* Step 6 */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-red-500 text-white rounded-lg p-4 text-center font-semibold text-lg">
+                6. Deploy Cloud Function
+              </div>
+              <div className="flex justify-center my-2">
+                <div className="w-1 h-8 bg-gray-400"></div>
+              </div>
+            </div>
+
+            {/* Final */}
+            <div className="w-full max-w-2xl">
+              <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-lg p-6 text-center">
+                <div className="text-2xl font-bold mb-2">✅ Installation Complete!</div>
+                <div className="text-sm">System ready to process invoices</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="text-4xl font-bold text-blue-600">6</div>
+            <div className="text-gray-600 mt-2">APIs to Enable</div>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="text-4xl font-bold text-green-600">3</div>
+            <div className="text-gray-600 mt-2">Storage Buckets</div>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="text-4xl font-bold text-purple-600">1</div>
+            <div className="text-gray-600 mt-2">AI Processor</div>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="text-4xl font-bold text-red-600">1</div>
+            <div className="text-gray-600 mt-2">Cloud Function</div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-gray-600">
+          <p className="text-lg font-semibold">
+            📚 See DEVOPS-SETUP.md for detailed step-by-step instructions
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default InstallationDiagram;
