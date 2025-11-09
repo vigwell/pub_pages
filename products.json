@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "description": "High-performance laptop with 16GB RAM and 512GB SSD",
+    "price": 1299.99,
+    "stockQuantity": 15
+  },
+  {
+    "id": 2,
+    "name": "Wireless Mouse",
+    "description": "Ergonomic wireless mouse with USB receiver",
+    "price": 29.99,
+    "stockQuantity": 50
+  },
+  {
+    "id": 3,
+    "name": "Mechanical Keyboard",
+    "description": "RGB mechanical keyboard with blue switches",
+    "price": 89.99,
+    "stockQuantity": 30
+  },
+  {
+    "id": 4,
+    "name": "USB-C Hub",
+    "description": "7-in-1 USB-C hub with HDMI, USB 3.0, and SD card reader",
+    "price": 45.50,
+    "stockQuantity": 25
+  },
+  {
+    "id": 5,
+    "name": "Webcam",
+    "description": "1080p HD webcam with built-in microphone",
+    "price": 79.99,
+    "stockQuantity": 20
+  }
+]
