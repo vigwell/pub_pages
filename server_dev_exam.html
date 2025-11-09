@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# .NET Junior Developer Exam</title>
+    <style>
+        @media print {
+            body { margin: 0; padding: 20px; }
+            .page-break { page-break-before: always; }
+            @page { margin: 2cm; }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 25px;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 20px;
+        }
+        
+        .header-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .header-info p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        
+        .requirements {
+            background: #e8f5e9;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin: 15px 0;
+        }
+        
+        .bonus-section {
+            background: #fff3e0;
+            padding: 15px;
+            border-left: 4px solid #ff9800;
+            margin: 15px 0;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85em;
+        }
+        
+        pre code {
+            background: none;
+            color: #ecf0f1;
+            padding: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        table th {
+            background: #3498db;
+            color: white;
+        }
+        
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .note {
+            background: #fff9c4;
+            padding: 10px;
+            border-left: 4px solid #fbc02d;
+            margin: 15px 0;
+        }
+        
+        .candidate-info {
+            border: 2px solid #333;
+            padding: 15px;
+            margin: 20px 0;
+            background: #fafafa;
+        }
+        
+        .candidate-info p {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .candidate-info label {
+            font-weight: bold;
+            min-width: 150px;
+        }
+        
+        .candidate-info input {
+            flex: 1;
+            border: none;
+            border-bottom: 1px solid #333;
+            background: transparent;
+            padding: 5px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>C# .NET Junior Server-Side Developer Exam</h1>
+    <h2 style="margin-top: 0; color: #7f8c8d;">Web API Development Assessment</h2>
+    
+    <div class="candidate-info">
+        <p><label>Candidate Name:</label> <input type="text" /></p>
+        <p><label>Date:</label> <input type="text" /></p>
+        <p><label>Start Time:</label> <input type="text" /></p>
+        <p><label>End Time:</label> <input type="text" /></p>
+    </div>
+    
+    <div class="header-info">
+        <p>⏱️ Time Limit: 90 minutes</p>
+        <p>📊 Total Points: 100 (Question 1: 70 points, Bonus Questions: 15 points each)</p>
+        <p>✅ Passing Score: 60/100</p>
+    </div>
+
+    <h2>Prerequisites</h2>
+    <ul>
+        <li>Visual Studio 2022 or Visual Studio Code</li>
+        <li>.NET 6.0 or higher SDK installed</li>
+        <li>Basic understanding of C# and RESTful APIs</li>
+    </ul>
+
+    <h2>Exam Instructions</h2>
+    <p>Create a new ASP.NET Core Web API project that manages products. Your API should include two endpoints as specified below.</p>
+
+    <h3>Product Model</h3>
+    <p>Use the following product structure:</p>
+    <pre><code>public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public decimal Price { get; set; }
+    public int StockQuantity { get; set; }
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <h2>Question 1: JSON File Storage (70 points)</h2>
+
+    <h3>Task</h3>
+    <p>Create a Web API with two endpoints that store and retrieve products from a JSON file.</p>
+
+    <div class="requirements">
+        <h3>1.1 GET Endpoint - Get Product by ID (30 points)</h3>
+        <ul>
+            <li><strong>Route:</strong> <code>GET /api/products/{id}</code></li>
+            <li><strong>Functionality:</strong></li>
+            <ul>
+                <li>Read products from a JSON file named <code>products.json</code></li>
+                <li>Return the product with the matching ID</li>
+                <li>Return appropriate HTTP status codes:
+                    <ul>
+                        <li><code>200 OK</code> if product found</li>
+                        <li><code>404 Not Found</code> if product doesn't exist</li>
+                        <li><code>500 Internal Server Error</code> if file reading fails</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </div>
+
+    <div class="requirements">
+        <h3>1.2 POST Endpoint - Insert Product (40 points)</h3>
+        <ul>
+            <li><strong>Route:</strong> <code>POST /api/products</code></li>
+            <li><strong>Functionality:</strong></li>
+            <ul>
+                <li>Accept a product object in the request body</li>
+                <li>Read existing products from <code>products.json</code></li>
+                <li>Auto-generate the next available ID</li>
+                <li>Validate the product data (all fields required, price > 0, stock >= 0)</li>
+                <li>Add the new product to the list</li>
+                <li>Save the updated list back to <code>products.json</code></li>
+                <li>Return appropriate HTTP status codes:
+                    <ul>
+                        <li><code>201 Created</code> with the created product</li>
+                        <li><code>400 Bad Request</code> if validation fails</li>
+                        <li><code>500 Internal Server Error</code> if file operations fail</li>
+                    </ul>
+                </li>
+            </ul>
+        </ul>
+    </div>
+
+    <h3>Evaluation Criteria</h3>
+    <table>
+        <tr>
+            <th>Criteria</th>
+            <th>Points</th>
+        </tr>
+        <tr>
+            <td>Proper controller structure and routing</td>
+            <td>10</td>
+        </tr>
+        <tr>
+            <td>Correct file I/O operations with error handling</td>
+            <td>15</td>
+        </tr>
+        <tr>
+            <td>JSON serialization/deserialization</td>
+            <td>10</td>
+        </tr>
+        <tr>
+            <td>Input validation</td>
+            <td>10</td>
+        </tr>
+        <tr>
+            <td>Appropriate HTTP status codes and responses</td>
+            <td>15</td>
+        </tr>
+        <tr>
+            <td>Code organization and readability</td>
+            <td>10</td>
+        </tr>
+    </table>
+
+    <h3>Sample JSON File Format</h3>
+    <pre><code>[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 1200.00,
+    "stockQuantity": 10
+  },
+  {
+    "id": 2,
+    "name": "Mouse",
+    "description": "Wireless mouse",
+    "price": 25.99,
+    "stockQuantity": 50
+  }
+]</code></pre>
+
+    <div class="page-break"></div>
+
+    <h2>Bonus Questions (15 points each)</h2>
+    <p>Choose one or both bonus questions to demonstrate advanced skills:</p>
+
+    <div class="bonus-section">
+        <h3>Bonus Question 1: SQL Database Storage (15 points)</h3>
+        
+        <h4>Task</h4>
+        <p>Extend your API to also support SQL Server database storage.</p>
+        
+        <h4>Requirements</h4>
+        <p><strong>Database Setup:</strong></p>
+        <ul>
+            <li>Create a SQL Server database named <code>ProductsDB</code></li>
+            <li>Create a <code>Products</code> table with the following schema:</li>
+        </ul>
+        
+        <pre><code>CREATE TABLE Products (
+    Id INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(500),
+    Price DECIMAL(18,2) NOT NULL,
+    StockQuantity INT NOT NULL
+);</code></pre>
+
+        <p><strong>Implementation (Choose ONE approach):</strong></p>
+        <ul>
+            <li><strong>Option A:</strong> Entity Framework Core with DbContext</li>
+            <li><strong>Option B:</strong> ADO.NET with SqlConnection and parameterized queries</li>
+        </ul>
+
+        <p><strong>Endpoints:</strong></p>
+        <ul>
+            <li><code>GET /api/products/db/{id}</code> - Get product from database</li>
+            <li><code>POST /api/products/db</code> - Insert product to database</li>
+        </ul>
+
+        <h4>Evaluation Criteria</h4>
+        <ul>
+            <li>Database connection and configuration (3 points)</li>
+            <li>Correct data access implementation (5 points)</li>
+            <li>Error handling and resource disposal (3 points)</li>
+            <li>SQL injection prevention (2 points)</li>
+            <li>Code quality (2 points)</li>
+        </ul>
+    </div>
+
+    <div class="bonus-section">
+        <h3>Bonus Question 2: Object Property Inspector (15 points)</h3>
+        
+        <h4>Task</h4>
+        <p>Write a recursive function that prints all properties of an object (including nested objects) to <code>Debug.Log</code> or console.</p>
+        
+        <h4>Requirements</h4>
+        <ul>
+            <li><strong>Function signature:</strong> <code>void PrintObjectProperties(object obj, string indent = "")</code></li>
+            <li>Print each property in the format: <code>"Property Name": "Property Value"</code></li>
+            <li>Handle nested objects recursively</li>
+            <li>Handle collections (arrays, lists) appropriately</li>
+            <li>Handle null values gracefully</li>
+            <li>Use proper indentation to show object hierarchy</li>
+        </ul>
+
+        <h4>Example Input/Output</h4>
+        <p><strong>Given this class structure:</strong></p>
+        <pre><code>public class Address
+{
+    public string Street { get; set; }
+    public string City { get; set; }
+}
+
+public class Customer
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public Address Address { get; set; }
+}</code></pre>
+
+        <p><strong>Example object:</strong></p>
+        <pre><code>var customer = new Customer
+{
+    Id = 1,
+    Name = "John Doe",
+    Address = new Address
+    {
+        Street = "123 Main St",
+        City = "New York"
+    }
+};</code></pre>
+
+        <p><strong>Expected output:</strong></p>
+        <pre><code>Id: 1
+Name: John Doe
+Address:
+  Street: 123 Main St
+  City: New York</code></pre>
+
+        <h4>Evaluation Criteria</h4>
+        <ul>
+            <li>Correct use of reflection to get properties (4 points)</li>
+            <li>Recursive handling of nested objects (4 points)</li>
+            <li>Proper null checking and error handling (3 points)</li>
+            <li>Correct formatting and indentation (2 points)</li>
+            <li>Code clarity and comments (2 points)</li>
+        </ul>
+
+        <div class="note">
+            <strong>💡 Hint:</strong> You'll need to use <code>System.Reflection</code> namespace and the <code>GetType().GetProperties()</code> method.
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>Testing Guidelines</h2>
+
+    <h3>Test Cases to Verify</h3>
+    
+    <h4>GET Product by ID:</h4>
+    <ul>
+        <li>✅ Test with existing ID (should return 200)</li>
+        <li>✅ Test with non-existing ID (should return 404)</li>
+        <li>✅ Test with invalid ID format (should return 400)</li>
+    </ul>
+
+    <h4>POST Product:</h4>
+    <ul>
+        <li>✅ Test with valid product data (should return 201)</li>
+        <li>✅ Test with missing required fields (should return 400)</li>
+        <li>✅ Test with negative price (should return 400)</li>
+        <li>✅ Test with negative stock quantity (should return 400)</li>
+    </ul>
+
+    <h2>Submission Requirements</h2>
+    <ol>
+        <li><strong>Source Code:</strong>
+            <ul>
+                <li>Complete Visual Studio solution/project</li>
+                <li>Include <code>products.json</code> file with at least 2 sample products</li>
+            </ul>
+        </li>
+        <li><strong>Documentation:</strong>
+            <ul>
+                <li>Brief README with setup and running instructions</li>
+                <li>API endpoint documentation</li>
+                <li>Connection string instructions (if applicable)</li>
+            </ul>
+        </li>
+        <li><strong>Testing Evidence:</strong>
+            <ul>
+                <li>Screenshots or Postman/Swagger exports showing successful requests</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h2>Additional Considerations (Extra Credit)</h2>
+    <ul>
+        <li>Async/await implementation for I/O operations</li>
+        <li>Logging implementation</li>
+        <li>Unit tests for controller methods</li>
+        <li>Swagger/OpenAPI documentation</li>
+        <li>Dependency injection for data access layer</li>
+    </ul>
+
+    <h2>Evaluation Summary</h2>
+    <table>
+        <tr>
+            <th>Component</th>
+            <th>Points</th>
+        </tr>
+        <tr>
+            <td>GET Endpoint (JSON)</td>
+            <td>30</td>
+        </tr>
+        <tr>
+            <td>POST Endpoint (JSON)</td>
+            <td>40</td>
+        </tr>
+        <tr>
+            <td>Bonus Question 1: SQL Database</td>
+            <td>15 (Optional)</td>
+        </tr>
+        <tr>
+            <td>Bonus Question 2: Object Inspector</td>
+            <td>15 (Optional)</td>
+        </tr>
+        <tr>
+            <th>Total</th>
+            <th>100 + 30 Bonus</th>
+        </tr>
+    </table>
+
+    <div class="note">
+        <p><strong>Scoring Guide:</strong></p>
+        <ul>
+            <li>60-69 points: Pass</li>
+            <li>70-79 points: Good</li>
+            <li>80-89 points: Very Good</li>
+            <li>90+ points: Excellent</li>
+        </ul>
+    </div>
+
+    <h2>Important Notes</h2>
+    <ul>
+        <li>Focus on code quality and proper error handling</li>
+        <li>Comment your code where necessary</li>
+        <li>Use meaningful variable and method names</li>
+        <li>Follow C# naming conventions (PascalCase for public members, camelCase for private)</li>
+        <li>Ensure your application runs without errors</li>
+        <li>Test all functionality before submission</li>
+    </ul>
+
+    <div style="margin-top: 40px; border-top: 2px solid #333; padding-top: 20px;">
+        <p><strong>Examiner Notes / Score:</strong></p>
+        <div style="min-height: 100px; border: 1px solid #ccc; padding: 10px;"></div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Auto-fill date
+            const today = new Date().toLocaleDateString();
+            const dateInputs = document.querySelectorAll('input[type="text"]');
+            if (dateInputs.length > 1) {
+                dateInputs[1].value = today;
+            }
+        };
+        
+        // Print functionality
+        if (window.location.hash === '#print') {
+            window.print();
+        }
+    </script>
+</body>
+</html>
