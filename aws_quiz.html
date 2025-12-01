@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הכנה לראיון AWS - שאלות ותשובות</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #232F3E 0%, #FF9900 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #232F3E;
+            border-bottom: 3px solid #FF9900;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .qa-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-right: 4px solid #FF9900;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .qa-item:hover {
+            background: #e9ecef;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .question {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #232F3E;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .question::before {
+            content: "❓";
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+        
+        .answer {
+            color: #495057;
+            font-size: 1em;
+        }
+        
+        .answer ul {
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+        
+        .answer li {
+            margin-bottom: 8px;
+            line-height: 1.8;
+        }
+        
+        .category-header {
+            background: linear-gradient(135deg, #232F3E 0%, #FF9900 100%);
+            color: white;
+            padding: 15px 20px;
+            margin: -30px -30px 30px -30px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        
+        .search-box input:focus {
+            border-color: #FF9900;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .tabs, .search-box {
+                display: none;
+            }
+            
+            .section {
+                display: block !important;
+            }
+            
+            .qa-item {
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .tab {
+                padding: 12px 15px;
+                font-size: 0.9em;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 הכנה לראיון AWS</h1>
+            <p>שאלות ותשובות מקצועיות | CTO Interview Prep</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showSection('aws-basics')">ארכיטקטורה AWS</button>
+            <button class="tab" onclick="showSection('nimbus')">Nimbus וממשל</button>
+            <button class="tab" onclick="showSection('ai')">AI בסביבות רגישות</button>
+            <button class="tab" onclick="showSection('business')">שאלות עסקיות</button>
+        </div>
+        
+        <div class="content">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 חיפוש שאלה..." onkeyup="searchQuestions()">
+            </div>
+            
+            <!-- AWS Basics Section -->
+            <div id="aws-basics" class="section active">
+                <div class="category-header">ארכיטקטורה AWS - יסודות</div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מטפלים ב-High Availability ו-Disaster Recovery?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>ארכיטקטורה multi-AZ על 3 zones</li>
+                            <li>Auto-scaling groups</li>
+                            <li>Backup אוטומטי ל-S3 עם cross-region replication</li>
+                            <li>RTO: 4 שעות, RPO: 15 דקות</li>
+                            <li>Runbook מפורט לכל תרחיש כשל</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה הגישה שלכם ל-VPC Architecture בסביבות רגישות?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>הפרדה בין subnets פרטיים וציבוריים</li>
+                            <li>NAT gateways לתעבורה יוצאת</li>
+                            <li>Security Groups + NACLs בגישת least privilege</li>
+                            <li>VPC נפרד לכל סביבה (dev/staging/prod)</li>
+                            <li>VPC peering או Transit Gateway מבוקר</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מבטיחים אבטחת IAM?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>רק role-based access, אף פעם לא access keys קבועים</li>
+                            <li>MFA חובה לכל המשתמשים</li>
+                            <li>Session policies מוגבלים בזמן</li>
+                            <li>IAM Access Analyzer לזיהוי הרשאות מיותרות</li>
+                            <li>SCPs ו-permission boundaries בפרויקטים מסווגים</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה הניסיון שלכם עם AWS security services?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>GuardDuty - זיהוי איומים בזמן אמת</li>
+                            <li>Security Hub - ניהול מרוכז של ממצאי אבטחה</li>
+                            <li>CloudTrail + CloudWatch Logs Insights</li>
+                            <li>AWS Config - עמידה ברגולציות</li>
+                            <li>Macie - זיהוי PII ב-S3</li>
+                            <li>SNS alerts + אינטגרציה ל-PagerDuty</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מתכננים סקיילביליטי?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>ECS/EKS עם Fargate למיקרו-סרביסים</li>
+                            <li>Auto-scaling מבוסס metrics מותאמים (לא רק CPU)</li>
+                            <li>RDS/Aurora עם read replicas</li>
+                            <li>Application Load Balancer + target tracking policies</li>
+                            <li>דוגמה: משרד החינוך - 5000 concurrent users</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מטפלים ב-cost optimization?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Reserved instances לworkloads יציבים (חיסכון 40-60%)</li>
+                            <li>Spot instances לעיבודים batch</li>
+                            <li>Auto-scaling aggressive</li>
+                            <li>Cost Explorer + budgets + alerts</li>
+                            <li>Tagging מפורט לכל resource</li>
+                            <li>דוגמה: איכילוב - הורדת עלויות ב-35%</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">ניסיון עם containers ו-orchestration?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Docker לכל הסרביסים</li>
+                            <li>ECS עם Fargate או EKS</li>
+                            <li>Helm charts + Istio service mesh</li>
+                            <li>Prometheus monitoring</li>
+                            <li>CI/CD עם GitHub Actions</li>
+                            <li>Security scans עם Trivy</li>
+                            <li>דוגמה: Fireblocks - 15 microservices על EKS</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">Monitoring ו-observability?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>CloudWatch למetrics ו-logs</li>
+                            <li>X-Ray לdistributed tracing</li>
+                            <li>Dashboards מותאמים לכל מערכת</li>
+                            <li>Alerting מבוסס thresholds דינמיים</li>
+                            <li>Slack/PagerDuty integration</li>
+                            <li>Grafana + Prometheus בפרויקטים גדולים</li>
+                            <li>Retention: 90 יום</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מטפלים ב-secrets management?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>AWS Secrets Manager בלבד</li>
+                            <li>Rotation אוטומטי כל 30-90 יום</li>
+                            <li>גישה רק דרך IAM roles (least privilege)</li>
+                            <li>כל קריאה נרשמת ב-CloudTrail</li>
+                            <li>CI/CD integration דרך task roles</li>
+                            <li>Approval workflow בפרויקטים sensitive</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Nimbus Section -->
+            <div id="nimbus" class="section">
+                <div class="category-header">ספציפי ל-Nimbus והממשל</div>
+                
+                <div class="qa-item">
+                    <div class="question">מה הניסיון שלכם עם IL regions?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>ניסיון מספר שנים עם Azure IL באלביט</li>
+                            <li>הכרת המגבלות של אזורים ממשלתיים</li>
+                            <li>מתודולוגיית "design for constraints"</li>
+                            <li>תכנון ארכיטקטורה סביב הגבלות ממשלתיות</li>
+                            <li>למעלה מ-100 עובדים עם סיווג ביטחוני רמה 3</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מתמודדים עם data residency?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>כל הנתונים בגבולות הגיאוגרפיים המוגדרים</li>
+                            <li>אין backups/logs/metadata שיוצאים מהאזור</li>
+                            <li>Bucket policies + VPC endpoints למניעת תעבורה חוצת גבולות</li>
+                            <li>Data classification עם tagging אוטומטי</li>
+                            <li>DLP policies למניעת העתקה לא מורשית</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה הגישה שלכם ל-audit trails?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>CloudTrail בכל החשבונות</li>
+                            <li>Immutable logging ל-S3 עם object lock</li>
+                            <li>שמירה: 7 שנים מינימום</li>
+                            <li>AWS Config Rules לcompliance אוטומטי</li>
+                            <li>Security Hub + CIS AWS Foundations benchmark</li>
+                            <li>SIEM integration (Splunk בפרויקטים גדולים)</li>
+                            <li>Dashboards בזמן אמת</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מטפלים ב-encryption?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>At rest: RDS/S3/EBS עם KMS</li>
+                            <li>In transit: TLS 1.3 מינימום</li>
+                            <li>Certificate management דרך ACM</li>
+                            <li>Key rotation אוטומטי כל 90 יום</li>
+                            <li>Key policies מוגבלים לפי role</li>
+                            <li>CloudHSM בפרויקטים עם FIPS 140-2 Level 3</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">ניסיון עם תקני אבטחה (ISO 27001)?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>אלעד מחזיקה ב-ISO 27001 + ISMS מלא</li>
+                            <li>Risk assessments לכל פרויקט</li>
+                            <li>Incident response procedures</li>
+                            <li>Change management מבוקר</li>
+                            <li>Security review לפני production</li>
+                            <li>Penetration testing תקופתי</li>
+                            <li>אישורים מרשם האוכלוסין לפרויקטים ממשלתיים</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מוודאים עמידה בדרישות Nimbus?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Security by design מההתחלה</li>
+                            <li>Checklist מפורט לדרישות ממשלתיות</li>
+                            <li>100+ עובדים עם סיווג ביטחוני רמה 3</li>
+                            <li>Security review בכל שלב</li>
+                            <li>תהליך אישור מול גורמי אבטחה לפני production</li>
+                            <li>Penetration testing עם חברות מוסמכות</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Section -->
+            <div id="ai" class="section">
+                <div class="category-header">AI בסביבות רגישות</div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מונעים data leakage?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>רק managed services: Bedrock/Azure OpenAI/Vertex AI</li>
+                            <li>הנתונים לא משמשים לאימון</li>
+                            <li>Data sanitization pipeline להסרת PII</li>
+                            <li>Guardrails APIs לפילטור תשובות</li>
+                            <li>דוגמה: איכילוב - de-identification אוטומטי</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה האסטרטגיה ל-model governance?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Model registry מרוכז</li>
+                            <li>Version control מלא + metadata</li>
+                            <li>Prompt versions ב-Git</li>
+                            <li>CI/CD pipeline עם accuracy testing</li>
+                            <li>A/B testing בייצור</li>
+                            <li>3 סביבות עם promotion process מבוקר</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מודדים accuracy?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>KPIs ברורים: accuracy rate, precision/recall, latency</li>
+                            <li>Monitoring בזמן אמת (CloudWatch)</li>
+                            <li>Human-in-the-loop validation לתשובות קריטיות</li>
+                            <li>השוואה ל-ground truth sample שבועי</li>
+                            <li>דוגמה: בר-אילן - WER (Word Error Rate) tracking</li>
+                            <li>Alerts על סטיות משמעותיות</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מטפלים בהלוסינציות?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>RAG עם retrieval מדויק מבסיס ידע מאומת</li>
+                            <li>Prompt engineering + ציטוט מקורות</li>
+                            <li>Confidence scoring</li>
+                            <li>Validation rules לconsistency</li>
+                            <li>פילטרים לתשובות חריגות</li>
+                            <li>Rule-based verification בהחלטות קריטיות</li>
+                            <li>Human review בסביבות קריטיות</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מטפלים ב-PII?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Data classification אוטומטית (Comprehend/Macie)</li>
+                            <li>Tokenization או masking לפני עיבוד</li>
+                            <li>Encryption ב-KMS + access logs</li>
+                            <li>דוגמה: איכילוב - hashing חד-כיווני לשמות ות"ז</li>
+                            <li>DLP policies ברמת הרשת</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">למה בחרתם במודלים שונים?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Claude: long context + reasoning מורכב → ניתוח מסמכים</li>
+                            <li>GPT-4: structured output → JSON מדויק</li>
+                            <li>Gemini: אינטגרציה עם GCP + מהיר → תמלול</li>
+                            <li>Abstraction layer להחלפה בין מודלים</li>
+                            <li>בחירה לפי cost/performance/latency</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">ניסיון עם fine-tuning?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>רוב הפרויקטים: foundation models + prompt engineering + RAG</li>
+                            <li>דוגמה ל-fine-tuning: SageMaker - מודל NER רפואי</li>
+                            <li>גישה: התחלה עם zero/few-shot → fine-tuning אם נדרש</li>
+                            <li>Custom models רק עם data מספיק + דרישות ייחודיות</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה היקף הנתונים שאתם מעבדים?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>איכילוב: 500 טפסים/יום, peak 1000</li>
+                            <li>Fireblocks: 300+ עובדים, 2000 שאלות/יום</li>
+                            <li>בר-אילן: 50-80 שעות הקלטות/שבוע</li>
+                            <li>מערכת גבייה: 200 אינטראקציות/יום</li>
+                            <li>כל המערכות: built to scale פי 10</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Business Section -->
+            <div id="business" class="section">
+                <div class="category-header">שאלות עסקיות ופרקטיות</div>
+                
+                <div class="qa-item">
+                    <div class="question">מה המתודולוגיה שלכם?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Agile עם sprints של שבועיים</li>
+                            <li>Stand-ups יומיים + retrospectives</li>
+                            <li>DevOps culture עם CI/CD מלא</li>
+                            <li>Infrastructure as Code (Terraform)</li>
+                            <li>Change management + security reviews בפרויקטים ממשלתיים</li>
+                            <li>Jira + Confluence</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מהו team size טיפוסי?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>צוות בסיסי: 5-8 אנשים</li>
+                            <li>Tech lead + 2-3 senior developers</li>
+                            <li>DevOps engineer + QA engineer</li>
+                            <li>Solution architect (50% involvement)</li>
+                            <li>הרחבה לפי צורך: data engineer, security engineer, UX</li>
+                            <li>דוגמה: איכילוב - 6 אנשים, 8 חודשים</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה ה-SLA שלכם?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Uptime: 99.9%</li>
+                            <li>Response time: <1 שעה ל-P1, <4 שעות ל-P2</li>
+                            <li>On-call 24/7 עם אסקלציה אוטומטית</li>
+                            <li>RTO: 4 שעות, RPO: 15 דקות</li>
+                            <li>Monitoring + alerting מתקדמים</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך נראה knowledge transfer?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>תיעוד טכני מלא (architecture, runbooks, API docs)</li>
+                            <li>2-3 הדרכות hands-on</li>
+                            <li>Hypercare: חודש עם תמיכה צמודה</li>
+                            <li>קוד ב-Git עם README מפורט</li>
+                            <li>Video recordings של הדרכות</li>
+                            <li>זמינות מתמשכת לשאלות</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מה עולה פרויקט?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>POC קטן: 200-300K ₪ (2-3 חודשים)</li>
+                            <li>פרויקט בינוני: 800K-1.5M ₪ (6-9 חודשים)</li>
+                            <li>פרויקט גדול: 3-5M ₪ (שנה)</li>
+                            <li>Time & Material עם cap או Fixed Price</li>
+                            <li>גמישות במודל התמחור</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">מהו timeline ריאלי?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>POC: 6-8 שבועות</li>
+                            <li>MVP: 3-4 חודשים</li>
+                            <li>פתרון מלא: 6-9 חודשים</li>
+                            <li>Breakdown: discovery (חודש) → פיתוח (2-3) → testing (חודש) → deployment (2-3 שבועות)</li>
+                            <li>פרויקטים ממשלתיים: +20-30% לאישורים</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="qa-item">
+                    <div class="question">איך אתם מתמודדים עם שינויים בדרישות?</div>
+                    <div class="answer">
+                        <ul>
+                            <li>Agile מאפשר שינוי priorities כל sprint</li>
+                            <li>Change management process מובנה</li>
+                            <li>Impact analysis: זמן, עלות, scope</li>
+                            <li>שינויים קטנים → sprint הקרוב</li>
+                            <li>שינויים גדולים → re-planning</li>
+                            <li>Transparency מלאה עם הלקוח</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        function searchQuestions() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const qaItems = document.querySelectorAll('.qa-item');
+            
+            qaItems.forEach(item => {
+                const question = item.querySelector('.question').textContent.toLowerCase();
+                const answer = item.querySelector('.answer').textContent.toLowerCase();
+                
+                if (question.includes(filter) || answer.includes(filter)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
