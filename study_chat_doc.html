@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Chat API - UI Integration Guide</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: #f5f7fa; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 40px 20px; margin-bottom: 30px; border-radius: 12px; }
+    header h1 { font-size: 2.2em; margin-bottom: 10px; }
+    header p { opacity: 0.9; font-size: 1.1em; }
+    .version-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85em; margin-top: 10px; }
+    section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    h2 { color: #1e3a5f; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; font-size: 1.5em; }
+    h3 { color: #2d5a87; margin: 20px 0 15px 0; font-size: 1.2em; }
+    h4 { color: #34495e; margin: 15px 0 10px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.95em; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: #f8f9fa; color: #1e3a5f; font-weight: 600; }
+    tr:hover { background: #f8f9fa; }
+    .enum-value { display: inline-block; background: #3498db; color: white; padding: 2px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9em; }
+    .endpoint-card { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #3498db; }
+    .endpoint-card h4 { margin-top: 0; color: #1e3a5f; }
+    .method { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 0.85em; margin-right: 10px; }
+    .method-post { background: #27ae60; color: white; }
+    .endpoint-url { font-family: 'Courier New', monospace; background: #2c3e50; color: #2ecc71; padding: 4px 10px; border-radius: 4px; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 0.9em; line-height: 1.5; margin: 15px 0; }
+    .json-key { color: #9cdcfe; }
+    .json-string { color: #ce9178; }
+    .json-number { color: #b5cea8; }
+    .json-bool { color: #569cd6; }
+    .json-null { color: #569cd6; }
+    code { font-family: 'Courier New', monospace; background: #e8e8e8; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+    .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 0 8px 8px 0; margin: 15px 0; }
+    .note-info { background: #d1ecf1; border-left-color: #17a2b8; }
+    .note-warning { background: #f8d7da; border-left-color: #dc3545; }
+    .note-success { background: #d4edda; border-left-color: #28a745; }
+    .toc { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+    .toc ul { list-style: none; }
+    .toc li { padding: 5px 0; }
+    .toc a { color: #3498db; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .status-code { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .status-200 { background: #d4edda; color: #155724; }
+    .status-400 { background: #fff3cd; color: #856404; }
+    .status-500 { background: #f8d7da; color: #721c24; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; }
+    .badge-required { background: #dc3545; color: white; }
+    .badge-optional { background: #6c757d; color: white; }
+    @media print { body { background: white; } section { box-shadow: none; border: 1px solid #ddd; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📋 Study Chat API</h1>
+      <p>UI Integration Guide for Frontend Developers</p>
+      <span class="version-badge">Version 1.0 | January 2026</span>
+    </header>
+
+    <!-- Table of Contents -->
+    <section class="toc">
+      <h2>📑 Table of Contents</h2>
+      <ul>
+        <li><a href="#overview">1. Overview</a></li>
+        <li><a href="#authentication">2. Authentication</a></li>
+        <li><a href="#catalogs">3. Catalog Values (Enums)</a></li>
+        <li><a href="#endpoints">4. API Endpoints</a></li>
+        <li><a href="#errors">5. Error Handling</a></li>
+        <li><a href="#ui-guidelines">6. UI Implementation Guidelines</a></li>
+        <li><a href="#best-practices">7. Best Practices</a></li>
+      </ul>
+    </section>
+
+    <!-- Overview -->
+    <section id="overview">
+      <h2>1. Overview</h2>
+      <p>The Study Chat API enables real-time messaging functionality within medical studies. It supports:</p>
+      <div class="grid-2" style="margin-top: 20px;">
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px;">
+          <strong>💬 Threaded Conversations</strong><br>
+          <small>Reply to specific messages with parent reference</small>
+        </div>
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px;">
+          <strong>👁️ Visibility Controls</strong><br>
+          <small>Control who sees messages (All/Clinic/Radiologist)</small>
+        </div>
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px;">
+          <strong>⚡ Priority Levels</strong><br>
+          <small>Normal and Urgent message priorities</small>
+        </div>
+        <div style="background: #e8f4fd; padding: 15px; border-radius: 8px;">
+          <strong>⏰ Response Tracking</strong><br>
+          <small>Deadlines, escalation, and status tracking</small>
+        </div>
+      </div>
+
+      <h3>Base URLs</h3>
+      <table>
+        <tr><th>Environment</th><th>URL</th></tr>
+        <tr><td>Production</td><td><code>https://api.pulse.com/api/StudyChat</code></td></tr>
+        <tr><td>Development</td><td><code>https://dev-api.pulse.com/api/StudyChat</code></td></tr>
+      </table>
+
+      <h3>Available Endpoints</h3>
+      <table>
+        <tr><th>Endpoint</th><th>Description</th></tr>
+        <tr><td><code>POST /CreateMessage</code></td><td>Create a new message (auto-creates chat if needed)</td></tr>
+        <tr><td><code>POST /ReplyMessage</code></td><td>Reply to an existing message</td></tr>
+        <tr><td><code>POST /GetMessages</code></td><td>Get all messages for a study</td></tr>
+        <tr><td><code>POST /DeleteMessage</code></td><td>Soft delete a message</td></tr>
+        <tr><td><code>POST /GetPendingResponses</code></td><td>Get messages awaiting your response</td></tr>
+      </table>
+    </section>
+
+    <!-- Authentication -->
+    <section id="authentication">
+      <h2>2. Authentication</h2>
+      <p>All requests require a valid JWT token in the Authorization header:</p>
+      <pre>Authorization: Bearer &lt;your-jwt-token&gt;</pre>
+      
+      <div class="note note-success">
+        <strong>✅ User ID Auto-Extraction:</strong> The <code>userID</code> is automatically extracted from the JWT token on the server side. You do NOT need to pass it in the request body.
+      </div>
+
+      <h3>Example Request Headers</h3>
+      <pre>{
+  <span class="json-key">"Content-Type"</span>: <span class="json-string">"application/json"</span>,
+  <span class="json-key">"Authorization"</span>: <span class="json-string">"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>
+}</pre>
+    </section>
+
+    <!-- Catalog Values -->
+    <section id="catalogs">
+      <h2>3. Catalog Values (Enums)</h2>
+      <p>These are the predefined values used across the API. Use the numeric values in your requests.</p>
+
+      <h3>3.1 Message Visibility</h3>
+      <p>Controls who can see the message:</p>
+      <table>
+        <tr><th>Value</th><th>Name</th><th>Description</th><th>Use Case</th></tr>
+        <tr>
+          <td><span class="enum-value">0</span></td>
+          <td>All</td>
+          <td>Visible to everyone</td>
+          <td>General study discussions</td>
+        </tr>
+        <tr>
+          <td><span class="enum-value">1</span></td>
+          <td>ClinicOnly</td>
+          <td>Visible only to clinic staff</td>
+          <td>Internal clinic notes</td>
+        </tr>
+        <tr>
+          <td><span class="enum-value">2</span></td>
+          <td>RadiologistOnly</td>
+          <td>Visible only to radiologists</td>
+          <td>Technical radiologist discussions</td>
+        </tr>
+      </table>
+
+      <h3>3.2 Message Type</h3>
+      <p>Defines if a response is required:</p>
+      <table>
+        <tr><th>Value</th><th>Name</th><th>Description</th><th>Behavior</th></tr>
+        <tr>
+          <td><span class="enum-value">0</span></td>
+          <td>Regular</td>
+          <td>Standard message</td>
+          <td>No response tracking</td>
+        </tr>
+        <tr>
+          <td><span class="enum-value">1</span></td>
+          <td>ResponseRequired</td>
+          <td>Requires a response</td>
+          <td>Creates deadline, tracks status, can escalate</td>
+        </tr>
+      </table>
+
+      <h3>3.3 Message Priority</h3>
+      <p>Sets urgency level (affects response deadline):</p>
+      <table>
+        <tr><th>Value</th><th>Name</th><th>Default Deadline</th><th>UI Styling</th></tr>
+        <tr>
+          <td><span class="enum-value">0</span></td>
+          <td>Normal</td>
+          <td>24 hours</td>
+          <td>Standard appearance</td>
+        </tr>
+        <tr>
+          <td><span class="enum-value">1</span></td>
+          <td>Urgent</td>
+          <td>4 hours</td>
+          <td>⚠️ Highlight with red/orange indicator</td>
+        </tr>
+      </table>
+
+      <h3>3.4 Response Status</h3>
+      <p>Tracks response state (system-managed, read-only):</p>
+      <table>
+        <tr><th>Value</th><th>Name</th><th>Description</th><th>UI Badge</th></tr>
+        <tr>
+          <td><span class="enum-value">0</span></td>
+          <td>None</td>
+          <td>No response tracking</td>
+          <td>No badge</td>
+        </tr>
+        <tr>
+          <td><span class="enum-value">1</span></td>
+          <td>Pending</td>
+          <td>Awaiting response</td>
+          <td><span class="badge" style="background:#ffc107;color:#000;">⏳ Pending</span></td>
+        </tr>
+        <tr>
+          <td><span class="enum-value">2</span></td>
+          <td>Responded</td>
+          <td>Response received</td>
+          <td><span class="badge" style="background:#28a745;color:#fff;">✓ Responded</span></td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- API Endpoints -->
+    <section id="endpoints">
+      <h2>4. API Endpoints</h2>
+
+      <!-- Create Message -->
+      <div class="endpoint-card">
+        <h4><span class="method method-post">POST</span> <span class="endpoint-url">/CreateMessage</span></h4>
+        <p>Creates a new message in a study chat. If the chat doesn't exist, it will be automatically created.</p>
+        
+        <h4>Request Parameters</h4>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td>studyId</td><td>GUID</td><td><span class="badge badge-required">Required</span></td><td>Study identifier (GUID)</td></tr>
+          <tr><td>content</td><td>string</td><td><span class="badge badge-required">Required</span></td><td>Message text content</td></tr>
+          <tr><td>visibility</td><td>int</td><td><span class="badge badge-required">Required</span></td><td>0=All, 1=ClinicOnly, 2=RadiologistOnly</td></tr>
+          <tr><td>messageType</td><td>int</td><td><span class="badge badge-required">Required</span></td><td>0=Regular, 1=ResponseRequired</td></tr>
+          <tr><td>priority</td><td>int</td><td><span class="badge badge-required">Required</span></td><td>0=Normal, 1=Urgent</td></tr>
+        </table>
+
+        <h4>Example: Regular Message</h4>
+        <pre>{
+  <span class="json-key">"studyId"</span>: <span class="json-string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+  <span class="json-key">"content"</span>: <span class="json-string">"Patient history has been updated with new information."</span>,
+  <span class="json-key">"visibility"</span>: <span class="json-number">0</span>,
+  <span class="json-key">"messageType"</span>: <span class="json-number">0</span>,
+  <span class="json-key">"priority"</span>: <span class="json-number">0</span>
+}</pre>
+
+        <h4>Example: Urgent Response Required (Radiologist Only)</h4>
+        <pre>{
+  <span class="json-key">"studyId"</span>: <span class="json-string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+  <span class="json-key">"content"</span>: <span class="json-string">"Please review chest X-ray findings urgently. Abnormal shadows detected."</span>,
+  <span class="json-key">"visibility"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"messageType"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"priority"</span>: <span class="json-number">1</span>
+}</pre>
+
+        <h4>Response</h4>
+        <pre>{
+  <span class="json-key">"success"</span>: <span class="json-bool">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Message created successfully"</span>,
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"messageId"</span>: <span class="json-string">"new-message-guid"</span>,
+    <span class="json-key">"chatId"</span>: <span class="json-string">"chat-guid"</span>,
+    <span class="json-key">"studyId"</span>: <span class="json-string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+    <span class="json-key">"fromUserId"</span>: <span class="json-string">"user-guid-from-token"</span>,
+    <span class="json-key">"content"</span>: <span class="json-string">"Please review chest X-ray findings urgently."</span>,
+    <span class="json-key">"visibility"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"messageType"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"priority"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"responseStatus"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"responseDeadline"</span>: <span class="json-string">"2024-01-15T18:30:00Z"</span>,
+    <span class="json-key">"respondedAt"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"respondedByUserId"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"escalatedAt"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T14:30:00Z"</span>
+  }
+}</pre>
+      </div>
+
+      <!-- Reply Message -->
+      <div class="endpoint-card">
+        <h4><span class="method method-post">POST</span> <span class="endpoint-url">/ReplyMessage</span></h4>
+        <p>Reply to an existing message, creating a threaded conversation.</p>
+        
+        <h4>Request Parameters</h4>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td>parentMessageId</td><td>GUID</td><td><span class="badge badge-required">Required</span></td><td>The message ID to reply to</td></tr>
+          <tr><td>content</td><td>string</td><td><span class="badge badge-required">Required</span></td><td>Reply message text</td></tr>
+          <tr><td>visibility</td><td>int</td><td><span class="badge badge-required">Required</span></td><td>0=All, 1=ClinicOnly, 2=RadiologistOnly</td></tr>
+          <tr><td>messageType</td><td>int</td><td><span class="badge badge-required">Required</span></td><td>0=Regular, 1=ResponseRequired</td></tr>
+          <tr><td>priority</td><td>int</td><td><span class="badge badge-required">Required</span></td><td>0=Normal, 1=Urgent</td></tr>
+        </table>
+
+        <h4>Request Example</h4>
+        <pre>{
+  <span class="json-key">"parentMessageId"</span>: <span class="json-string">"original-message-guid-to-reply-to"</span>,
+  <span class="json-key">"content"</span>: <span class="json-string">"Reviewed. The shadows appear to be artifact. Recommend repeat imaging."</span>,
+  <span class="json-key">"visibility"</span>: <span class="json-number">0</span>,
+  <span class="json-key">"messageType"</span>: <span class="json-number">0</span>,
+  <span class="json-key">"priority"</span>: <span class="json-number">0</span>
+}</pre>
+
+        <h4>Response</h4>
+        <pre>{
+  <span class="json-key">"success"</span>: <span class="json-bool">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Reply created successfully"</span>,
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"messageId"</span>: <span class="json-string">"new-reply-message-guid"</span>,
+    <span class="json-key">"chatId"</span>: <span class="json-string">"chat-guid"</span>,
+    <span class="json-key">"studyId"</span>: <span class="json-string">"study-guid"</span>,
+    <span class="json-key">"parentMessageId"</span>: <span class="json-string">"original-message-guid-to-reply-to"</span>,
+    <span class="json-key">"fromUserId"</span>: <span class="json-string">"user-guid-from-token"</span>,
+    <span class="json-key">"content"</span>: <span class="json-string">"Reviewed. The shadows appear to be artifact. Recommend repeat imaging."</span>,
+    <span class="json-key">"visibility"</span>: <span class="json-number">0</span>,
+    <span class="json-key">"messageType"</span>: <span class="json-number">0</span>,
+    <span class="json-key">"priority"</span>: <span class="json-number">0</span>,
+    <span class="json-key">"responseStatus"</span>: <span class="json-number">0</span>,
+    <span class="json-key">"responseDeadline"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"respondedAt"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"respondedByUserId"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"escalatedAt"</span>: <span class="json-null">null</span>,
+    <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T15:00:00Z"</span>,
+    <span class="json-key">"parentMessage"</span>: {
+      <span class="json-key">"messageId"</span>: <span class="json-string">"original-message-guid-to-reply-to"</span>,
+      <span class="json-key">"fromUserId"</span>: <span class="json-string">"original-sender-guid"</span>,
+      <span class="json-key">"content"</span>: <span class="json-string">"Please review chest X-ray findings urgently."</span>,
+      <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T14:30:00Z"</span>
+    }
+  }
+}</pre>
+        
+        <div class="note note-info">
+          <strong>ℹ️ Auto-Response Tracking:</strong> When replying to a message that has <code>responseStatus = 1</code> (Pending), the parent message will automatically be marked as <code>responseStatus = 2</code> (Responded).
+        </div>
+      </div>
+
+      <!-- Get Messages -->
+      <div class="endpoint-card">
+        <h4><span class="method method-post">POST</span> <span class="endpoint-url">/GetMessages</span></h4>
+        <p>Retrieves all messages for a study. Messages are automatically filtered based on user's visibility permissions.</p>
+        
+        <h4>Request Parameters</h4>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td>studyId</td><td>GUID</td><td><span class="badge badge-required">Required</span></td><td>Study identifier</td></tr>
+        </table>
+
+        <h4>Request</h4>
+        <pre>{
+  <span class="json-key">"studyId"</span>: <span class="json-string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>
+}</pre>
+
+        <h4>Response</h4>
+        <pre>{
+  <span class="json-key">"success"</span>: <span class="json-bool">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Messages retrieved successfully"</span>,
+  <span class="json-key">"data"</span>: [
+    {
+      <span class="json-key">"messageId"</span>: <span class="json-string">"msg-001-guid"</span>,
+      <span class="json-key">"chatId"</span>: <span class="json-string">"chat-guid"</span>,
+      <span class="json-key">"studyId"</span>: <span class="json-string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+      <span class="json-key">"fromUserId"</span>: <span class="json-string">"user-a-guid"</span>,
+      <span class="json-key">"content"</span>: <span class="json-string">"Please clarify the patient's medication history."</span>,
+      <span class="json-key">"visibility"</span>: <span class="json-number">0</span>,
+      <span class="json-key">"messageType"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"priority"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"responseStatus"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"responseDeadline"</span>: <span class="json-string">"2024-01-15T14:30:00Z"</span>,
+      <span class="json-key">"respondedAt"</span>: <span class="json-string">"2024-01-15T12:45:00Z"</span>,
+      <span class="json-key">"respondedByUserId"</span>: <span class="json-string">"user-b-guid"</span>,
+      <span class="json-key">"escalatedAt"</span>: <span class="json-null">null</span>,
+      <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T10:30:00Z"</span>,
+      <span class="json-key">"parentMessage"</span>: <span class="json-null">null</span>
+    },
+    {
+      <span class="json-key">"messageId"</span>: <span class="json-string">"msg-002-guid"</span>,
+      <span class="json-key">"chatId"</span>: <span class="json-string">"chat-guid"</span>,
+      <span class="json-key">"studyId"</span>: <span class="json-string">"a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+      <span class="json-key">"fromUserId"</span>: <span class="json-string">"user-b-guid"</span>,
+      <span class="json-key">"content"</span>: <span class="json-string">"Patient is on Metformin 500mg twice daily."</span>,
+      <span class="json-key">"visibility"</span>: <span class="json-number">0</span>,
+      <span class="json-key">"messageType"</span>: <span class="json-number">0</span>,
+      <span class="json-key">"priority"</span>: <span class="json-number">0</span>,
+      <span class="json-key">"responseStatus"</span>: <span class="json-number">0</span>,
+      <span class="json-key">"responseDeadline"</span>: <span class="json-null">null</span>,
+      <span class="json-key">"respondedAt"</span>: <span class="json-null">null</span>,
+      <span class="json-key">"respondedByUserId"</span>: <span class="json-null">null</span>,
+      <span class="json-key">"escalatedAt"</span>: <span class="json-null">null</span>,
+      <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T12:45:00Z"</span>,
+      <span class="json-key">"parentMessage"</span>: {
+        <span class="json-key">"messageId"</span>: <span class="json-string">"msg-001-guid"</span>,
+        <span class="json-key">"fromUserId"</span>: <span class="json-string">"user-a-guid"</span>,
+        <span class="json-key">"content"</span>: <span class="json-string">"Please clarify the patient's medication history."</span>,
+        <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T10:30:00Z"</span>
+      }
+    }
+  ]
+}</pre>
+
+        <div class="note note-info">
+          <strong>ℹ️ Visibility Filtering:</strong> The API automatically filters messages based on the user's role. Clinic staff won't see <code>visibility = 2</code> (RadiologistOnly) messages, and radiologists won't see <code>visibility = 1</code> (ClinicOnly) messages.
+        </div>
+      </div>
+
+      <!-- Delete Message -->
+      <div class="endpoint-card">
+        <h4><span class="method method-post">POST</span> <span class="endpoint-url">/DeleteMessage</span></h4>
+        <p>Soft-deletes a message. Only the message sender can delete their own messages.</p>
+        
+        <h4>Request Parameters</h4>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td>messageId</td><td>GUID</td><td><span class="badge badge-required">Required</span></td><td>Message ID to delete</td></tr>
+        </table>
+
+        <h4>Request</h4>
+        <pre>{
+  <span class="json-key">"messageId"</span>: <span class="json-string">"msg-001-guid"</span>
+}</pre>
+
+        <h4>Response</h4>
+        <pre>{
+  <span class="json-key">"success"</span>: <span class="json-bool">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Message deleted successfully"</span>,
+  <span class="json-key">"data"</span>: <span class="json-bool">true</span>
+}</pre>
+
+        <div class="note note-warning">
+          <strong>⚠️ Permission Check:</strong> Users can only delete their own messages. Attempting to delete another user's message will return a 403 Forbidden error.
+        </div>
+      </div>
+
+      <!-- Get Pending Responses -->
+      <div class="endpoint-card">
+        <h4><span class="method method-post">POST</span> <span class="endpoint-url">/GetPendingResponses</span></h4>
+        <p>Retrieves all messages awaiting response from the current user. Use this for notification badges and task lists.</p>
+        
+        <h4>Request</h4>
+        <pre>{
+  <span class="json-comment">// No parameters needed - user is identified from token</span>
+}</pre>
+        <p><em>Note: Send an empty JSON object <code>{}</code> or omit the body entirely.</em></p>
+
+        <h4>Response</h4>
+        <pre>{
+  <span class="json-key">"success"</span>: <span class="json-bool">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Pending responses retrieved successfully"</span>,
+  <span class="json-key">"data"</span>: [
+    {
+      <span class="json-key">"messageId"</span>: <span class="json-string">"msg-pending-001"</span>,
+      <span class="json-key">"chatId"</span>: <span class="json-string">"chat-guid"</span>,
+      <span class="json-key">"studyId"</span>: <span class="json-string">"study-guid-001"</span>,
+      <span class="json-key">"fromUserId"</span>: <span class="json-string">"requester-guid"</span>,
+      <span class="json-key">"content"</span>: <span class="json-string">"Please confirm the diagnosis."</span>,
+      <span class="json-key">"priority"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"responseDeadline"</span>: <span class="json-string">"2024-01-15T18:00:00Z"</span>,
+      <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T14:00:00Z"</span>,
+      <span class="json-key">"isOverdue"</span>: <span class="json-bool">false</span>
+    },
+    {
+      <span class="json-key">"messageId"</span>: <span class="json-string">"msg-pending-002"</span>,
+      <span class="json-key">"chatId"</span>: <span class="json-string">"chat-guid-2"</span>,
+      <span class="json-key">"studyId"</span>: <span class="json-string">"study-guid-002"</span>,
+      <span class="json-key">"fromUserId"</span>: <span class="json-string">"another-user-guid"</span>,
+      <span class="json-key">"content"</span>: <span class="json-string">"Urgent: Need second opinion on MRI results."</span>,
+      <span class="json-key">"priority"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"responseDeadline"</span>: <span class="json-string">"2024-01-15T12:00:00Z"</span>,
+      <span class="json-key">"createdAt"</span>: <span class="json-string">"2024-01-15T08:00:00Z"</span>,
+      <span class="json-key">"isOverdue"</span>: <span class="json-bool">true</span>
+    }
+  ]
+}</pre>
+
+        <div class="note note-info">
+          <strong>ℹ️ isOverdue Flag:</strong> The <code>isOverdue</code> field is calculated server-side. Use it to highlight overdue items in red in your UI.
+        </div>
+      </div>
+    </section>
+
+    <!-- Error Handling -->
+    <section id="errors">
+      <h2>5. Error Handling</h2>
+      <p>All endpoints return a consistent error format:</p>
+      
+      <pre>{
+  <span class="json-key">"success"</span>: <span class="json-bool">false</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Error description here"</span>,
+  <span class="json-key">"data"</span>: <span class="json-null">null</span>,
+  <span class="json-key">"errors"</span>: [
+    <span class="json-string">"Detailed error message 1"</span>,
+    <span class="json-string">"Detailed error message 2"</span>
+  ]
+}</pre>
+
+      <h3>HTTP Status Codes</h3>
+      <table>
+        <tr><th>Code</th><th>Status</th><th>Description</th></tr>
+        <tr><td><span class="status-code status-200">200</span></td><td>OK</td><td>Request successful</td></tr>
+        <tr><td><span class="status-code status-400">400</span></td><td>Bad Request</td><td>Invalid input or validation error</td></tr>
+        <tr><td><span class="status-code status-400">401</span></td><td>Unauthorized</td><td>Invalid or missing JWT token</td></tr>
+        <tr><td><span class="status-code status-400">403</span></td><td>Forbidden</td><td>No permission (e.g., deleting another user's message)</td></tr>
+        <tr><td><span class="status-code status-400">404</span></td><td>Not Found</td><td>Study, chat, or message doesn't exist</td></tr>
+        <tr><td><span class="status-code status-500">500</span></td><td>Server Error</td><td>Internal server error</td></tr>
+      </table>
+    </section>
+
+    <!-- UI Guidelines -->
+    <section id="ui-guidelines">
+      <h2>6. UI Implementation Guidelines</h2>
+
+      <h3>6.1 Message Display Logic</h3>
+      <pre><span style="color:#569cd6;">function</span> <span style="color:#dcdcaa;">getMessageStyle</span>(message) {
+  <span style="color:#569cd6;">const</span> styles = {
+    container: <span class="json-string">'message-base'</span>,
+    badge: <span class="json-null">null</span>,
+    urgent: <span class="json-bool">false</span>
+  };
+  
+  <span style="color:#6a9955;">// Priority styling</span>
+  <span style="color:#569cd6;">if</span> (message.priority === <span class="json-number">1</span>) {
+    styles.container += <span class="json-string">' message-urgent'</span>;
+    styles.urgent = <span class="json-bool">true</span>;
+  }
+  
+  <span style="color:#6a9955;">// Response status badge</span>
+  <span style="color:#569cd6;">switch</span> (message.responseStatus) {
+    <span style="color:#569cd6;">case</span> <span class="json-number">1</span>: <span style="color:#6a9955;">// Pending</span>
+      styles.badge = message.isOverdue ? <span class="json-string">'badge-overdue'</span> : <span class="json-string">'badge-pending'</span>;
+      <span style="color:#569cd6;">break</span>;
+    <span style="color:#569cd6;">case</span> <span class="json-number">2</span>: <span style="color:#6a9955;">// Responded</span>
+      styles.badge = <span class="json-string">'badge-responded'</span>;
+      <span style="color:#569cd6;">break</span>;
+  }
+  
+  <span style="color:#6a9955;">// Visibility indicator icon</span>
+  <span style="color:#569cd6;">switch</span> (message.visibility) {
+    <span style="color:#569cd6;">case</span> <span class="json-number">1</span>: styles.visibilityIcon = <span class="json-string">'🏥'</span>; <span style="color:#569cd6;">break</span>; <span style="color:#6a9955;">// Clinic</span>
+    <span style="color:#569cd6;">case</span> <span class="json-number">2</span>: styles.visibilityIcon = <span class="json-string">'👨‍⚕️'</span>; <span style="color:#569cd6;">break</span>; <span style="color:#6a9955;">// Radiologist</span>
+  }
+  
+  <span style="color:#569cd6;">return</span> styles;
+}</pre>
+
+      <h3>6.2 Building Thread Display</h3>
+      <pre><span style="color:#569cd6;">function</span> <span style="color:#dcdcaa;">buildThreads</span>(messages) {
+  <span style="color:#569cd6;">const</span> threads = [];
+  <span style="color:#569cd6;">const</span> messageMap = <span style="color:#569cd6;">new</span> Map();
+  
+  <span style="color:#6a9955;">// Create map with replies array</span>
+  messages.forEach(msg => {
+    messageMap.set(msg.messageId, { ...msg, replies: [] });
+  });
+  
+  <span style="color:#6a9955;">// Build thread structure</span>
+  messages.forEach(msg => {
+    <span style="color:#569cd6;">if</span> (msg.parentMessage) {
+      <span style="color:#569cd6;">const</span> parent = messageMap.get(msg.parentMessage.messageId);
+      <span style="color:#569cd6;">if</span> (parent) parent.replies.push(messageMap.get(msg.messageId));
+    } <span style="color:#569cd6;">else</span> {
+      threads.push(messageMap.get(msg.messageId));
+    }
+  });
+  
+  <span style="color:#569cd6;">return</span> threads;
+}</pre>
+
+      <h3>6.3 Notification Badge Counts</h3>
+      <pre><span style="color:#569cd6;">async function</span> <span style="color:#dcdcaa;">getNotificationCounts</span>() {
+  <span style="color:#569cd6;">const</span> response = <span style="color:#569cd6;">await</span> api.getPendingResponses();
+  <span style="color:#569cd6;">const</span> pending = response.data;
+  
+  <span style="color:#569cd6;">return</span> {
+    totalPending: pending.length,
+    overdueCount: pending.filter(m => m.isOverdue).length,
+    urgentCount: pending.filter(m => m.priority === <span class="json-number">1</span>).length
+  };
+}</pre>
+
+      <h3>6.4 Recommended UI Components</h3>
+      <div class="grid-2">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+          <strong>📌 Message Card</strong>
+          <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>Show visibility icon (🏥 or 👨‍⚕️)</li>
+            <li>Priority indicator (urgent = red border)</li>
+            <li>Response status badge</li>
+            <li>Deadline countdown if pending</li>
+            <li>Reply button for threading</li>
+            <li>Delete button (own messages only)</li>
+          </ul>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+          <strong>🔔 Notification Panel</strong>
+          <ul style="margin-top: 10px; padding-left: 20px;">
+            <li>Badge count for pending items</li>
+            <li>Highlight overdue in red</li>
+            <li>Sort by deadline (urgent first)</li>
+            <li>Click to navigate to study</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Best Practices -->
+    <section id="best-practices">
+      <h2>7. Best Practices</h2>
+      
+      <div class="grid-2">
+        <div class="note note-info">
+          <strong>🔄 Real-time Updates</strong><br>
+          Poll <code>/GetMessages</code> every 30 seconds or implement WebSocket for live updates.
+        </div>
+        <div class="note note-info">
+          <strong>💾 Caching</strong><br>
+          Cache messages locally. Refresh when user opens chat or receives notification.
+        </div>
+        <div class="note note-info">
+          <strong>⚡ Optimistic Updates</strong><br>
+          Show message immediately in UI, then revert on API error.
+        </div>
+        <div class="note note-info">
+          <strong>⏰ Deadline Display</strong><br>
+          Show countdown timer for pending responses. Highlight overdue in red.
+        </div>
+        <div class="note">
+          <strong>⚠️ Visibility Filtering</strong><br>
+          API handles visibility filtering server-side. Never filter messages client-side based on visibility.
+        </div>
+        <div class="note note-warning">
+          <strong>🚫 Token Security</strong><br>
+          Never store JWT tokens in localStorage. Use httpOnly cookies or secure session storage.
+        </div>
+      </div>
+    </section>
+
+    <footer style="text-align: center; padding: 30px; color: #666; font-size: 0.9em;">
+      <p>Study Chat API Integration Guide v1.0 | Last Updated: January 2026</p>
+      <p>For support, contact: <a href="mailto:api-support@pulse.com">api-support@pulse.com</a></p>
+    </footer>
+  </div>
+</body>
+</html>
