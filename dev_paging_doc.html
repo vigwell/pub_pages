@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web API Paging Implementation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #34495e;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        pre code {
+            background: none;
+            color: #ecf0f1;
+            padding: 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .toc {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 30px 0;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border-bottom: none;
+            font-size: 1.5em;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 5px;
+        }
+
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .tip {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .highlight {
+            background: #ffffcc;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #3498db;
+            color: white;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .badge.green {
+            background: #28a745;
+        }
+
+        .badge.red {
+            background: #dc3545;
+        }
+
+        .badge.yellow {
+            background: #ffc107;
+            color: #333;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            pre {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.6em;
+            }
+            
+            pre {
+                padding: 10px;
+                font-size: 0.8em;
+            }
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #66d9ef; }
+        .string { color: #a6e22e; }
+        .comment { color: #75715e; }
+        .type { color: #f92672; }
+        .number { color: #ae81ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Web API Paging Implementation Guide for Developers</h1>
+        <p><strong>Version:</strong> 1.0 | <strong>Last Updated:</strong> January 2026</p>
+
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#introduction">1. Introduction</a></li>
+                <li><a href="#core-concepts">2. Core Concepts</a></li>
+                <li><a href="#api-design">3. API Design Standards</a></li>
+                <li><a href="#implementation">4. Implementation Examples</a></li>
+                <li><a href="#database">5. Database-Specific Implementations</a></li>
+                <li><a href="#advanced">6. Advanced Scenarios</a></li>
+                <li><a href="#best-practices">7. Best Practices</a></li>
+                <li><a href="#pitfalls">8. Common Pitfalls</a></li>
+                <li><a href="#summary">9. Summary</a></li>
+            </ul>
+        </div>
+
+        <div id="introduction" class="section">
+            <h2>1. Introduction</h2>
+            <p>This document provides a comprehensive guide for implementing pagination in RESTful Web APIs using C# and ASP.NET Core. Pagination is essential for:</p>
+            <ul>
+                <li><strong>Performance:</strong> Reducing data transfer and processing time</li>
+                <li><strong>User Experience:</strong> Loading data progressively</li>
+                <li><strong>Resource Management:</strong> Managing memory and database connections efficiently</li>
+                <li><strong>Scalability:</strong> Supporting large datasets without overwhelming the system</li>
+            </ul>
+        </div>
+
+        <div id="core-concepts" class="section">
+            <h2>2. Core Concepts</h2>
+            
+            <h3>What is Paging?</h3>
+            <p>Paging (or pagination) is the process of dividing a large dataset into smaller, discrete pages that can be retrieved independently.</p>
+
+            <h3>Key Terminology</h3>
+            <ul>
+                <li><strong>Page Number:</strong> The current page being requested (1-based indexing is recommended)</li>
+                <li><strong>Page Size:</strong> Number of items per page</li>
+                <li><strong>Total Count:</strong> Total number of items in the entire dataset</li>
+                <li><strong>Total Pages:</strong> Calculated as <code>Ceiling(TotalCount / PageSize)</code></li>
+                <li><strong>Offset:</strong> Starting position in the dataset, calculated as <code>(PageNumber - 1) * PageSize</code></li>
+            </ul>
+
+            <h3>Paging Strategies</h3>
+            <ol>
+                <li><strong>Offset-Based Paging:</strong> Uses page number and page size (most common)</li>
+                <li><strong>Cursor-Based Paging:</strong> Uses a cursor/token to fetch the next set (better for real-time data)</li>
+                <li><strong>Keyset Paging:</strong> Uses the last retrieved key for the next query (most efficient for large datasets)</li>
+            </ol>
+        </div>
+
+        <div id="api-design" class="section">
+            <h2>3. API Design Standards</h2>
+
+            <h3>Request Parameters</h3>
+
+            <h4>Standard Query Parameters</h4>
+            <pre><code>public class PagingParameters
+{
+    private const int MaxPageSize = 100;
+    private int _pageSize = 10;
+    
+    /// &lt;summary&gt;
+    /// Page number (1-based)
+    /// &lt;/summary&gt;
+    public int PageNumber { get; set; } = 1;
+    
+    /// &lt;summary&gt;
+    /// Number of items per page
+    /// &lt;/summary&gt;
+    public int PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
+    }
+}</code></pre>
+
+            <h4>Extended Parameters with Filtering and Sorting</h4>
+            <pre><code>public class ProductQueryParameters : PagingParameters
+{
+    /// &lt;summary&gt;
+    /// Search term for product name
+    /// &lt;/summary&gt;
+    public string SearchTerm { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Filter by category
+    /// &lt;/summary&gt;
+    public string Category { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Minimum price filter
+    /// &lt;/summary&gt;
+    public decimal? MinPrice { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Maximum price filter
+    /// &lt;/summary&gt;
+    public decimal? MaxPrice { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Sort field (e.g., "name", "price", "createdDate")
+    /// &lt;/summary&gt;
+    public string SortBy { get; set; } = "name";
+    
+    /// &lt;summary&gt;
+    /// Sort direction: "asc" or "desc"
+    /// &lt;/summary&gt;
+    public string SortDirection { get; set; } = "asc";
+}</code></pre>
+
+            <h3>Response Structure</h3>
+
+            <h4>Standard Paged Response</h4>
+            <pre><code>public class PagedResponse&lt;T&gt;
+{
+    /// &lt;summary&gt;
+    /// Current page number
+    /// &lt;/summary&gt;
+    public int PageNumber { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Number of items per page
+    /// &lt;/summary&gt;
+    public int PageSize { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Total number of items across all pages
+    /// &lt;/summary&gt;
+    public int TotalCount { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Total number of pages
+    /// &lt;/summary&gt;
+    public int TotalPages { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Indicates if there is a previous page
+    /// &lt;/summary&gt;
+    public bool HasPrevious { get; set; }
+    
+    /// &lt;summary&gt;
+    /// Indicates if there is a next page
+    /// &lt;/summary&gt;
+    public bool HasNext { get; set; }
+    
+    /// &lt;summary&gt;
+    /// The actual data items for this page
+    /// &lt;/summary&gt;
+    public IEnumerable&lt;T&gt; Data { get; set; }
+    
+    public PagedResponse(IEnumerable&lt;T&gt; data, int pageNumber, int pageSize, int totalCount)
+    {
+        Data = data;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+        TotalCount = totalCount;
+        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        HasPrevious = pageNumber > 1;
+        HasNext = pageNumber < TotalPages;
+    }
+}</code></pre>
+
+            <div class="tip">
+                <strong>💡 Tip:</strong> Always include metadata like <code>TotalCount</code>, <code>TotalPages</code>, <code>HasPrevious</code>, and <code>HasNext</code> in your response. This helps clients build proper pagination UI without making additional requests.
+            </div>
+        </div>
+
+        <div id="implementation" class="section">
+            <h2>4. Implementation Examples</h2>
+
+            <h3>Controller Implementation</h3>
+
+            <h4>Basic Paging Controller</h4>
+            <pre><code>[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private readonly IProductService _productService;
+    private readonly ILogger&lt;ProductsController&gt; _logger;
+    
+    public ProductsController(IProductService productService, ILogger&lt;ProductsController&gt; logger)
+    {
+        _productService = productService;
+        _logger = logger;
+    }
+    
+    /// &lt;summary&gt;
+    /// Get paginated list of products
+    /// &lt;/summary&gt;
+    /// &lt;param name="parameters"&gt;Query parameters including page number and size&lt;/param&gt;
+    /// &lt;returns&gt;Paged list of products&lt;/returns&gt;
+    [HttpGet]
+    [ProducesResponseType(typeof(PagedResponse&lt;ProductDto&gt;), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task&lt;ActionResult&lt;PagedResponse&lt;ProductDto&gt;&gt;&gt; GetProducts(
+        [FromQuery] PagingParameters parameters)
+    {
+        try
+        {
+            if (parameters.PageNumber < 1)
+                return BadRequest("Page number must be greater than 0");
+            
+            if (parameters.PageSize < 1)
+                return BadRequest("Page size must be greater than 0");
+            
+            var result = await _productService.GetProductsAsync(parameters);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving products");
+            return StatusCode(500, "An error occurred while retrieving products");
+        }
+    }
+}</code></pre>
+
+            <h4>Advanced Controller with Filtering</h4>
+            <pre><code>[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private readonly IProductService _productService;
+    private readonly ILogger&lt;ProductsController&gt; _logger;
+    
+    public ProductsController(IProductService productService, ILogger&lt;ProductsController&gt; logger)
+    {
+        _productService = productService;
+        _logger = logger;
+    }
+    
+    /// &lt;summary&gt;
+    /// Get paginated and filtered list of products
+    /// &lt;/summary&gt;
+    /// &lt;param name="parameters"&gt;Query parameters including filters, sorting, and paging&lt;/param&gt;
+    /// &lt;returns&gt;Paged list of products&lt;/returns&gt;
+    [HttpGet]
+    [ProducesResponseType(typeof(PagedResponse&lt;ProductDto&gt;), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task&lt;ActionResult&lt;PagedResponse&lt;ProductDto&gt;&gt;&gt; GetProducts(
+        [FromQuery] ProductQueryParameters parameters)
+    {
+        try
+        {
+            // Validate parameters
+            if (parameters.PageNumber < 1)
+                return BadRequest("Page number must be greater than 0");
+            
+            if (parameters.PageSize < 1)
+                return BadRequest("Page size must be greater than 0");
+            
+            if (parameters.MinPrice.HasValue && parameters.MaxPrice.HasValue 
+                && parameters.MinPrice > parameters.MaxPrice)
+                return BadRequest("Minimum price cannot be greater than maximum price");
+            
+            var result = await _productService.GetProductsAsync(parameters);
+            
+            // Add pagination metadata to response headers
+            Response.Headers.Add("X-Pagination", 
+                System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    result.PageNumber,
+                    result.PageSize,
+                    result.TotalCount,
+                    result.TotalPages
+                }));
+            
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving products with filters: {@Parameters}", parameters);
+            return StatusCode(500, "An error occurred while retrieving products");
+        }
+    }
+}</code></pre>
+
+            <h3>Service Layer Implementation</h3>
+            <pre><code>public interface IProductService
+{
+    Task&lt;PagedResponse&lt;ProductDto&gt;&gt; GetProductsAsync(ProductQueryParameters parameters);
+    Task&lt;ProductDto&gt; GetProductByIdAsync(int id);
+}
+
+public class ProductService : IProductService
+{
+    private readonly IProductRepository _repository;
+    private readonly IMapper _mapper;
+    private readonly ILogger&lt;ProductService&gt; _logger;
+    
+    public ProductService(
+        IProductRepository repository, 
+        IMapper mapper,
+        ILogger&lt;ProductService&gt; logger)
+    {
+        _repository = repository;
+        _mapper = mapper;
+        _logger = logger;
+    }
+    
+    public async Task&lt;PagedResponse&lt;ProductDto&gt;&gt; GetProductsAsync(ProductQueryParameters parameters)
+    {
+        try
+        {
+            // Get paged data from repository
+            var (products, totalCount) = await _repository.GetProductsPagedAsync(parameters);
+            
+            // Map to DTOs
+            var productDtos = _mapper.Map&lt;IEnumerable&lt;ProductDto&gt;&gt;(products);
+            
+            // Create and return paged response
+            return new PagedResponse&lt;ProductDto&gt;(
+                productDtos,
+                parameters.PageNumber,
+                parameters.PageSize,
+                totalCount
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in GetProductsAsync with parameters: {@Parameters}", parameters);
+            throw;
+        }
+    }
+    
+    public async Task&lt;ProductDto&gt; GetProductByIdAsync(int id)
+    {
+        var product = await _repository.GetByIdAsync(id);
+        return _mapper.Map&lt;ProductDto&gt;(product);
+    }
+}</code></pre>
+
+            <h3>Repository Implementation</h3>
+
+            <h4>Entity Framework Implementation</h4>
+            <pre><code>public class ProductRepository : IProductRepository
+{
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger&lt;ProductRepository&gt; _logger;
+    
+    public ProductRepository(ApplicationDbContext context, ILogger&lt;ProductRepository&gt; logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+    
+    public async Task&lt;(IEnumerable&lt;Product&gt; Products, int TotalCount)&gt; GetProductsPagedAsync(
+        ProductQueryParameters parameters)
+    {
+        try
+        {
+            // Start with base query
+            IQueryable&lt;Product&gt; query = _context.Products.AsNoTracking();
+            
+            // Apply filters
+            query = ApplyFilters(query, parameters);
+            
+            // Get total count before paging
+            var totalCount = await query.CountAsync();
+            
+            // Apply sorting
+            query = ApplySorting(query, parameters.SortBy, parameters.SortDirection);
+            
+            // Apply paging
+            var products = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+            
+            return (products, totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in GetProductsPagedAsync");
+            throw;
+        }
+    }
+    
+    private IQueryable&lt;Product&gt; ApplyFilters(IQueryable&lt;Product&gt; query, ProductQueryParameters parameters)
+    {
+        // Search term filter
+        if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
+        {
+            var searchTerm = parameters.SearchTerm.ToLower();
+            query = query.Where(p => p.Name.ToLower().Contains(searchTerm) 
+                                  || p.Description.ToLower().Contains(searchTerm));
+        }
+        
+        // Category filter
+        if (!string.IsNullOrWhiteSpace(parameters.Category))
+        {
+            query = query.Where(p => p.Category == parameters.Category);
+        }
+        
+        // Price range filters
+        if (parameters.MinPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= parameters.MinPrice.Value);
+        }
+        
+        if (parameters.MaxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= parameters.MaxPrice.Value);
+        }
+        
+        return query;
+    }
+    
+    private IQueryable&lt;Product&gt; ApplySorting(
+        IQueryable&lt;Product&gt; query, 
+        string sortBy, 
+        string sortDirection)
+    {
+        var isAscending = sortDirection?.ToLower() == "asc";
+        
+        query = sortBy?.ToLower() switch
+        {
+            "name" => isAscending 
+                ? query.OrderBy(p => p.Name) 
+                : query.OrderByDescending(p => p.Name),
+            "price" => isAscending 
+                ? query.OrderBy(p => p.Price) 
+                : query.OrderByDescending(p => p.Price),
+            "createdate" => isAscending 
+                ? query.OrderBy(p => p.CreatedDate) 
+                : query.OrderByDescending(p => p.CreatedDate),
+            "category" => isAscending 
+                ? query.OrderBy(p => p.Category) 
+                : query.OrderByDescending(p => p.Category),
+            _ => query.OrderBy(p => p.Name) // Default sorting
+        };
+        
+        return query;
+    }
+}</code></pre>
+
+            <div class="warning">
+                <strong>⚠️ Warning:</strong> Always use <code>AsNoTracking()</code> for read-only queries. This significantly improves performance by preventing Entity Framework from tracking changes to entities.
+            </div>
+        </div>
+
+        <div id="database" class="section">
+            <h2>5. Database-Specific Implementations</h2>
+
+            <h3>SQL Server Stored Procedure</h3>
+
+            <h4>Create Stored Procedure</h4>
+            <pre><code>CREATE PROCEDURE sp_GetProductsPaged
+    @PageNumber INT = 1,
+    @PageSize INT = 10,
+    @SearchTerm NVARCHAR(100) = NULL,
+    @Category NVARCHAR(50) = NULL,
+    @MinPrice DECIMAL(18, 2) = NULL,
+    @MaxPrice DECIMAL(18, 2) = NULL,
+    @SortBy NVARCHAR(50) = 'Name',
+    @SortDirection NVARCHAR(4) = 'ASC',
+    @TotalCount INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    -- Build WHERE clause
+    DECLARE @WhereClause NVARCHAR(MAX) = 'WHERE 1=1';
+    
+    IF @SearchTerm IS NOT NULL
+        SET @WhereClause = @WhereClause + 
+            ' AND (Name LIKE ''%' + @SearchTerm + '%'' OR Description LIKE ''%' + @SearchTerm + '%'')';
+    
+    IF @Category IS NOT NULL
+        SET @WhereClause = @WhereClause + ' AND Category = ''' + @Category + '''';
+    
+    IF @MinPrice IS NOT NULL
+        SET @WhereClause = @WhereClause + ' AND Price >= ' + CAST(@MinPrice AS NVARCHAR(20));
+    
+    IF @MaxPrice IS NOT NULL
+        SET @WhereClause = @WhereClause + ' AND Price <= ' + CAST(@MaxPrice AS NVARCHAR(20));
+    
+    -- Get total count
+    DECLARE @CountSQL NVARCHAR(MAX) = 
+        'SELECT @Total = COUNT(*) FROM Products ' + @WhereClause;
+    
+    EXEC sp_executesql @CountSQL, N'@Total INT OUTPUT', @Total = @TotalCount OUTPUT;
+    
+    -- Validate sort column to prevent SQL injection
+    IF @SortBy NOT IN ('Name', 'Price', 'CreatedDate', 'Category')
+        SET @SortBy = 'Name';
+    
+    IF @SortDirection NOT IN ('ASC', 'DESC')
+        SET @SortDirection = 'ASC';
+    
+    -- Get paged data
+    DECLARE @SQL NVARCHAR(MAX) = 
+        'SELECT 
+            Id,
+            Name,
+            Description,
+            Price,
+            Category,
+            CreatedDate,
+            ModifiedDate
+        FROM Products ' + @WhereClause +
+        ' ORDER BY ' + @SortBy + ' ' + @SortDirection +
+        ' OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY';
+    
+    EXEC sp_executesql @SQL, 
+        N'@Offset INT, @PageSize INT', 
+        @Offset = @Offset, 
+        @PageSize = @PageSize;
+END
+GO</code></pre>
+
+            <h3>Redis Implementation</h3>
+            <pre><code>public class RedisProductRepository : IProductRepository
+{
+    private readonly IDatabase _redis;
+    private readonly ILogger&lt;RedisProductRepository&gt; _logger;
+    
+    public RedisProductRepository(IConnectionMultiplexer redis, ILogger&lt;RedisProductRepository&gt; logger)
+    {
+        _redis = redis.GetDatabase();
+        _logger = logger;
+    }
+    
+    public async Task&lt;(IEnumerable&lt;Product&gt; Products, int TotalCount)&gt; GetProductsPagedAsync(
+        ProductQueryParameters parameters)
+    {
+        try
+        {
+            var sortedSetKey = "products:sorted:name";
+            
+            // Get total count
+            var totalCount = (int)await _redis.SortedSetLengthAsync(sortedSetKey);
+            
+            // Calculate range
+            var start = (parameters.PageNumber - 1) * parameters.PageSize;
+            var stop = start + parameters.PageSize - 1;
+            
+            // Get product IDs from sorted set
+            var productIds = await _redis.SortedSetRangeByRankAsync(
+                sortedSetKey, 
+                start, 
+                stop);
+            
+            // Fetch full product details
+            var products = new List&lt;Product&gt;();
+            foreach (var productId in productIds)
+            {
+                var productKey = $"product:{productId}";
+                var productJson = await _redis.StringGetAsync(productKey);
+                
+                if (!productJson.IsNullOrEmpty)
+                {
+                    var product = System.Text.Json.JsonSerializer.Deserialize&lt;Product&gt;(productJson);
+                    products.Add(product);
+                }
+            }
+            
+            return (products, totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in GetProductsPagedAsync from Redis");
+            throw;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div id="advanced" class="section">
+            <h2>6. Advanced Scenarios</h2>
+
+            <h3>Cursor-Based Paging</h3>
+            <p>Cursor-based paging is ideal for real-time data feeds and avoiding "page drift" when data changes:</p>
+
+            <pre><code>public class CursorPagingParameters
+{
+    public int PageSize { get; set; } = 10;
+    public string Cursor { get; set; } // Base64 encoded cursor
+}
+
+public class CursorPagedResponse&lt;T&gt;
+{
+    public IEnumerable&lt;T&gt; Data { get; set; }
+    public string NextCursor { get; set; }
+    public string PreviousCursor { get; set; }
+    public bool HasMore { get; set; }
+}
+
+public class ProductCursor
+{
+    public int Id { get; set; }
+    public DateTime CreatedDate { get; set; }
+    
+    public string Encode()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(this);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        return Convert.ToBase64String(bytes);
+    }
+    
+    public static ProductCursor Decode(string cursor)
+    {
+        if (string.IsNullOrWhiteSpace(cursor))
+            return null;
+        
+        var bytes = Convert.FromBase64String(cursor);
+        var json = System.Text.Encoding.UTF8.GetString(bytes);
+        return System.Text.Json.JsonSerializer.Deserialize&lt;ProductCursor&gt;(json);
+    }
+}
+
+// Repository implementation
+public async Task&lt;CursorPagedResponse&lt;Product&gt;&gt; GetProductsWithCursorAsync(
+    CursorPagingParameters parameters)
+{
+    var cursor = ProductCursor.Decode(parameters.Cursor);
+    
+    IQueryable&lt;Product&gt; query = _context.Products.AsNoTracking();
+    
+    if (cursor != null)
+    {
+        // Get items after the cursor
+        query = query.Where(p => 
+            p.CreatedDate < cursor.CreatedDate || 
+            (p.CreatedDate == cursor.CreatedDate && p.Id < cursor.Id));
+    }
+    
+    var products = await query
+        .OrderByDescending(p => p.CreatedDate)
+        .ThenByDescending(p => p.Id)
+        .Take(parameters.PageSize + 1)
+        .ToListAsync();
+    
+    var hasMore = products.Count > parameters.PageSize;
+    if (hasMore)
+    {
+        products = products.Take(parameters.PageSize).ToList();
+    }
+    
+    var nextCursor = hasMore && products.Any()
+        ? new ProductCursor 
+        { 
+            Id = products.Last().Id, 
+            CreatedDate = products.Last().CreatedDate 
+        }.Encode()
+        : null;
+    
+    return new CursorPagedResponse&lt;Product&gt;
+    {
+        Data = products,
+        NextCursor = nextCursor,
+        HasMore = hasMore
+    };
+}</code></pre>
+
+            <h3>Keyset Paging (Seek Method)</h3>
+            <p>Most efficient for large datasets:</p>
+
+            <pre><code>public class KeysetPagingParameters
+{
+    public int PageSize { get; set; } = 10;
+    public int? LastId { get; set; }
+    public DateTime? LastCreatedDate { get; set; }
+}
+
+public async Task&lt;(IEnumerable&lt;Product&gt; Products, bool HasMore)&gt; GetProductsWithKeysetAsync(
+    KeysetPagingParameters parameters)
+{
+    IQueryable&lt;Product&gt; query = _context.Products.AsNoTracking();
+    
+    if (parameters.LastId.HasValue && parameters.LastCreatedDate.HasValue)
+    {
+        // Keyset condition for next page
+        query = query.Where(p => 
+            p.CreatedDate < parameters.LastCreatedDate.Value || 
+            (p.CreatedDate == parameters.LastCreatedDate.Value && p.Id > parameters.LastId.Value));
+    }
+    
+    var products = await query
+        .OrderByDescending(p => p.CreatedDate)
+        .ThenBy(p => p.Id)
+        .Take(parameters.PageSize + 1)
+        .ToListAsync();
+    
+    var hasMore = products.Count > parameters.PageSize;
+    if (hasMore)
+    {
+        products = products.Take(parameters.PageSize).ToList();
+    }
+    
+    return (products, hasMore);
+}</code></pre>
+        </div>
+
+        <div id="best-practices" class="section">
+            <h2>7. Best Practices</h2>
+
+            <h3>Performance Optimization</h3>
+
+            <h4>1. Always Use Indexes</h4>
+            <pre><code>-- Create indexes on commonly filtered and sorted columns
+CREATE NONCLUSTERED INDEX IX_Products_Name 
+ON Products(Name);
+
+CREATE NONCLUSTERED INDEX IX_Products_Category_Price 
+ON Products(Category, Price);
+
+CREATE NONCLUSTERED INDEX IX_Products_CreatedDate 
+ON Products(CreatedDate DESC) INCLUDE (Name, Price);</code></pre>
+
+            <h4>2. Use AsNoTracking for Read-Only Queries</h4>
+            <pre><code>var products = await _context.Products
+    .AsNoTracking() // Significantly improves performance
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h4>3. Avoid N+1 Queries</h4>
+            <pre><code>// Bad: N+1 query problem
+var products = await _context.Products
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();
+
+// Good: Use eager loading
+var products = await _context.Products
+    .Include(p => p.Category)
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h4>4. Use Projection for Large Objects</h4>
+            <pre><code>// Instead of loading entire entity
+var products = await _context.Products
+    .Skip(offset)
+    .Take(pageSize)
+    .Select(p => new ProductDto
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+        // Only select fields you need
+    })
+    .ToListAsync();</code></pre>
+
+            <h3>Caching Strategy</h3>
+            <pre><code>public class CachedProductService : IProductService
+{
+    private readonly IProductService _innerService;
+    private readonly IMemoryCache _cache;
+    private readonly ILogger&lt;CachedProductService&gt; _logger;
+    
+    public async Task&lt;PagedResponse&lt;ProductDto&gt;&gt; GetProductsAsync(ProductQueryParameters parameters)
+    {
+        var cacheKey = $"products_{parameters.PageNumber}_{parameters.PageSize}_" +
+                      $"{parameters.SearchTerm}_{parameters.Category}_{parameters.SortBy}";
+        
+        if (_cache.TryGetValue(cacheKey, out PagedResponse&lt;ProductDto&gt; cachedResult))
+        {
+            _logger.LogInformation("Retrieved products from cache: {CacheKey}", cacheKey);
+            return cachedResult;
+        }
+        
+        var result = await _innerService.GetProductsAsync(parameters);
+        
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(5))
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+        
+        _cache.Set(cacheKey, result, cacheOptions);
+        
+        return result;
+    }
+}</code></pre>
+
+            <h3>Input Validation</h3>
+            <pre><code>public class PagingParametersValidator : AbstractValidator&lt;PagingParameters&gt;
+{
+    public PagingParametersValidator()
+    {
+        RuleFor(x => x.PageNumber)
+            .GreaterThan(0)
+            .WithMessage("Page number must be greater than 0");
+        
+        RuleFor(x => x.PageSize)
+            .InclusiveBetween(1, 100)
+            .WithMessage("Page size must be between 1 and 100");
+    }
+}</code></pre>
+
+            <h3>Security Considerations</h3>
+
+            <h4>Prevent SQL Injection</h4>
+            <pre><code>// Bad - vulnerable to SQL injection
+var sql = $"SELECT * FROM Products WHERE Name LIKE '%{searchTerm}%'";
+
+// Good - parameterized
+var products = await _context.Products
+    .Where(p => p.Name.Contains(searchTerm))
+    .ToListAsync();</code></pre>
+
+            <h4>Validate Sort Columns</h4>
+            <pre><code>private readonly HashSet&lt;string&gt; _allowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
+{
+    "Name", "Price", "CreatedDate", "Category"
+};
+
+private string ValidateSortColumn(string sortBy)
+{
+    if (string.IsNullOrWhiteSpace(sortBy) || !_allowedSortColumns.Contains(sortBy))
+    {
+        return "Name"; // Default
+    }
+    return sortBy;
+}</code></pre>
+
+            <h4>Rate Limiting</h4>
+            <pre><code>[EnableRateLimiting("fixed")]
+[HttpGet]
+public async Task&lt;ActionResult&lt;PagedResponse&lt;ProductDto&gt;&gt;&gt; GetProducts(
+    [FromQuery] ProductQueryParameters parameters)
+{
+    var result = await _productService.GetProductsAsync(parameters);
+    return Ok(result);
+}
+
+// In Program.cs
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 100;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
+});</code></pre>
+        </div>
+
+        <div id="pitfalls" class="section">
+            <h2>8. Common Pitfalls</h2>
+
+            <h3>1. Missing ORDER BY</h3>
+            <div class="warning">
+                <strong>⚠️ Problem:</strong> Results may be inconsistent without ordering.
+            </div>
+            <pre><code>// Bad: Results may be inconsistent
+var products = await _context.Products
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();
+
+// Good: Always specify ordering
+var products = await _context.Products
+    .OrderBy(p => p.Id)
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h3>2. Counting Before Filtering</h3>
+            <pre><code>// Bad: Incorrect total count
+var totalCount = await _context.Products.CountAsync();
+var products = await _context.Products
+    .Where(p => p.Category == "Electronics")
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();
+
+// Good: Count after filtering
+var query = _context.Products.Where(p => p.Category == "Electronics");
+var totalCount = await query.CountAsync();
+var products = await query
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h3>3. Large Page Sizes</h3>
+            <pre><code>// Implement maximum page size
+public class PagingParameters
+{
+    private const int MaxPageSize = 100;
+    private int _pageSize = 10;
+    
+    public int PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
+    }
+}</code></pre>
+
+            <h3>4. Not Handling Edge Cases</h3>
+            <pre><code>// Handle page number beyond total pages
+if (parameters.PageNumber > totalPages && totalCount > 0)
+{
+    return BadRequest($"Page {parameters.PageNumber} exceeds total pages {totalPages}");
+}
+
+// Handle empty results gracefully
+if (totalCount == 0)
+{
+    return Ok(new PagedResponse&lt;ProductDto&gt;(
+        new List&lt;ProductDto&gt;(), 
+        parameters.PageNumber, 
+        parameters.PageSize, 
+        0));
+}</code></pre>
+        </div>
+
+        <div id="summary" class="section">
+            <h2>9. Summary</h2>
+
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li><strong>Always use consistent ordering</strong> when implementing paging</li>
+                <li><strong>Validate input parameters</strong> to prevent abuse and errors</li>
+                <li><strong>Implement maximum page size</strong> to protect server resources</li>
+                <li><strong>Use appropriate indexes</strong> on sorted and filtered columns</li>
+                <li><strong>Choose the right paging strategy</strong> for your use case:
+                    <ul>
+                        <li>Offset-based for simple scenarios</li>
+                        <li>Cursor-based for real-time feeds</li>
+                        <li>Keyset for large datasets</li>
+                    </ul>
+                </li>
+                <li><strong>Cache results when appropriate</strong> to improve performance</li>
+                <li><strong>Handle edge cases</strong> gracefully (empty results, pages beyond range)</li>
+                <li><strong>Document your API</strong> clearly with examples</li>
+                <li><strong>Monitor and log</strong> paging operations for performance analysis</li>
+                <li><strong>Test with realistic data volumes</strong> before deploying to production</li>
+            </ol>
+
+            <h3>Example API Call</h3>
+            <pre><code>GET /api/products?pageNumber=2&pageSize=20&searchTerm=laptop&category=Electronics
+&minPrice=500&maxPrice=2000&sortBy=price&sortDirection=desc</code></pre>
+
+            <h3>Example Response</h3>
+            <pre><code>{
+  "pageNumber": 2,
+  "pageSize": 20,
+  "totalCount": 156,
+  "totalPages": 8,
+  "hasPrevious": true,
+  "hasNext": true,
+  "data": [
+    {
+      "id": 101,
+      "name": "Gaming Laptop Pro",
+      "description": "High-performance gaming laptop",
+      "price": 1899.99,
+      "category": "Electronics",
+      "createdDate": "2024-01-15T10:30:00Z"
+    }
+    // ... more items
+  ]
+}</code></pre>
+
+            <div class="tip">
+                <strong>📚 Additional Resources:</strong>
+                <ul>
+                    <li><a href="https://docs.microsoft.com/en-us/ef/core/" target="_blank">Entity Framework Core Documentation</a></li>
+                    <li><a href="https://docs.microsoft.com/en-us/aspnet/core/web-api/" target="_blank">ASP.NET Core Web API Best Practices</a></li>
+                    <li><a href="https://docs.microsoft.com/en-us/sql/t-sql/queries/select-order-by-clause-transact-sql" target="_blank">SQL Server Paging Techniques</a></li>
+                    <li><a href="https://restfulapi.net/" target="_blank">RESTful API Design Guidelines</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #666;">
+            <p><strong>Document Version:</strong> 1.0 | <strong>Last Updated:</strong> January 2026</p>
+            <p><strong>Maintained By:</strong> Development Team</p>
+        </div>
+    </div>
+</body>
+</html>

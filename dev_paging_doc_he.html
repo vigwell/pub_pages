@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מדריך מימוש Paging ב-Web API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', 'Tahoma', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 15px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #34495e;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-right: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+            font-size: 0.9em;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-right: 4px solid #3498db;
+            direction: ltr;
+            text-align: left;
+        }
+
+        pre code {
+            background: none;
+            color: #ecf0f1;
+            padding: 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .toc {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 30px 0;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border-bottom: none;
+            font-size: 1.5em;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-right: 0;
+        }
+
+        .toc li {
+            margin-bottom: 5px;
+        }
+
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border-right: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        .tip {
+            background: #d4edda;
+            border-right: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .highlight {
+            background: #ffffcc;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #3498db;
+            color: white;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+
+        .badge.green {
+            background: #28a745;
+        }
+
+        .badge.red {
+            background: #dc3545;
+        }
+
+        .badge.yellow {
+            background: #ffc107;
+            color: #333;
+        }
+
+        strong {
+            color: #2c3e50;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            pre {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.6em;
+            }
+            
+            pre {
+                padding: 10px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מדריך מימוש Paging ב-Web API למפתחים</h1>
+        <p><strong>גרסה:</strong> 1.0 | <strong>עודכן לאחרונה:</strong> ינואר 2026</p>
+
+        <div class="toc">
+            <h2>תוכן עניינים</h2>
+            <ul>
+                <li><a href="#introduction">1. מבוא</a></li>
+                <li><a href="#core-concepts">2. מושגי יסוד</a></li>
+                <li><a href="#api-design">3. סטנדרטים לעיצוב API</a></li>
+                <li><a href="#implementation">4. דוגמאות מימוש</a></li>
+                <li><a href="#database">5. מימושים ספציפיים למסדי נתונים</a></li>
+                <li><a href="#advanced">6. תרחישים מתקדמים</a></li>
+                <li><a href="#best-practices">7. שיטות עבודה מומלצות</a></li>
+                <li><a href="#pitfalls">8. מלכודות נפוצות</a></li>
+                <li><a href="#summary">9. סיכום</a></li>
+            </ul>
+        </div>
+
+        <div id="introduction" class="section">
+            <h2>1. מבוא</h2>
+            <p>מסמך זה מספק מדריך מקיף למימוש Pagination (עימוד) ב-RESTful Web APIs באמצעות C# ו-ASP.NET Core. Pagination חיוני עבור:</p>
+            <ul>
+                <li><strong>ביצועים:</strong> הפחתת העברת נתונים וזמן עיבוד</li>
+                <li><strong>חווית משתמש:</strong> טעינת נתונים באופן הדרגתי</li>
+                <li><strong>ניהול משאבים:</strong> ניהול יעיל של זיכרון וחיבורי מסד נתונים</li>
+                <li><strong>מדרגיות:</strong> תמיכה במערכי נתונים גדולים מבלי להעמיס על המערכת</li>
+            </ul>
+        </div>
+
+        <div id="core-concepts" class="section">
+            <h2>2. מושגי יסוד</h2>
+            
+            <h3>מהו Paging?</h3>
+            <p>Paging (או Pagination) הוא תהליך של חלוקת מערך נתונים גדול לדפים קטנים ונפרדים שניתן לאחזר באופן עצמאי.</p>
+
+            <h3>טרמינולוגיה מרכזית</h3>
+            <ul>
+                <li><strong>מספר דף (Page Number):</strong> הדף הנוכחי המבוקש (מומלץ אינדקס מבוסס-1)</li>
+                <li><strong>גודל דף (Page Size):</strong> מספר הפריטים בכל דף</li>
+                <li><strong>ספירה כוללת (Total Count):</strong> מספר כל הפריטים במערך הנתונים</li>
+                <li><strong>סך דפים (Total Pages):</strong> מחושב כ-<code>Ceiling(TotalCount / PageSize)</code></li>
+                <li><strong>היסט (Offset):</strong> מיקום התחלה במערך הנתונים, מחושב כ-<code>(PageNumber - 1) * PageSize</code></li>
+            </ul>
+
+            <h3>אסטרטגיות Paging</h3>
+            <ol>
+                <li><strong>Offset-Based Paging:</strong> משתמש במספר דף וגודל דף (הנפוץ ביותר)</li>
+                <li><strong>Cursor-Based Paging:</strong> משתמש ב-cursor/token לאחזור הסט הבא (טוב יותר לנתונים בזמן אמת)</li>
+                <li><strong>Keyset Paging:</strong> משתמש במפתח האחרון שאוחזר לשאילתה הבאה (היעיל ביותר למערכי נתונים גדולים)</li>
+            </ol>
+        </div>
+
+        <div id="api-design" class="section">
+            <h2>3. סטנדרטים לעיצוב API</h2>
+
+            <h3>פרמטרי בקשה (Request Parameters)</h3>
+
+            <h4>פרמטרי שאילתה סטנדרטיים</h4>
+            <pre><code>public class PagingParameters
+{
+    private const int MaxPageSize = 100;
+    private int _pageSize = 10;
+    
+    /// &lt;summary&gt;
+    /// מספר דף (מבוסס-1)
+    /// &lt;/summary&gt;
+    public int PageNumber { get; set; } = 1;
+    
+    /// &lt;summary&gt;
+    /// מספר פריטים בדף
+    /// &lt;/summary&gt;
+    public int PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
+    }
+}</code></pre>
+
+            <h4>פרמטרים מורחבים עם סינון ומיון</h4>
+            <pre><code>public class ProductQueryParameters : PagingParameters
+{
+    /// &lt;summary&gt;
+    /// מונח חיפוש לשם מוצר
+    /// &lt;/summary&gt;
+    public string SearchTerm { get; set; }
+    
+    /// &lt;summary&gt;
+    /// סינון לפי קטגוריה
+    /// &lt;/summary&gt;
+    public string Category { get; set; }
+    
+    /// &lt;summary&gt;
+    /// סינון מחיר מינימלי
+    /// &lt;/summary&gt;
+    public decimal? MinPrice { get; set; }
+    
+    /// &lt;summary&gt;
+    /// סינון מחיר מקסימלי
+    /// &lt;/summary&gt;
+    public decimal? MaxPrice { get; set; }
+    
+    /// &lt;summary&gt;
+    /// שדה מיון (לדוגמה: "name", "price", "createdDate")
+    /// &lt;/summary&gt;
+    public string SortBy { get; set; } = "name";
+    
+    /// &lt;summary&gt;
+    /// כיוון מיון: "asc" או "desc"
+    /// &lt;/summary&gt;
+    public string SortDirection { get; set; } = "asc";
+}</code></pre>
+
+            <h3>מבנה תגובה (Response Structure)</h3>
+
+            <h4>תגובה מעומדת סטנדרטית</h4>
+            <pre><code>public class PagedResponse&lt;T&gt;
+{
+    /// &lt;summary&gt;
+    /// מספר דף נוכחי
+    /// &lt;/summary&gt;
+    public int PageNumber { get; set; }
+    
+    /// &lt;summary&gt;
+    /// מספר פריטים בדף
+    /// &lt;/summary&gt;
+    public int PageSize { get; set; }
+    
+    /// &lt;summary&gt;
+    /// מספר כולל של פריטים בכל הדפים
+    /// &lt;/summary&gt;
+    public int TotalCount { get; set; }
+    
+    /// &lt;summary&gt;
+    /// מספר כולל של דפים
+    /// &lt;/summary&gt;
+    public int TotalPages { get; set; }
+    
+    /// &lt;summary&gt;
+    /// מציין אם קיים דף קודם
+    /// &lt;/summary&gt;
+    public bool HasPrevious { get; set; }
+    
+    /// &lt;summary&gt;
+    /// מציין אם קיים דף הבא
+    /// &lt;/summary&gt;
+    public bool HasNext { get; set; }
+    
+    /// &lt;summary&gt;
+    /// פריטי הנתונים בפועל לדף זה
+    /// &lt;/summary&gt;
+    public IEnumerable&lt;T&gt; Data { get; set; }
+    
+    public PagedResponse(IEnumerable&lt;T&gt; data, int pageNumber, int pageSize, int totalCount)
+    {
+        Data = data;
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+        TotalCount = totalCount;
+        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        HasPrevious = pageNumber > 1;
+        HasNext = pageNumber < TotalPages;
+    }
+}</code></pre>
+
+            <div class="tip">
+                <strong>💡 טיפ:</strong> תמיד כלול מטא-דאטה כמו <code>TotalCount</code>, <code>TotalPages</code>, <code>HasPrevious</code> ו-<code>HasNext</code> בתגובה שלך. זה עוזר ללקוחות לבנות ממשק Pagination נכון ללא צורך בבקשות נוספות.
+            </div>
+        </div>
+
+        <div id="implementation" class="section">
+            <h2>4. דוגמאות מימוש</h2>
+
+            <h3>מימוש Controller</h3>
+
+            <h4>Controller בסיסי עם Paging</h4>
+            <pre><code>[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private readonly IProductService _productService;
+    private readonly ILogger&lt;ProductsController&gt; _logger;
+    
+    public ProductsController(IProductService productService, ILogger&lt;ProductsController&gt; logger)
+    {
+        _productService = productService;
+        _logger = logger;
+    }
+    
+    /// &lt;summary&gt;
+    /// קבלת רשימת מוצרים מעומדת
+    /// &lt;/summary&gt;
+    /// &lt;param name="parameters"&gt;פרמטרי שאילתה כולל מספר דף וגודל&lt;/param&gt;
+    /// &lt;returns&gt;רשימת מוצרים מעומדת&lt;/returns&gt;
+    [HttpGet]
+    [ProducesResponseType(typeof(PagedResponse&lt;ProductDto&gt;), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task&lt;ActionResult&lt;PagedResponse&lt;ProductDto&gt;&gt;&gt; GetProducts(
+        [FromQuery] PagingParameters parameters)
+    {
+        try
+        {
+            if (parameters.PageNumber < 1)
+                return BadRequest("מספר דף חייב להיות גדול מ-0");
+            
+            if (parameters.PageSize < 1)
+                return BadRequest("גודל דף חייב להיות גדול מ-0");
+            
+            var result = await _productService.GetProductsAsync(parameters);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "שגיאה באחזור מוצרים");
+            return StatusCode(500, "אירעה שגיאה באחזור המוצרים");
+        }
+    }
+}</code></pre>
+
+            <h4>Controller מתקדם עם סינון</h4>
+            <pre><code>[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private readonly IProductService _productService;
+    private readonly ILogger&lt;ProductsController&gt; _logger;
+    
+    public ProductsController(IProductService productService, ILogger&lt;ProductsController&gt; logger)
+    {
+        _productService = productService;
+        _logger = logger;
+    }
+    
+    /// &lt;summary&gt;
+    /// קבלת רשימת מוצרים מעומדת ומסוננת
+    /// &lt;/summary&gt;
+    /// &lt;param name="parameters"&gt;פרמטרי שאילתה כולל סינונים, מיון ועימוד&lt;/param&gt;
+    /// &lt;returns&gt;רשימת מוצרים מעומדת&lt;/returns&gt;
+    [HttpGet]
+    [ProducesResponseType(typeof(PagedResponse&lt;ProductDto&gt;), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task&lt;ActionResult&lt;PagedResponse&lt;ProductDto&gt;&gt;&gt; GetProducts(
+        [FromQuery] ProductQueryParameters parameters)
+    {
+        try
+        {
+            // אימות פרמטרים
+            if (parameters.PageNumber < 1)
+                return BadRequest("מספר דף חייב להיות גדול מ-0");
+            
+            if (parameters.PageSize < 1)
+                return BadRequest("גודל דף חייב להיות גדול מ-0");
+            
+            if (parameters.MinPrice.HasValue && parameters.MaxPrice.HasValue 
+                && parameters.MinPrice > parameters.MaxPrice)
+                return BadRequest("מחיר מינימלי לא יכול להיות גדול ממחיר מקסימלי");
+            
+            var result = await _productService.GetProductsAsync(parameters);
+            
+            // הוספת מטא-דאטה של pagination לכותרות התגובה
+            Response.Headers.Add("X-Pagination", 
+                System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    result.PageNumber,
+                    result.PageSize,
+                    result.TotalCount,
+                    result.TotalPages
+                }));
+            
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "שגיאה באחזור מוצרים עם סינונים: {@Parameters}", parameters);
+            return StatusCode(500, "אירעה שגיאה באחזור המוצרים");
+        }
+    }
+}</code></pre>
+
+            <h3>מימוש שכבת Service</h3>
+            <pre><code>public interface IProductService
+{
+    Task&lt;PagedResponse&lt;ProductDto&gt;&gt; GetProductsAsync(ProductQueryParameters parameters);
+    Task&lt;ProductDto&gt; GetProductByIdAsync(int id);
+}
+
+public class ProductService : IProductService
+{
+    private readonly IProductRepository _repository;
+    private readonly IMapper _mapper;
+    private readonly ILogger&lt;ProductService&gt; _logger;
+    
+    public ProductService(
+        IProductRepository repository, 
+        IMapper mapper,
+        ILogger&lt;ProductService&gt; logger)
+    {
+        _repository = repository;
+        _mapper = mapper;
+        _logger = logger;
+    }
+    
+    public async Task&lt;PagedResponse&lt;ProductDto&gt;&gt; GetProductsAsync(ProductQueryParameters parameters)
+    {
+        try
+        {
+            // קבלת נתונים מעומדים מה-repository
+            var (products, totalCount) = await _repository.GetProductsPagedAsync(parameters);
+            
+            // המרה ל-DTOs
+            var productDtos = _mapper.Map&lt;IEnumerable&lt;ProductDto&gt;&gt;(products);
+            
+            // יצירה והחזרת תגובה מעומדת
+            return new PagedResponse&lt;ProductDto&gt;(
+                productDtos,
+                parameters.PageNumber,
+                parameters.PageSize,
+                totalCount
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "שגיאה ב-GetProductsAsync עם פרמטרים: {@Parameters}", parameters);
+            throw;
+        }
+    }
+    
+    public async Task&lt;ProductDto&gt; GetProductByIdAsync(int id)
+    {
+        var product = await _repository.GetByIdAsync(id);
+        return _mapper.Map&lt;ProductDto&gt;(product);
+    }
+}</code></pre>
+
+            <h3>מימוש Repository</h3>
+
+            <h4>מימוש Entity Framework</h4>
+            <pre><code>public class ProductRepository : IProductRepository
+{
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger&lt;ProductRepository&gt; _logger;
+    
+    public ProductRepository(ApplicationDbContext context, ILogger&lt;ProductRepository&gt; logger)
+    {
+        _context = context;
+        _logger = logger;
+    }
+    
+    public async Task&lt;(IEnumerable&lt;Product&gt; Products, int TotalCount)&gt; GetProductsPagedAsync(
+        ProductQueryParameters parameters)
+    {
+        try
+        {
+            // התחלה עם שאילתת בסיס
+            IQueryable&lt;Product&gt; query = _context.Products.AsNoTracking();
+            
+            // החלת סינונים
+            query = ApplyFilters(query, parameters);
+            
+            // קבלת ספירה כוללת לפני עימוד
+            var totalCount = await query.CountAsync();
+            
+            // החלת מיון
+            query = ApplySorting(query, parameters.SortBy, parameters.SortDirection);
+            
+            // החלת עימוד
+            var products = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+            
+            return (products, totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "שגיאה ב-GetProductsPagedAsync");
+            throw;
+        }
+    }
+    
+    private IQueryable&lt;Product&gt; ApplyFilters(IQueryable&lt;Product&gt; query, ProductQueryParameters parameters)
+    {
+        // סינון מונח חיפוש
+        if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
+        {
+            var searchTerm = parameters.SearchTerm.ToLower();
+            query = query.Where(p => p.Name.ToLower().Contains(searchTerm) 
+                                  || p.Description.ToLower().Contains(searchTerm));
+        }
+        
+        // סינון קטגוריה
+        if (!string.IsNullOrWhiteSpace(parameters.Category))
+        {
+            query = query.Where(p => p.Category == parameters.Category);
+        }
+        
+        // סינוני טווח מחירים
+        if (parameters.MinPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= parameters.MinPrice.Value);
+        }
+        
+        if (parameters.MaxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= parameters.MaxPrice.Value);
+        }
+        
+        return query;
+    }
+    
+    private IQueryable&lt;Product&gt; ApplySorting(
+        IQueryable&lt;Product&gt; query, 
+        string sortBy, 
+        string sortDirection)
+    {
+        var isAscending = sortDirection?.ToLower() == "asc";
+        
+        query = sortBy?.ToLower() switch
+        {
+            "name" => isAscending 
+                ? query.OrderBy(p => p.Name) 
+                : query.OrderByDescending(p => p.Name),
+            "price" => isAscending 
+                ? query.OrderBy(p => p.Price) 
+                : query.OrderByDescending(p => p.Price),
+            "createdate" => isAscending 
+                ? query.OrderBy(p => p.CreatedDate) 
+                : query.OrderByDescending(p => p.CreatedDate),
+            "category" => isAscending 
+                ? query.OrderBy(p => p.Category) 
+                : query.OrderByDescending(p => p.Category),
+            _ => query.OrderBy(p => p.Name) // מיון ברירת מחדל
+        };
+        
+        return query;
+    }
+}</code></pre>
+
+            <div class="warning">
+                <strong>⚠️ אזהרה:</strong> תמיד השתמש ב-<code>AsNoTracking()</code> עבור שאילתות קריאה בלבד. זה משפר משמעותית את הביצועים על ידי מניעת Entity Framework מלעקוב אחר שינויים ישויות.
+            </div>
+        </div>
+
+        <div id="database" class="section">
+            <h2>5. מימושים ספציפיים למסדי נתונים</h2>
+
+            <h3>SQL Server Stored Procedure</h3>
+
+            <h4>יצירת Stored Procedure</h4>
+            <pre><code>CREATE PROCEDURE sp_GetProductsPaged
+    @PageNumber INT = 1,
+    @PageSize INT = 10,
+    @SearchTerm NVARCHAR(100) = NULL,
+    @Category NVARCHAR(50) = NULL,
+    @MinPrice DECIMAL(18, 2) = NULL,
+    @MaxPrice DECIMAL(18, 2) = NULL,
+    @SortBy NVARCHAR(50) = 'Name',
+    @SortDirection NVARCHAR(4) = 'ASC',
+    @TotalCount INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @Offset INT = (@PageNumber - 1) * @PageSize;
+    
+    -- בניית WHERE clause
+    DECLARE @WhereClause NVARCHAR(MAX) = 'WHERE 1=1';
+    
+    IF @SearchTerm IS NOT NULL
+        SET @WhereClause = @WhereClause + 
+            ' AND (Name LIKE ''%' + @SearchTerm + '%'' OR Description LIKE ''%' + @SearchTerm + '%'')';
+    
+    IF @Category IS NOT NULL
+        SET @WhereClause = @WhereClause + ' AND Category = ''' + @Category + '''';
+    
+    IF @MinPrice IS NOT NULL
+        SET @WhereClause = @WhereClause + ' AND Price >= ' + CAST(@MinPrice AS NVARCHAR(20));
+    
+    IF @MaxPrice IS NOT NULL
+        SET @WhereClause = @WhereClause + ' AND Price <= ' + CAST(@MaxPrice AS NVARCHAR(20));
+    
+    -- קבלת ספירה כוללת
+    DECLARE @CountSQL NVARCHAR(MAX) = 
+        'SELECT @Total = COUNT(*) FROM Products ' + @WhereClause;
+    
+    EXEC sp_executesql @CountSQL, N'@Total INT OUTPUT', @Total = @TotalCount OUTPUT;
+    
+    -- אימות עמודת מיון למניעת SQL injection
+    IF @SortBy NOT IN ('Name', 'Price', 'CreatedDate', 'Category')
+        SET @SortBy = 'Name';
+    
+    IF @SortDirection NOT IN ('ASC', 'DESC')
+        SET @SortDirection = 'ASC';
+    
+    -- קבלת נתונים מעומדים
+    DECLARE @SQL NVARCHAR(MAX) = 
+        'SELECT 
+            Id,
+            Name,
+            Description,
+            Price,
+            Category,
+            CreatedDate,
+            ModifiedDate
+        FROM Products ' + @WhereClause +
+        ' ORDER BY ' + @SortBy + ' ' + @SortDirection +
+        ' OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY';
+    
+    EXEC sp_executesql @SQL, 
+        N'@Offset INT, @PageSize INT', 
+        @Offset = @Offset, 
+        @PageSize = @PageSize;
+END
+GO</code></pre>
+
+            <h4>מימוש Repository עם Stored Procedure</h4>
+            <pre><code>public class ProductRepository : IProductRepository
+{
+    private readonly string _connectionString;
+    private readonly ILogger&lt;ProductRepository&gt; _logger;
+    
+    public ProductRepository(IConfiguration configuration, ILogger&lt;ProductRepository&gt; logger)
+    {
+        _connectionString = configuration.GetConnectionString("DefaultConnection");
+        _logger = logger;
+    }
+    
+    public async Task&lt;(IEnumerable&lt;Product&gt; Products, int TotalCount)&gt; GetProductsPagedAsync(
+        ProductQueryParameters parameters)
+    {
+        try
+        {
+            var products = new List&lt;Product&gt;();
+            int totalCount = 0;
+            
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                using (var command = new SqlCommand("sp_GetProductsPaged", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    
+                    // הוספת פרמטרים
+                    command.Parameters.AddWithValue("@PageNumber", parameters.PageNumber);
+                    command.Parameters.AddWithValue("@PageSize", parameters.PageSize);
+                    command.Parameters.AddWithValue("@SearchTerm", 
+                        (object)parameters.SearchTerm ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@Category", 
+                        (object)parameters.Category ?? DBNull.Value);
+                    command.Parameters.AddWithValue("@MinPrice", 
+                        parameters.MinPrice.HasValue ? (object)parameters.MinPrice.Value : DBNull.Value);
+                    command.Parameters.AddWithValue("@MaxPrice", 
+                        parameters.MaxPrice.HasValue ? (object)parameters.MaxPrice.Value : DBNull.Value);
+                    command.Parameters.AddWithValue("@SortBy", parameters.SortBy);
+                    command.Parameters.AddWithValue("@SortDirection", parameters.SortDirection);
+                    
+                    // הוספת פרמטר פלט
+                    var totalCountParam = command.Parameters.Add("@TotalCount", SqlDbType.Int);
+                    totalCountParam.Direction = ParameterDirection.Output;
+                    
+                    await connection.OpenAsync();
+                    
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            products.Add(new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Description = reader.IsDBNull(reader.GetOrdinal("Description")) 
+                                    ? null 
+                                    : reader.GetString(reader.GetOrdinal("Description")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Category = reader.GetString(reader.GetOrdinal("Category")),
+                                CreatedDate = reader.GetDateTime(reader.GetOrdinal("CreatedDate")),
+                                ModifiedDate = reader.IsDBNull(reader.GetOrdinal("ModifiedDate"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("ModifiedDate"))
+                            });
+                        }
+                    }
+                    
+                    totalCount = (int)totalCountParam.Value;
+                }
+            }
+            
+            return (products, totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "שגיאה ב-GetProductsPagedAsync עם stored procedure");
+            throw;
+        }
+    }
+}</code></pre>
+
+            <h3>מימוש Redis</h3>
+            <pre><code>public class RedisProductRepository : IProductRepository
+{
+    private readonly IDatabase _redis;
+    private readonly ILogger&lt;RedisProductRepository&gt; _logger;
+    
+    public RedisProductRepository(IConnectionMultiplexer redis, ILogger&lt;RedisProductRepository&gt; logger)
+    {
+        _redis = redis.GetDatabase();
+        _logger = logger;
+    }
+    
+    public async Task&lt;(IEnumerable&lt;Product&gt; Products, int TotalCount)&gt; GetProductsPagedAsync(
+        ProductQueryParameters parameters)
+    {
+        try
+        {
+            var sortedSetKey = "products:sorted:name";
+            
+            // קבלת ספירה כוללת
+            var totalCount = (int)await _redis.SortedSetLengthAsync(sortedSetKey);
+            
+            // חישוב טווח
+            var start = (parameters.PageNumber - 1) * parameters.PageSize;
+            var stop = start + parameters.PageSize - 1;
+            
+            // קבלת מזהי מוצרים מ-sorted set
+            var productIds = await _redis.SortedSetRangeByRankAsync(
+                sortedSetKey, 
+                start, 
+                stop);
+            
+            // אחזור פרטי מוצר מלאים
+            var products = new List&lt;Product&gt;();
+            foreach (var productId in productIds)
+            {
+                var productKey = $"product:{productId}";
+                var productJson = await _redis.StringGetAsync(productKey);
+                
+                if (!productJson.IsNullOrEmpty)
+                {
+                    var product = System.Text.Json.JsonSerializer.Deserialize&lt;Product&gt;(productJson);
+                    products.Add(product);
+                }
+            }
+            
+            return (products, totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "שגיאה ב-GetProductsPagedAsync מ-Redis");
+            throw;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div id="advanced" class="section">
+            <h2>6. תרחישים מתקדמים</h2>
+
+            <h3>Cursor-Based Paging</h3>
+            <p>Cursor-based paging אידיאלי עבור פידים של נתונים בזמן אמת והימנעות מ-"page drift" כאשר הנתונים משתנים:</p>
+
+            <pre><code>public class CursorPagingParameters
+{
+    public int PageSize { get; set; } = 10;
+    public string Cursor { get; set; } // Cursor מקודד Base64
+}
+
+public class CursorPagedResponse&lt;T&gt;
+{
+    public IEnumerable&lt;T&gt; Data { get; set; }
+    public string NextCursor { get; set; }
+    public string PreviousCursor { get; set; }
+    public bool HasMore { get; set; }
+}
+
+public class ProductCursor
+{
+    public int Id { get; set; }
+    public DateTime CreatedDate { get; set; }
+    
+    public string Encode()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(this);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+        return Convert.ToBase64String(bytes);
+    }
+    
+    public static ProductCursor Decode(string cursor)
+    {
+        if (string.IsNullOrWhiteSpace(cursor))
+            return null;
+        
+        var bytes = Convert.FromBase64String(cursor);
+        var json = System.Text.Encoding.UTF8.GetString(bytes);
+        return System.Text.Json.JsonSerializer.Deserialize&lt;ProductCursor&gt;(json);
+    }
+}
+
+// מימוש Repository
+public async Task&lt;CursorPagedResponse&lt;Product&gt;&gt; GetProductsWithCursorAsync(
+    CursorPagingParameters parameters)
+{
+    var cursor = ProductCursor.Decode(parameters.Cursor);
+    
+    IQueryable&lt;Product&gt; query = _context.Products.AsNoTracking();
+    
+    if (cursor != null)
+    {
+        // קבלת פריטים אחרי ה-cursor
+        query = query.Where(p => 
+            p.CreatedDate < cursor.CreatedDate || 
+            (p.CreatedDate == cursor.CreatedDate && p.Id < cursor.Id));
+    }
+    
+    var products = await query
+        .OrderByDescending(p => p.CreatedDate)
+        .ThenByDescending(p => p.Id)
+        .Take(parameters.PageSize + 1)
+        .ToListAsync();
+    
+    var hasMore = products.Count > parameters.PageSize;
+    if (hasMore)
+    {
+        products = products.Take(parameters.PageSize).ToList();
+    }
+    
+    var nextCursor = hasMore && products.Any()
+        ? new ProductCursor 
+        { 
+            Id = products.Last().Id, 
+            CreatedDate = products.Last().CreatedDate 
+        }.Encode()
+        : null;
+    
+    return new CursorPagedResponse&lt;Product&gt;
+    {
+        Data = products,
+        NextCursor = nextCursor,
+        HasMore = hasMore
+    };
+}</code></pre>
+
+            <h3>Keyset Paging (שיטת Seek)</h3>
+            <p>היעיל ביותר עבור מערכי נתונים גדולים:</p>
+
+            <pre><code>public class KeysetPagingParameters
+{
+    public int PageSize { get; set; } = 10;
+    public int? LastId { get; set; }
+    public DateTime? LastCreatedDate { get; set; }
+}
+
+public async Task&lt;(IEnumerable&lt;Product&gt; Products, bool HasMore)&gt; GetProductsWithKeysetAsync(
+    KeysetPagingParameters parameters)
+{
+    IQueryable&lt;Product&gt; query = _context.Products.AsNoTracking();
+    
+    if (parameters.LastId.HasValue && parameters.LastCreatedDate.HasValue)
+    {
+        // תנאי Keyset לדף הבא
+        query = query.Where(p => 
+            p.CreatedDate < parameters.LastCreatedDate.Value || 
+            (p.CreatedDate == parameters.LastCreatedDate.Value && p.Id > parameters.LastId.Value));
+    }
+    
+    var products = await query
+        .OrderByDescending(p => p.CreatedDate)
+        .ThenBy(p => p.Id)
+        .Take(parameters.PageSize + 1)
+        .ToListAsync();
+    
+    var hasMore = products.Count > parameters.PageSize;
+    if (hasMore)
+    {
+        products = products.Take(parameters.PageSize).ToList();
+    }
+    
+    return (products, hasMore);
+}</code></pre>
+        </div>
+
+        <div id="best-practices" class="section">
+            <h2>7. שיטות עבודה מומלצות</h2>
+
+            <h3>אופטימיזציה של ביצועים</h3>
+
+            <h4>1. תמיד השתמש ב-Indexes</h4>
+            <pre><code>-- יצירת indexes על עמודות נפוצות לסינון ומיון
+CREATE NONCLUSTERED INDEX IX_Products_Name 
+ON Products(Name);
+
+CREATE NONCLUSTERED INDEX IX_Products_Category_Price 
+ON Products(Category, Price);
+
+CREATE NONCLUSTERED INDEX IX_Products_CreatedDate 
+ON Products(CreatedDate DESC) INCLUDE (Name, Price);</code></pre>
+
+            <h4>2. השתמש ב-AsNoTracking עבור שאילתות קריאה בלבד</h4>
+            <pre><code>var products = await _context.Products
+    .AsNoTracking() // משפר משמעותית את הביצועים
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h4>3. הימנע מבעיית N+1 Queries</h4>
+            <pre><code>// רע: בעיית N+1 query
+var products = await _context.Products
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();
+
+// טוב: השתמש ב-eager loading
+var products = await _context.Products
+    .Include(p => p.Category)
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h4>4. השתמש ב-Projection עבור אובייקטים גדולים</h4>
+            <pre><code>// במקום לטעון entity שלם
+var products = await _context.Products
+    .Skip(offset)
+    .Take(pageSize)
+    .Select(p => new ProductDto
+    {
+        Id = p.Id,
+        Name = p.Name,
+        Price = p.Price
+        // רק בחר שדות שאתה צריך
+    })
+    .ToListAsync();</code></pre>
+
+            <h3>אסטרטגיית Caching</h3>
+            <pre><code>public class CachedProductService : IProductService
+{
+    private readonly IProductService _innerService;
+    private readonly IMemoryCache _cache;
+    private readonly ILogger&lt;CachedProductService&gt; _logger;
+    
+    public async Task&lt;PagedResponse&lt;ProductDto&gt;&gt; GetProductsAsync(ProductQueryParameters parameters)
+    {
+        var cacheKey = $"products_{parameters.PageNumber}_{parameters.PageSize}_" +
+                      $"{parameters.SearchTerm}_{parameters.Category}_{parameters.SortBy}";
+        
+        if (_cache.TryGetValue(cacheKey, out PagedResponse&lt;ProductDto&gt; cachedResult))
+        {
+            _logger.LogInformation("נתונים אוחזרו מ-cache: {CacheKey}", cacheKey);
+            return cachedResult;
+        }
+        
+        var result = await _innerService.GetProductsAsync(parameters);
+        
+        var cacheOptions = new MemoryCacheEntryOptions()
+            .SetSlidingExpiration(TimeSpan.FromMinutes(5))
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+        
+        _cache.Set(cacheKey, result, cacheOptions);
+        
+        return result;
+    }
+}</code></pre>
+
+            <h3>אימות קלט (Input Validation)</h3>
+            <pre><code>public class PagingParametersValidator : AbstractValidator&lt;PagingParameters&gt;
+{
+    public PagingParametersValidator()
+    {
+        RuleFor(x => x.PageNumber)
+            .GreaterThan(0)
+            .WithMessage("מספר דף חייב להיות גדול מ-0");
+        
+        RuleFor(x => x.PageSize)
+            .InclusiveBetween(1, 100)
+            .WithMessage("גודל דף חייב להיות בין 1 ל-100");
+    }
+}</code></pre>
+
+            <h3>שיקולי אבטחה</h3>
+
+            <h4>מניעת SQL Injection</h4>
+            <pre><code>// רע - פגיע ל-SQL injection
+var sql = $"SELECT * FROM Products WHERE Name LIKE '%{searchTerm}%'";
+
+// טוב - parameterized
+var products = await _context.Products
+    .Where(p => p.Name.Contains(searchTerm))
+    .ToListAsync();</code></pre>
+
+            <h4>אימות עמודות מיון</h4>
+            <pre><code>private readonly HashSet&lt;string&gt; _allowedSortColumns = new(StringComparer.OrdinalIgnoreCase)
+{
+    "Name", "Price", "CreatedDate", "Category"
+};
+
+private string ValidateSortColumn(string sortBy)
+{
+    if (string.IsNullOrWhiteSpace(sortBy) || !_allowedSortColumns.Contains(sortBy))
+    {
+        return "Name"; // ברירת מחדל
+    }
+    return sortBy;
+}</code></pre>
+
+            <h4>Rate Limiting</h4>
+            <pre><code>[EnableRateLimiting("fixed")]
+[HttpGet]
+public async Task&lt;ActionResult&lt;PagedResponse&lt;ProductDto&gt;&gt;&gt; GetProducts(
+    [FromQuery] ProductQueryParameters parameters)
+{
+    var result = await _productService.GetProductsAsync(parameters);
+    return Ok(result);
+}
+
+// ב-Program.cs
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 100;
+        opt.Window = TimeSpan.FromMinutes(1);
+    });
+});</code></pre>
+        </div>
+
+        <div id="pitfalls" class="section">
+            <h2>8. מלכודות נפוצות</h2>
+
+            <h3>1. חסר ORDER BY</h3>
+            <div class="warning">
+                <strong>⚠️ בעיה:</strong> התוצאות עשויות להיות לא עקביות ללא מיון.
+            </div>
+            <pre><code>// רע: תוצאות עשויות להיות לא עקביות
+var products = await _context.Products
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();
+
+// טוב: תמיד ציין מיון
+var products = await _context.Products
+    .OrderBy(p => p.Id)
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h3>2. ספירה לפני סינון</h3>
+            <pre><code>// רע: ספירה כוללת שגויה
+var totalCount = await _context.Products.CountAsync();
+var products = await _context.Products
+    .Where(p => p.Category == "Electronics")
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();
+
+// טוב: ספור אחרי סינון
+var query = _context.Products.Where(p => p.Category == "Electronics");
+var totalCount = await query.CountAsync();
+var products = await query
+    .Skip(offset)
+    .Take(pageSize)
+    .ToListAsync();</code></pre>
+
+            <h3>3. גדלי דף גדולים</h3>
+            <pre><code>// הטמע גודל דף מקסימלי
+public class PagingParameters
+{
+    private const int MaxPageSize = 100;
+    private int _pageSize = 10;
+    
+    public int PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
+    }
+}</code></pre>
+
+            <h3>4. אי-טיפול במקרי קצה</h3>
+            <pre><code>// טיפול במספר דף מעבר לסך הדפים
+if (parameters.PageNumber > totalPages && totalCount > 0)
+{
+    return BadRequest($"דף {parameters.PageNumber} חורג מסך הדפים {totalPages}");
+}
+
+// טיפול בתוצאות ריקות בצורה נאה
+if (totalCount == 0)
+{
+    return Ok(new PagedResponse&lt;ProductDto&gt;(
+        new List&lt;ProductDto&gt;(), 
+        parameters.PageNumber, 
+        parameters.PageSize, 
+        0));
+}</code></pre>
+        </div>
+
+        <div id="summary" class="section">
+            <h2>9. סיכום</h2>
+
+            <h3>נקודות מפתח</h3>
+            <ol>
+                <li><strong>תמיד השתמש במיון עקבי</strong> בעת מימוש paging</li>
+                <li><strong>אמת פרמטרי קלט</strong> למניעת שימוש לרעה ושגיאות</li>
+                <li><strong>הטמע גודל דף מקסימלי</strong> להגנה על משאבי השרת</li>
+                <li><strong>השתמש ב-indexes מתאימים</strong> על עמודות ממוינות ומסוננות</li>
+                <li><strong>בחר את אסטרטגיית ה-paging הנכונה</strong> לתרחיש שלך:
+                    <ul>
+                        <li>Offset-based לתרחישים פשוטים</li>
+                        <li>Cursor-based לפידים בזמן אמת</li>
+                        <li>Keyset למערכי נתונים גדולים</li>
+                    </ul>
+                </li>
+                <li><strong>שמור תוצאות ב-cache כשמתאים</strong> לשיפור ביצועים</li>
+                <li><strong>טפל במקרי קצה</strong> בצורה נאה (תוצאות ריקות, דפים מעבר לטווח)</li>
+                <li><strong>תעד את ה-API שלך</strong> בצורה ברורה עם דוגמאות</li>
+                <li><strong>עקוב ורשום</strong> פעולות paging לניתוח ביצועים</li>
+                <li><strong>בדוק עם נפחי נתונים ריאליסטיים</strong> לפני העלאה לייצור</li>
+            </ol>
+
+            <h3>דוגמה לקריאת API</h3>
+            <pre><code>GET /api/products?pageNumber=2&pageSize=20&searchTerm=laptop&category=Electronics
+&minPrice=500&maxPrice=2000&sortBy=price&sortDirection=desc</code></pre>
+
+            <h3>דוגמה לתגובה</h3>
+            <pre><code>{
+  "pageNumber": 2,
+  "pageSize": 20,
+  "totalCount": 156,
+  "totalPages": 8,
+  "hasPrevious": true,
+  "hasNext": true,
+  "data": [
+    {
+      "id": 101,
+      "name": "Gaming Laptop Pro",
+      "description": "High-performance gaming laptop",
+      "price": 1899.99,
+      "category": "Electronics",
+      "createdDate": "2024-01-15T10:30:00Z"
+    }
+    // ... פריטים נוספים
+  ]
+}</code></pre>
+
+            <div class="tip">
+                <strong>📚 משאבים נוספים:</strong>
+                <ul>
+                    <li><a href="https://docs.microsoft.com/en-us/ef/core/" target="_blank">תיעוד Entity Framework Core</a></li>
+                    <li><a href="https://docs.microsoft.com/en-us/aspnet/core/web-api/" target="_blank">שיטות עבודה מומלצות ASP.NET Core Web API</a></li>
+                    <li><a href="https://docs.microsoft.com/en-us/sql/t-sql/queries/select-order-by-clause-transact-sql" target="_blank">טכניקות Paging ב-SQL Server</a></li>
+                    <li><a href="https://restfulapi.net/" target="_blank">הנחיות עיצוב RESTful API</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #666;">
+            <p><strong>גרסת מסמך:</strong> 1.0 | <strong>עודכן לאחרונה:</strong> ינואר 2026</p>
+            <p><strong>מתוחזק על ידי:</strong> צוות הפיתוח</p>
+        </div>
+    </div>
+</body>
+</html>
