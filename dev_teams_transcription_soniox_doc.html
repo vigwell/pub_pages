@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams Transcription Solution - Developer Documentation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary-color: #6264A7;
+            --primary-dark: #4b4d8c;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --dark-color: #1e1e1e;
+            --light-bg: #f8f9fa;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background: var(--light-bg);
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--dark-color);
+            color: white;
+            overflow-y: auto;
+            padding: 20px 0;
+            z-index: 1000;
+        }
+
+        .nav-header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .nav-header h2 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .nav-header p {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            padding: 10px 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 1px;
+        }
+
+        .nav a {
+            display: block;
+            padding: 10px 20px;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav a:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav a.active {
+            background: rgba(98, 100, 167, 0.2);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 280px;
+            padding: 40px 60px;
+            max-width: 1200px;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: #444;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Alert Boxes */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            color: #084298;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 1px solid #ffecb5;
+            color: #664d03;
+        }
+
+        .alert-success {
+            background: #d1e7dd;
+            border: 1px solid #badbcc;
+            color: #0f5132;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border: 1px solid #f5c2c7;
+            color: #842029;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--dark-color);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Syntax Highlighting */
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .function { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+        .variable { color: #9cdcfe; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        /* Architecture Diagram */
+        .diagram {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            white-space: pre;
+            overflow-x: auto;
+            line-height: 1.4;
+            font-size: 0.85rem;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 12px 16px;
+            background: white;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .checklist-number {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-required {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .badge-optional {
+            background: #e7f3ff;
+            color: #084298;
+        }
+
+        .badge-azure {
+            background: #0078d4;
+            color: white;
+        }
+
+        .badge-soniox {
+            background: #6264A7;
+            color: white;
+        }
+
+        /* File Tree */
+        .file-tree {
+            background: var(--dark-color);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .file-tree .folder {
+            color: #dcb67a;
+        }
+
+        .file-tree .file {
+            color: #9cdcfe;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Copy Button */
+        .code-block {
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #888;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* Flow Steps */
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .flow-step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .flow-step-content h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+
+        .flow-step-content p {
+            margin: 0;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .nav {
+                width: 240px;
+            }
+            .main {
+                margin-left: 240px;
+                padding: 30px 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav {
+                display: none;
+            }
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav {
+                display: none;
+            }
+            .main {
+                margin-left: 0;
+            }
+            pre {
+                white-space: pre-wrap;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Section Anchors */
+        section {
+            scroll-margin-top: 20px;
+        }
+
+        /* Version Badge */
+        .version-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        /* API Endpoint */
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .endpoint-method {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .endpoint-method.get {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .endpoint-method.post {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .endpoint-method.delete {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .endpoint-path {
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-header">
+            <h2>📚 Developer Docs</h2>
+            <p>Teams Transcription v1.0</p>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Overview</div>
+            <a href="#introduction">Introduction</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#requirements">Requirements</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Azure Setup</div>
+            <a href="#azure-resources">Azure Resources</a>
+            <a href="#communication-services">Communication Services</a>
+            <a href="#azure-bot">Azure Bot Service</a>
+            <a href="#app-registration">App Registration</a>
+            <a href="#app-service">App Service</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Development</div>
+            <a href="#project-structure">Project Structure</a>
+            <a href="#environment-setup">Environment Setup</a>
+            <a href="#server-implementation">Server Implementation</a>
+            <a href="#soniox-integration">Soniox Integration</a>
+            <a href="#websocket-handler">WebSocket Handler</a>
+            <a href="#frontend">Frontend UI</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">API Reference</div>
+            <a href="#api-endpoints">API Endpoints</a>
+            <a href="#websocket-events">WebSocket Events</a>
+            <a href="#error-handling">Error Handling</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Deployment</div>
+            <a href="#local-testing">Local Testing</a>
+            <a href="#azure-deployment">Azure Deployment</a>
+            <a href="#troubleshooting">Troubleshooting</a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Appendix</div>
+            <a href="#credentials-template">Credentials Template</a>
+            <a href="#checklist">Checklist</a>
+            <a href="#glossary">Glossary</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Introduction -->
+        <section id="introduction">
+            <h1>Teams Meeting Transcription Solution <span class="version-badge">v1.0</span></h1>
+            
+            <p>This documentation provides a comprehensive guide for developers to implement a real-time transcription solution for Microsoft Teams meetings using Azure Communication Services and Soniox API.</p>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">🎯</span>
+                    <span class="card-title">Solution Overview</span>
+                </div>
+                <p><strong>Purpose:</strong> Capture audio from Teams meetings and transcribe in real-time using Soniox API.</p>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>Automatic bot joining Teams meetings</li>
+                    <li>Real-time audio streaming via Azure Communication Services</li>
+                    <li>Real-time transcription with speaker identification</li>
+                    <li>Downloadable transcript files</li>
+                    <li>Multi-language support</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    <strong>Important Limitation:</strong> This solution works only for meetings within your organization. External meetings (other tenants) require the meeting organizer to allow external bots, or you need to use a browser-based capture approach.
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture -->
+        <section id="architecture">
+            <h2>Architecture</h2>
+
+            <h3>System Overview</h3>
+            <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              TEAMS MEETING                                   │
+│                           (Audio/Video Source)                               │
+└─────────────────────────────────────────────────────┬───────────────────────┘
+                                                      │
+                                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                 AZURE                                        │
+│  ┌───────────────────┐    ┌───────────────────┐    ┌───────────────────┐   │
+│  │                   │    │                   │    │                   │   │
+│  │    Azure Bot      │───▶│   Communication   │───▶│   App Service     │   │
+│  │    Service        │    │   Services (ACS)  │    │   (Node.js)       │   │
+│  │                   │    │                   │    │                   │   │
+│  │  • Teams Channel  │    │  • Call Control   │    │  • Express API    │   │
+│  │  • Bot Identity   │    │  • Audio Stream   │    │  • WebSocket      │   │
+│  │                   │    │  • Media Platform │    │  • Business Logic │   │
+│  └───────────────────┘    └───────────────────┘    └─────────┬─────────┘   │
+│                                                               │             │
+│  ┌───────────────────┐                                        │             │
+│  │   Azure AD        │◀───────────────────────────────────────┤             │
+│  │  (Authentication) │                                        │             │
+│  └───────────────────┘                                        │             │
+└───────────────────────────────────────────────────────────────│─────────────┘
+                                                                │
+                                                                ▼
+                                              ┌───────────────────────────────┐
+                                              │          SONIOX               │
+                                              │    (Transcription API)        │
+                                              │                               │
+                                              │  • Real-time Processing       │
+                                              │  • Speaker Diarization        │
+                                              │  • Multi-language Support     │
+                                              └───────────────────────────────┘
+                                                                │
+                                                                ▼
+                                              ┌───────────────────────────────┐
+                                              │      FRONTEND CLIENT          │
+                                              │       (Web Browser)           │
+                                              │                               │
+                                              │  • Real-time Display          │
+                                              │  • Download Transcript        │
+                                              │  • Meeting Controls           │
+                                              └───────────────────────────────┘
+            </div>
+
+            <h3>Data Flow</h3>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="flow-step-number">1</div>
+                    <div class="flow-step-content">
+                        <h4>User Initiates Join</h4>
+                        <p>User provides Teams meeting link via the web interface. Frontend sends POST request to <code>/api/join-meeting</code>.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">2</div>
+                    <div class="flow-step-content">
+                        <h4>Bot Joins Meeting</h4>
+                        <p>Server uses Azure Communication Services Call Automation to join the Teams meeting as a bot participant.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">3</div>
+                    <div class="flow-step-content">
+                        <h4>Audio Streaming Begins</h4>
+                        <p>ACS establishes WebSocket connection and streams raw PCM audio (16-bit, 16kHz) to the server.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">4</div>
+                    <div class="flow-step-content">
+                        <h4>Real-time Transcription</h4>
+                        <p>Server forwards audio chunks to Soniox API via WebSocket. Soniox returns transcribed text with speaker identification.</p>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-step-number">5</div>
+                    <div class="flow-step-content">
+                        <h4>Frontend Updates</h4>
+                        <p>Server broadcasts transcription results to connected frontend clients via WebSocket. UI updates in real-time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Requirements -->
+        <section id="requirements">
+            <h2>Requirements</h2>
+
+            <h3>Azure Resources <span class="badge badge-azure">Azure</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Purpose</th>
+                        <th>Required</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Azure Communication Services</td>
+                        <td>Call automation and audio streaming</td>
+                        <td><span class="badge badge-required">Required</span></td>
+                    </tr>
+                    <tr>
+                        <td>Azure Bot Service</td>
+                        <td>Teams channel integration</td>
+                        <td><span class="badge badge-required">Required</span></td>
+                    </tr>
+                    <tr>
+                        <td>Azure AD App Registration</td>
+                        <td>Authentication and permissions</td>
+                        <td><span class="badge badge-required">Required</span></td>
+                    </tr>
+                    <tr>
+                        <td>Azure App Service</td>
+                        <td>Host the Node.js server</td>
+                        <td><span class="badge badge-required">Required</span></td>
+                    </tr>
+                    <tr>
+                        <td>Azure Event Grid</td>
+                        <td>Webhook callbacks</td>
+                        <td><span class="badge badge-required">Required</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>External Services <span class="badge badge-soniox">Soniox</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Purpose</th>
+                        <th>Website</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Soniox</td>
+                        <td>Real-time speech-to-text transcription</td>
+                        <td><a href="https://soniox.com" target="_blank">soniox.com</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Development Environment</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Version</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Node.js</td>
+                        <td>18.x or higher</td>
+                        <td>LTS version recommended</td>
+                    </tr>
+                    <tr>
+                        <td>npm</td>
+                        <td>9.x or higher</td>
+                        <td>Comes with Node.js</td>
+                    </tr>
+                    <tr>
+                        <td>ngrok</td>
+                        <td>Latest</td>
+                        <td>For local testing with HTTPS</td>
+                    </tr>
+                    <tr>
+                        <td>Git</td>
+                        <td>Latest</td>
+                        <td>Version control</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Azure Resources -->
+        <section id="azure-resources">
+            <h2>Azure Resources Setup</h2>
+
+            <div class="alert alert-info">
+                <span class="alert-icon">ℹ️</span>
+                <div>
+                    <strong>Note:</strong> These steps are typically performed by the Azure Admin team. As a developer, you will receive the credentials and connection strings after setup is complete.
+                </div>
+            </div>
+
+            <h3>Resource Summary</h3>
+            <div class="diagram">
+Azure Subscription
+└── Resource Group: rg-teams-transcription
+    ├── Communication Services: acs-transcription
+    ├── Bot Service: bot-teams-transcription
+    ├── App Service Plan: asp-teams-transcription
+    ├── App Service: app-teams-transcription
+    └── App Registration (Azure AD): Teams Transcription App
+            </div>
+        </section>
+
+        <!-- Communication Services -->
+        <section id="communication-services">
+            <h2>Azure Communication Services</h2>
+
+            <h3>Overview</h3>
+            <p>Azure Communication Services (ACS) provides the infrastructure to join Teams meetings programmatically and stream audio.</p>
+
+            <h3>Creation Steps</h3>
+            <ol>
+                <li>Go to Azure Portal → Create a resource</li>
+                <li>Search for "Communication Services"</li>
+                <li>Configure:
+                    <ul>
+                        <li><strong>Name:</strong> acs-transcription</li>
+                        <li><strong>Resource Group:</strong> rg-teams-transcription</li>
+                        <li><strong>Data Location:</strong> United States (or closest region)</li>
+                    </ul>
+                </li>
+                <li>Click Create</li>
+            </ol>
+
+            <h3>Get Connection String</h3>
+            <div class="code-block">
+                <pre><code>Azure Portal → Communication Services → Settings → Keys → Connection string</code></pre>
+            </div>
+
+            <h3>Enable Events</h3>
+            <ol>
+                <li>Navigate to Communication Services → Events</li>
+                <li>Create Event Subscription:
+                    <ul>
+                        <li><strong>Name:</strong> call-events</li>
+                        <li><strong>Endpoint Type:</strong> Webhook</li>
+                        <li><strong>Endpoint:</strong> https://your-app.azurewebsites.net/api/callbacks</li>
+                    </ul>
+                </li>
+                <li>Select Events:
+                    <ul>
+                        <li>Microsoft.Communication.IncomingCall</li>
+                        <li>Microsoft.Communication.CallConnected</li>
+                        <li>Microsoft.Communication.CallDisconnected</li>
+                        <li>Microsoft.Communication.MediaStreamingStarted</li>
+                        <li>Microsoft.Communication.MediaStreamingStopped</li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+
+        <!-- Azure Bot -->
+        <section id="azure-bot">
+            <h2>Azure Bot Service</h2>
+
+            <h3>Overview</h3>
+            <p>The Azure Bot Service enables your application to interact with Microsoft Teams as a bot participant.</p>
+
+            <h3>Creation Steps</h3>
+            <ol>
+                <li>Go to Azure Portal → Create a resource</li>
+                <li>Search for "Azure Bot"</li>
+                <li>Configure:
+                    <ul>
+                        <li><strong>Bot handle:</strong> bot-teams-transcription</li>
+                        <li><strong>Pricing tier:</strong> Standard</li>
+                        <li><strong>Microsoft App ID:</strong> Create new</li>
+                        <li><strong>App type:</strong> Multi Tenant</li>
+                    </ul>
+                </li>
+                <li>Click Create</li>
+            </ol>
+
+            <h3>Configure Teams Channel</h3>
+            <ol>
+                <li>Navigate to Bot Service → Channels</li>
+                <li>Click on Microsoft Teams</li>
+                <li>Accept terms and save</li>
+            </ol>
+
+            <h3>Get Bot Credentials</h3>
+            <div class="code-block">
+                <pre><code>Azure Portal → Bot Service → Configuration
+├── Microsoft App ID (copy this)
+└── Manage Password → New client secret (copy this)</code></pre>
+            </div>
+
+            <div class="alert alert-danger">
+                <span class="alert-icon">🔐</span>
+                <div>
+                    <strong>Security:</strong> Store the Bot App Secret securely. It will only be shown once. If lost, you'll need to generate a new one.
+                </div>
+            </div>
+        </section>
+
+        <!-- App Registration -->
+        <section id="app-registration">
+            <h2>Azure AD App Registration</h2>
+
+            <h3>Overview</h3>
+            <p>The App Registration provides authentication and authorization for accessing Microsoft Graph APIs and Teams resources.</p>
+
+            <h3>Creation Steps</h3>
+            <ol>
+                <li>Go to Azure Portal → Azure Active Directory</li>
+                <li>Navigate to App registrations → New registration</li>
+                <li>Configure:
+                    <ul>
+                        <li><strong>Name:</strong> Teams Transcription App</li>
+                        <li><strong>Supported account types:</strong> Accounts in any organizational directory (Multitenant)</li>
+                        <li><strong>Redirect URI:</strong> Leave blank</li>
+                    </ul>
+                </li>
+                <li>Click Register</li>
+            </ol>
+
+            <h3>Required API Permissions</h3>
+            <p>Navigate to API permissions → Add a permission → Microsoft Graph → Application permissions</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Permission</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Calls.AccessMedia.All</td>
+                        <td>Application</td>
+                        <td>Access media streams in calls</td>
+                    </tr>
+                    <tr>
+                        <td>Calls.Initiate.All</td>
+                        <td>Application</td>
+                        <td>Initiate outgoing calls</td>
+                    </tr>
+                    <tr>
+                        <td>Calls.JoinGroupCall.All</td>
+                        <td>Application</td>
+                        <td>Join group calls and meetings</td>
+                    </tr>
+                    <tr>
+                        <td>Calls.JoinGroupCallAsGuest.All</td>
+                        <td>Application</td>
+                        <td>Join group calls as a guest</td>
+                    </tr>
+                    <tr>
+                        <td>OnlineMeetings.Read.All</td>
+                        <td>Application</td>
+                        <td>Read online meeting details</td>
+                    </tr>
+                    <tr>
+                        <td>OnlineMeetings.ReadWrite.All</td>
+                        <td>Application</td>
+                        <td>Read and create online meetings</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                <div>
+                    <strong>Admin Consent Required:</strong> After adding permissions, click "Grant admin consent for [Your Organization]". This requires Azure AD admin privileges.
+                </div>
+            </div>
+
+            <h3>Create Client Secret</h3>
+            <ol>
+                <li>Navigate to Certificates & secrets</li>
+                <li>Click New client secret</li>
+                <li>Set description and expiration</li>
+                <li>Copy the secret value immediately</li>
+            </ol>
+
+            <h3>Get App Credentials</h3>
+            <div class="code-block">
+                <pre><code>Azure Portal → App Registration → Overview
+├── Application (client) ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+├── Directory (tenant) ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+└── Client Secret: (from Certificates & secrets)</code></pre>
+            </div>
+        </section>
+
+        <!-- App Service -->
+        <section id="app-service">
+            <h2>Azure App Service</h2>
+
+            <h3>Creation Steps</h3>
+            <ol>
+                <li>Go to Azure Portal → Create a resource</li>
+                <li>Search for "Web App"</li>
+                <li>Configure:
+                    <ul>
+                        <li><strong>Name:</strong> app-teams-transcription</li>
+                        <li><strong>Runtime stack:</strong> Node 18 LTS</li>
+                        <li><strong>Operating System:</strong> Linux</li>
+                        <li><strong>Region:</strong> Same as other resources</li>
+                        <li><strong>App Service Plan:</strong> B1 or higher (WebSocket support required)</li>
+                    </ul>
+                </li>
+                <li>Click Create</li>
+            </ol>
+
+            <h3>Enable WebSockets</h3>
+            <ol>
+                <li>Navigate to App Service → Configuration</li>
+                <li>Go to General settings</li>
+                <li>Set Web sockets: ON</li>
+                <li>Save changes</li>
+            </ol>
+
+            <h3>Environment Variables</h3>
+            <p>Navigate to App Service → Configuration → Application settings → New application setting</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Value</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ACS_CONNECTION_STRING</td>
+                        <td>endpoint=https://...;accesskey=...</td>
+                        <td>Communication Services</td>
+                    </tr>
+                    <tr>
+                        <td>BOT_APP_ID</td>
+                        <td>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</td>
+                        <td>Bot Service</td>
+                    </tr>
+                    <tr>
+                        <td>BOT_APP_SECRET</td>
+                        <td>***</td>
+                        <td>Bot Service</td>
+                    </tr>
+                    <tr>
+                        <td>AZURE_CLIENT_ID</td>
+                        <td>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</td>
+                        <td>App Registration</td>
+                    </tr>
+                    <tr>
+                        <td>AZURE_CLIENT_SECRET</td>
+                        <td>***</td>
+                        <td>App Registration</td>
+                    </tr>
+                    <tr>
+                        <td>AZURE_TENANT_ID</td>
+                        <td>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</td>
+                        <td>App Registration</td>
+                    </tr>
+                    <tr>
+                        <td>CALLBACK_URL</td>
+                        <td>https://app-teams-transcription.azurewebsites.net/api/callbacks</td>
+                        <td>App Service URL</td>
+                    </tr>
+                    <tr>
+                        <td>SONIOX_API_KEY</td>
+                        <td>***</td>
+                        <td>Soniox Dashboard</td>
+                    </tr>
+                    <tr>
+                        <td>PORT</td>
+                        <td>8080</td>
+                        <td>Default for App Service</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Project Structure -->
+        <section id="project-structure">
+            <h2>Project Structure</h2>
+
+            <div class="file-tree">
+<span class="folder">teams-transcription-soniox/</span>
+├── <span class="file">.env</span>                          # Environment variables (local)
+├── <span class="file">.env.example</span>                  # Environment template
+├── <span class="file">.gitignore</span>                    # Git ignore file
+├── <span class="file">package.json</span>                  # NPM dependencies
+├── <span class="file">server.js</span>                     # Main entry point
+├── <span class="folder">src/</span>
+│   ├── <span class="file">callAutomation.js</span>         # Azure Call Automation logic
+│   ├── <span class="file">audioProcessor.js</span>         # PCM audio processing
+│   ├── <span class="file">sonioxTranscription.js</span>    # Soniox API integration
+│   ├── <span class="file">websocketHandler.js</span>       # WebSocket connections
+│   └── <span class="file">bot.js</span>                    # Bot Framework handler
+├── <span class="folder">public/</span>
+│   ├── <span class="file">index.html</span>                # Frontend UI
+│   └── <span class="file">app.js</span>                    # Frontend JavaScript
+└── <span class="file">README.md</span>                     # Project documentation
+            </div>
+        </section>
+
+        <!-- Environment Setup -->
+        <section id="environment-setup">
+            <h2>Environment Setup</h2>
+
+            <h3>1. Clone/Create Project</h3>
+            <div class="code-block">
+                <pre><code><span class="comment"># Create project directory</span>
+mkdir teams-transcription-soniox
+cd teams-transcription-soniox
+
+<span class="comment"># Initialize npm project</span>
+npm init -y</code></pre>
+            </div>
+
+            <h3>2. Install Dependencies</h3>
+            <div class="code-block">
+                <pre><code><span class="comment"># Production dependencies</span>
+npm install @azure/communication-call-automation
+npm install @azure/communication-common
+npm install @azure/communication-identity
+npm install botbuilder
+npm install dotenv
+npm install express
+npm install ws
+
+<span class="comment"># Development dependencies</span>
+npm install --save-dev nodemon</code></pre>
+            </div>
+
+            <h3>3. Create package.json</h3>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"name"</span>: <span class="string">"teams-transcription-soniox"</span>,
+  <span class="string">"version"</span>: <span class="string">"1.0.0"</span>,
+  <span class="string">"description"</span>: <span class="string">"Real-time Teams meeting transcription with Soniox"</span>,
+  <span class="string">"main"</span>: <span class="string">"server.js"</span>,
+  <span class="string">"scripts"</span>: {
+    <span class="string">"start"</span>: <span class="string">"node server.js"</span>,
+    <span class="string">"dev"</span>: <span class="string">"nodemon server.js"</span>
+  },
+  <span class="string">"dependencies"</span>: {
+    <span class="string">"@azure/communication-call-automation"</span>: <span class="string">"^1.2.0"</span>,
+    <span class="string">"@azure/communication-common"</span>: <span class="string">"^2.3.0"</span>,
+    <span class="string">"@azure/communication-identity"</span>: <span class="string">"^1.3.0"</span>,
+    <span class="string">"botbuilder"</span>: <span class="string">"^4.22.0"</span>,
+    <span class="string">"dotenv"</span>: <span class="string">"^16.3.1"</span>,
+    <span class="string">"express"</span>: <span class="string">"^4.18.2"</span>,
+    <span class="string">"ws"</span>: <span class="string">"^8.14.2"</span>
+  },
+  <span class="string">"devDependencies"</span>: {
+    <span class="string">"nodemon"</span>: <span class="string">"^3.0.1"</span>
+  }
+}</code></pre>
+            </div>
+
+            <h3>4. Create .env File</h3>
+            <div class="code-block">
+                <pre><code><span class="comment"># Azure Communication Services</span>
+ACS_CONNECTION_STRING=endpoint=https://your-acs.communication.azure.com/;accesskey=your-key
+
+<span class="comment"># Azure Bot</span>
+BOT_APP_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+BOT_APP_SECRET=your-bot-secret
+
+<span class="comment"># Azure AD</span>
+AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+AZURE_CLIENT_SECRET=your-client-secret
+AZURE_TENANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+<span class="comment"># Server URLs</span>
+CALLBACK_URL=https://your-domain.com/api/callbacks
+WEBSOCKET_URL=wss://your-domain.com/audio
+
+<span class="comment"># Soniox</span>
+SONIOX_API_KEY=your-soniox-api-key
+
+<span class="comment"># Transcription Settings</span>
+TRANSCRIPTION_LANGUAGE=en
+
+<span class="comment"># Server</span>
+PORT=3000</code></pre>
+            </div>
+
+            <div class="alert alert-danger">
+                <span class="alert-icon">🔐</span>
+                <div>
+                    <strong>Security:</strong> Never commit the <code>.env</code> file to version control. Add it to <code>.gitignore</code>.
+                </div>
+            </div>
+        </section>
+
+        <!-- Server Implementation -->
+        <section id="server-implementation">
+            <h2>Server Implementation</h2>
+
+            <h3>server.js - Main Entry Point</h3>
+            <div class="code-block">
+                <pre><code><span class="keyword">require</span>(<span class="string">'dotenv'</span>).config();
+<span class="keyword">const</span> express = <span class="keyword">require</span>(<span class="string">'express'</span>);
+<span class="keyword">const</span> http = <span class="keyword">require</span>(<span class="string">'http'</span>);
+<span class="keyword">const</span> { setupWebSocketHandler } = <span class="keyword">require</span>(<span class="string">'./src/websocketHandler'</span>);
+<span class="keyword">const</span> { setupBot } = <span class="keyword">require</span>(<span class="string">'./src/bot'</span>);
+<span class="keyword">const</span> { CallAutomationService } = <span class="keyword">require</span>(<span class="string">'./src/callAutomation'</span>);
+
+<span class="keyword">const</span> app = <span class="function">express</span>();
+<span class="keyword">const</span> server = http.<span class="function">createServer</span>(app);
+
+app.<span class="function">use</span>(express.<span class="function">json</span>());
+app.<span class="function">use</span>(express.<span class="function">static</span>(<span class="string">'public'</span>));
+
+<span class="comment">// Initialize services</span>
+<span class="keyword">const</span> callService = <span class="keyword">new</span> <span class="function">CallAutomationService</span>();
+<span class="keyword">const</span> transcripts = <span class="keyword">new</span> <span class="function">Map</span>();
+
+<span class="comment">// Setup WebSocket for audio streaming + Soniox</span>
+<span class="function">setupWebSocketHandler</span>(server, transcripts);
+
+<span class="comment">// Setup Bot Framework</span>
+<span class="function">setupBot</span>(app);
+
+<span class="comment">// ============ API ENDPOINTS ============</span>
+
+<span class="comment">// Join Teams meeting</span>
+app.<span class="function">post</span>(<span class="string">'/api/join-meeting'</span>, <span class="keyword">async</span> (req, res) => {
+    <span class="keyword">const</span> { teamsMeetingLink, displayName } = req.body;
+
+    <span class="keyword">if</span> (!teamsMeetingLink) {
+        <span class="keyword">return</span> res.<span class="function">status</span>(<span class="number">400</span>).<span class="function">json</span>({ error: <span class="string">'Meeting link required'</span> });
+    }
+
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> result = <span class="keyword">await</span> callService.<span class="function">joinMeeting</span>(
+            teamsMeetingLink, 
+            displayName || <span class="string">'Transcription Bot'</span>
+        );
+        
+        transcripts.<span class="function">set</span>(result.callId, {
+            callId: result.callId,
+            startTime: <span class="keyword">new</span> <span class="function">Date</span>(),
+            entries: [],
+            status: <span class="string">'joining'</span>
+        });
+
+        res.<span class="function">json</span>({
+            success: <span class="keyword">true</span>,
+            callId: result.callId,
+            message: <span class="string">'Joining meeting...'</span>
+        });
+    } <span class="keyword">catch</span> (error) {
+        console.<span class="function">error</span>(<span class="string">'Join error:'</span>, error);
+        res.<span class="function">status</span>(<span class="number">500</span>).<span class="function">json</span>({ error: error.message });
+    }
+});
+
+<span class="comment">// Leave meeting</span>
+app.<span class="function">post</span>(<span class="string">'/api/leave-meeting'</span>, <span class="keyword">async</span> (req, res) => {
+    <span class="keyword">const</span> { callId } = req.body;
+
+    <span class="keyword">try</span> {
+        <span class="keyword">await</span> callService.<span class="function">leaveMeeting</span>(callId);
+        
+        <span class="keyword">if</span> (transcripts.<span class="function">has</span>(callId)) {
+            transcripts.<span class="function">get</span>(callId).status = <span class="string">'ended'</span>;
+            transcripts.<span class="function">get</span>(callId).endTime = <span class="keyword">new</span> <span class="function">Date</span>();
+        }
+        
+        res.<span class="function">json</span>({ success: <span class="keyword">true</span> });
+    } <span class="keyword">catch</span> (error) {
+        res.<span class="function">status</span>(<span class="number">500</span>).<span class="function">json</span>({ error: error.message });
+    }
+});
+
+<span class="comment">// Get transcript</span>
+app.<span class="function">get</span>(<span class="string">'/api/transcripts/:callId'</span>, (req, res) => {
+    <span class="keyword">const</span> { callId } = req.params;
+    <span class="keyword">const</span> transcript = transcripts.<span class="function">get</span>(callId);
+    
+    <span class="keyword">if</span> (!transcript) {
+        <span class="keyword">return</span> res.<span class="function">status</span>(<span class="number">404</span>).<span class="function">json</span>({ error: <span class="string">'Transcript not found'</span> });
+    }
+    
+    res.<span class="function">json</span>(transcript);
+});
+
+<span class="comment">// Azure callbacks</span>
+app.<span class="function">post</span>(<span class="string">'/api/callbacks'</span>, <span class="keyword">async</span> (req, res) => {
+    <span class="keyword">const</span> events = Array.<span class="function">isArray</span>(req.body) ? req.body : [req.body];
+    
+    <span class="keyword">for</span> (<span class="keyword">const</span> event <span class="keyword">of</span> events) {
+        console.<span class="function">log</span>(<span class="string">'Event:'</span>, event.type || event.eventType);
+        <span class="keyword">await</span> callService.<span class="function">handleEvent</span>(event);
+    }
+    
+    res.<span class="function">status</span>(<span class="number">200</span>).<span class="function">send</span>(<span class="string">'OK'</span>);
+});
+
+<span class="comment">// Health check</span>
+app.<span class="function">get</span>(<span class="string">'/health'</span>, (req, res) => {
+    res.<span class="function">json</span>({ 
+        status: <span class="string">'ok'</span>, 
+        timestamp: <span class="keyword">new</span> <span class="function">Date</span>(),
+        activeCalls: callService.<span class="function">getActiveCalls</span>().length
+    });
+});
+
+<span class="comment">// Start server</span>
+<span class="keyword">const</span> PORT = process.env.PORT || <span class="number">3000</span>;
+server.<span class="function">listen</span>(PORT, () => {
+    console.<span class="function">log</span>(<span class="string">`Server running on http://localhost:${PORT}`</span>);
+});</code></pre>
+            </div>
+        </section>
+
+        <!-- Soniox Integration -->
+        <section id="soniox-integration">
+            <h2>Soniox Integration</h2>
+
+            <h3>Overview</h3>
+            <p>Soniox provides real-time speech-to-text transcription with speaker diarization and multi-language support.</p>
+
+            <h3>src/sonioxTranscription.js</h3>
+            <div class="code-block">
+                <pre><code><span class="keyword">const</span> WebSocket = <span class="keyword">require</span>(<span class="string">'ws'</span>);
+
+<span class="keyword">class</span> <span class="function">SonioxTranscription</span> {
+    <span class="function">constructor</span>(apiKey, options = {}) {
+        <span class="keyword">this</span>.apiKey = apiKey;
+        <span class="keyword">this</span>.language = options.language || <span class="string">'en'</span>;
+        <span class="keyword">this</span>.sampleRate = options.sampleRate || <span class="number">16000</span>;
+        <span class="keyword">this</span>.socket = <span class="keyword">null</span>;
+        <span class="keyword">this</span>.isConnected = <span class="keyword">false</span>;
+        <span class="keyword">this</span>.onTranscript = options.onTranscript || (() => {});
+        <span class="keyword">this</span>.onError = options.onError || console.error;
+    }
+
+    <span class="keyword">async</span> <span class="function">connect</span>() {
+        <span class="keyword">return new</span> <span class="function">Promise</span>((resolve, reject) => {
+            <span class="keyword">try</span> {
+                <span class="comment">// Soniox WebSocket endpoint</span>
+                <span class="keyword">const</span> wsUrl = <span class="string">'wss://api.soniox.com/transcribe-websocket'</span>;
+                
+                <span class="keyword">this</span>.socket = <span class="keyword">new</span> <span class="function">WebSocket</span>(wsUrl, {
+                    headers: {
+                        <span class="string">'Authorization'</span>: <span class="string">`Bearer ${<span class="keyword">this</span>.apiKey}`</span>
+                    }
+                });
+
+                <span class="keyword">this</span>.socket.<span class="function">on</span>(<span class="string">'open'</span>, () => {
+                    console.<span class="function">log</span>(<span class="string">'✅ Connected to Soniox'</span>);
+                    <span class="keyword">this</span>.isConnected = <span class="keyword">true</span>;
+                    <span class="keyword">this</span>.<span class="function">sendConfig</span>();
+                    <span class="function">resolve</span>();
+                });
+
+                <span class="keyword">this</span>.socket.<span class="function">on</span>(<span class="string">'message'</span>, (data) => {
+                    <span class="keyword">this</span>.<span class="function">handleMessage</span>(data);
+                });
+
+                <span class="keyword">this</span>.socket.<span class="function">on</span>(<span class="string">'close'</span>, () => {
+                    console.<span class="function">log</span>(<span class="string">'Soniox connection closed'</span>);
+                    <span class="keyword">this</span>.isConnected = <span class="keyword">false</span>;
+                });
+
+                <span class="keyword">this</span>.socket.<span class="function">on</span>(<span class="string">'error'</span>, (error) => {
+                    console.<span class="function">error</span>(<span class="string">'Soniox error:'</span>, error);
+                    <span class="keyword">this</span>.<span class="function">onError</span>(error);
+                    <span class="function">reject</span>(error);
+                });
+
+            } <span class="keyword">catch</span> (error) {
+                <span class="function">reject</span>(error);
+            }
+        });
+    }
+
+    <span class="function">sendConfig</span>() {
+        <span class="keyword">const</span> config = {
+            type: <span class="string">'config'</span>,
+            config: {
+                language: <span class="keyword">this</span>.language,
+                sample_rate: <span class="keyword">this</span>.sampleRate,
+                encoding: <span class="string">'pcm_s16le'</span>,
+                channels: <span class="number">1</span>,
+                enable_punctuation: <span class="keyword">true</span>,
+                enable_speaker_diarization: <span class="keyword">true</span>,
+                interim_results: <span class="keyword">true</span>
+            }
+        };
+
+        <span class="keyword">this</span>.socket.<span class="function">send</span>(JSON.<span class="function">stringify</span>(config));
+    }
+
+    <span class="function">handleMessage</span>(data) {
+        <span class="keyword">try</span> {
+            <span class="keyword">const</span> message = JSON.<span class="function">parse</span>(data.<span class="function">toString</span>());
+
+            <span class="keyword">switch</span> (message.type) {
+                <span class="keyword">case</span> <span class="string">'transcript'</span>:
+                    <span class="keyword">if</span> (message.text && message.text.<span class="function">trim</span>()) {
+                        <span class="keyword">this</span>.<span class="function">onTranscript</span>({
+                            text: message.text,
+                            isFinal: <span class="keyword">false</span>,
+                            speaker: message.speaker || <span class="string">'Unknown'</span>,
+                            confidence: message.confidence,
+                            timestamp: <span class="keyword">new</span> <span class="function">Date</span>()
+                        });
+                    }
+                    <span class="keyword">break</span>;
+
+                <span class="keyword">case</span> <span class="string">'final_transcript'</span>:
+                    <span class="keyword">if</span> (message.text && message.text.<span class="function">trim</span>()) {
+                        <span class="keyword">this</span>.<span class="function">onTranscript</span>({
+                            text: message.text,
+                            isFinal: <span class="keyword">true</span>,
+                            speaker: message.speaker || <span class="string">'Unknown'</span>,
+                            confidence: message.confidence,
+                            timestamp: <span class="keyword">new</span> <span class="function">Date</span>()
+                        });
+                    }
+                    <span class="keyword">break</span>;
+
+                <span class="keyword">case</span> <span class="string">'error'</span>:
+                    console.<span class="function">error</span>(<span class="string">'Soniox error:'</span>, message.error);
+                    <span class="keyword">this</span>.<span class="function">onError</span>(<span class="keyword">new</span> <span class="function">Error</span>(message.error));
+                    <span class="keyword">break</span>;
+            }
+        } <span class="keyword">catch</span> (error) {
+            console.<span class="function">error</span>(<span class="string">'Error parsing Soniox message:'</span>, error);
+        }
+    }
+
+    <span class="function">sendAudio</span>(audioBuffer) {
+        <span class="keyword">if</span> (!<span class="keyword">this</span>.isConnected || !<span class="keyword">this</span>.socket) {
+            <span class="keyword">return false</span>;
+        }
+
+        <span class="keyword">try</span> {
+            <span class="keyword">this</span>.socket.<span class="function">send</span>(audioBuffer);
+            <span class="keyword">return true</span>;
+        } <span class="keyword">catch</span> (error) {
+            console.<span class="function">error</span>(<span class="string">'Error sending audio:'</span>, error);
+            <span class="keyword">return false</span>;
+        }
+    }
+
+    <span class="keyword">async</span> <span class="function">disconnect</span>() {
+        <span class="keyword">if</span> (<span class="keyword">this</span>.socket) {
+            <span class="keyword">this</span>.socket.<span class="function">send</span>(JSON.<span class="function">stringify</span>({ type: <span class="string">'end'</span> }));
+            <span class="keyword">await new</span> <span class="function">Promise</span>(resolve => <span class="function">setTimeout</span>(resolve, <span class="number">1000</span>));
+            <span class="keyword">this</span>.socket.<span class="function">close</span>();
+            <span class="keyword">this</span>.socket = <span class="keyword">null</span>;
+            <span class="keyword">this</span>.isConnected = <span class="keyword">false</span>;
+        }
+    }
+}
+
+module.exports = { SonioxTranscription };</code></pre>
+            </div>
+
+            <h3>Soniox Configuration Options</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>Type</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>language</td>
+                        <td>string</td>
+                        <td>"en"</td>
+                        <td>Transcription language (en, he, ar, es, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td>sample_rate</td>
+                        <td>number</td>
+                        <td>16000</td>
+                        <td>Audio sample rate in Hz</td>
+                    </tr>
+                    <tr>
+                        <td>encoding</td>
+                        <td>string</td>
+                        <td>"pcm_s16le"</td>
+                        <td>Audio encoding format</td>
+                    </tr>
+                    <tr>
+                        <td>enable_punctuation</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>Add punctuation to transcript</td>
+                    </tr>
+                    <tr>
+                        <td>enable_speaker_diarization</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>Identify different speakers</td>
+                    </tr>
+                    <tr>
+                        <td>interim_results</td>
+                        <td>boolean</td>
+                        <td>true</td>
+                        <td>Return partial results</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- WebSocket Handler -->
+        <section id="websocket-handler">
+            <h2>WebSocket Handler</h2>
+
+            <h3>src/websocketHandler.js</h3>
+            <div class="code-block">
+                <pre><code><span class="keyword">const</span> WebSocket = <span class="keyword">require</span>(<span class="string">'ws'</span>);
+<span class="keyword">const</span> { SonioxTranscription } = <span class="keyword">require</span>(<span class="string">'./sonioxTranscription'</span>);
+
+<span class="keyword">function</span> <span class="function">setupWebSocketHandler</span>(server, transcripts) {
+    <span class="comment">// WebSocket for receiving audio from Azure</span>
+    <span class="keyword">const</span> audioWss = <span class="keyword">new</span> WebSocket.<span class="function">Server</span>({ server, path: <span class="string">'/audio'</span> });
+    
+    <span class="comment">// WebSocket for sending transcripts to UI</span>
+    <span class="keyword">const</span> uiWss = <span class="keyword">new</span> WebSocket.<span class="function">Server</span>({ server, path: <span class="string">'/ui'</span> });
+    <span class="keyword">const</span> uiClients = <span class="keyword">new</span> <span class="function">Set</span>();
+
+    uiWss.<span class="function">on</span>(<span class="string">'connection'</span>, (ws) => {
+        console.<span class="function">log</span>(<span class="string">'UI client connected'</span>);
+        uiClients.<span class="function">add</span>(ws);
+        
+        ws.<span class="function">on</span>(<span class="string">'close'</span>, () => {
+            uiClients.<span class="function">delete</span>(ws);
+        });
+    });
+
+    <span class="comment">// Broadcast to all UI clients</span>
+    <span class="keyword">function</span> <span class="function">broadcastToUI</span>(data) {
+        <span class="keyword">const</span> message = JSON.<span class="function">stringify</span>(data);
+        uiClients.<span class="function">forEach</span>(client => {
+            <span class="keyword">if</span> (client.readyState === WebSocket.OPEN) {
+                client.<span class="function">send</span>(message);
+            }
+        });
+    }
+
+    <span class="comment">// Handle audio streams from Azure</span>
+    audioWss.<span class="function">on</span>(<span class="string">'connection'</span>, <span class="keyword">async</span> (ws) => {
+        console.<span class="function">log</span>(<span class="string">'🎤 Audio stream connected'</span>);
+        
+        <span class="keyword">let</span> callId = <span class="keyword">null</span>;
+        
+        <span class="comment">// Initialize Soniox</span>
+        <span class="keyword">const</span> soniox = <span class="keyword">new</span> <span class="function">SonioxTranscription</span>(process.env.SONIOX_API_KEY, {
+            language: process.env.TRANSCRIPTION_LANGUAGE || <span class="string">'en'</span>,
+            sampleRate: <span class="number">16000</span>,
+            
+            onTranscript: (result) => {
+                <span class="keyword">if</span> (result.isFinal && result.text) {
+                    console.<span class="function">log</span>(<span class="string">`📝 [${result.speaker}]: ${result.text}`</span>);
+                    
+                    <span class="comment">// Store in transcript</span>
+                    <span class="keyword">if</span> (callId && transcripts.<span class="function">has</span>(callId)) {
+                        transcripts.<span class="function">get</span>(callId).entries.<span class="function">push</span>({
+                            timestamp: result.timestamp,
+                            speaker: result.speaker,
+                            text: result.text,
+                            confidence: result.confidence
+                        });
+                    }
+
+                    <span class="comment">// Broadcast to UI</span>
+                    <span class="function">broadcastToUI</span>({
+                        type: <span class="string">'transcript'</span>,
+                        callId,
+                        speaker: result.speaker,
+                        text: result.text,
+                        timestamp: result.timestamp,
+                        isFinal: <span class="keyword">true</span>
+                    });
+                }
+            },
+            
+            onError: (error) => {
+                console.<span class="function">error</span>(<span class="string">'Soniox error:'</span>, error);
+            }
+        });
+
+        <span class="comment">// Connect to Soniox</span>
+        <span class="keyword">try</span> {
+            <span class="keyword">await</span> soniox.<span class="function">connect</span>();
+        } <span class="keyword">catch</span> (error) {
+            console.<span class="function">error</span>(<span class="string">'Failed to connect to Soniox:'</span>, error);
+        }
+
+        <span class="comment">// Handle incoming messages</span>
+        ws.<span class="function">on</span>(<span class="string">'message'</span>, (data) => {
+            <span class="keyword">try</span> {
+                <span class="keyword">const</span> message = JSON.<span class="function">parse</span>(data.<span class="function">toString</span>());
+
+                <span class="keyword">if</span> (message.kind === <span class="string">'AudioMetadata'</span>) {
+                    callId = message.audioMetadata?.callConnectionId;
+                    console.<span class="function">log</span>(<span class="string">`📋 Audio metadata for call: ${callId}`</span>);
+                    <span class="keyword">return</span>;
+                }
+
+                <span class="keyword">if</span> (message.kind === <span class="string">'AudioData'</span>) {
+                    <span class="keyword">const</span> audioData = Buffer.<span class="function">from</span>(message.audioData.data, <span class="string">'base64'</span>);
+                    soniox.<span class="function">sendAudio</span>(audioData);
+                    <span class="keyword">return</span>;
+                }
+
+            } <span class="keyword">catch</span> (e) {
+                <span class="comment">// Binary audio data</span>
+                soniox.<span class="function">sendAudio</span>(Buffer.<span class="function">from</span>(data));
+            }
+        });
+
+        ws.<span class="function">on</span>(<span class="string">'close'</span>, <span class="keyword">async</span> () => {
+            console.<span class="function">log</span>(<span class="string">'🔌 Audio stream disconnected'</span>);
+            <span class="keyword">await</span> soniox.<span class="function">disconnect</span>();
+        });
+    });
+
+    console.<span class="function">log</span>(<span class="string">'WebSocket handlers initialized'</span>);
+}
+
+module.exports = { setupWebSocketHandler };</code></pre>
+            </div>
+        </section>
+
+        <!-- API Endpoints -->
+        <section id="api-endpoints">
+            <h2>API Endpoints</h2>
+
+            <h3>POST /api/join-meeting</h3>
+            <div class="endpoint">
+                <span class="endpoint-method post">POST</span>
+                <span class="endpoint-path">/api/join-meeting</span>
+            </div>
+            <p>Join a Teams meeting and start transcription.</p>
+            
+            <h4>Request Body</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"teamsMeetingLink"</span>: <span class="string">"https://teams.microsoft.com/l/meetup-join/..."</span>,
+  <span class="string">"displayName"</span>: <span class="string">"Transcription Bot"</span>  <span class="comment">// Optional</span>
+}</code></pre>
+            </div>
+
+            <h4>Response (Success)</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"success"</span>: <span class="keyword">true</span>,
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>,
+  <span class="string">"message"</span>: <span class="string">"Joining meeting..."</span>
+}</code></pre>
+            </div>
+
+            <h3>POST /api/leave-meeting</h3>
+            <div class="endpoint">
+                <span class="endpoint-method post">POST</span>
+                <span class="endpoint-path">/api/leave-meeting</span>
+            </div>
+            <p>Leave the current meeting and stop transcription.</p>
+
+            <h4>Request Body</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>
+}</code></pre>
+            </div>
+
+            <h3>GET /api/transcripts/:callId</h3>
+            <div class="endpoint">
+                <span class="endpoint-method get">GET</span>
+                <span class="endpoint-path">/api/transcripts/:callId</span>
+            </div>
+            <p>Get the transcript for a specific call.</p>
+
+            <h4>Response</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>,
+  <span class="string">"startTime"</span>: <span class="string">"2024-01-15T10:30:00.000Z"</span>,
+  <span class="string">"endTime"</span>: <span class="string">"2024-01-15T11:00:00.000Z"</span>,
+  <span class="string">"status"</span>: <span class="string">"ended"</span>,
+  <span class="string">"entries"</span>: [
+    {
+      <span class="string">"timestamp"</span>: <span class="string">"2024-01-15T10:30:15.000Z"</span>,
+      <span class="string">"speaker"</span>: <span class="string">"Speaker 1"</span>,
+      <span class="string">"text"</span>: <span class="string">"Hello everyone, welcome to the meeting."</span>,
+      <span class="string">"confidence"</span>: <span class="number">0.95</span>
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <h3>GET /health</h3>
+            <div class="endpoint">
+                <span class="endpoint-method get">GET</span>
+                <span class="endpoint-path">/health</span>
+            </div>
+            <p>Health check endpoint for monitoring.</p>
+        </section>
+
+        <!-- WebSocket Events -->
+        <section id="websocket-events">
+            <h2>WebSocket Events</h2>
+
+            <h3>UI WebSocket (/ui)</h3>
+            <p>Connect to receive real-time transcript updates.</p>
+
+            <h4>Event: transcript</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"type"</span>: <span class="string">"transcript"</span>,
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>,
+  <span class="string">"speaker"</span>: <span class="string">"Speaker 1"</span>,
+  <span class="string">"text"</span>: <span class="string">"This is the transcribed text."</span>,
+  <span class="string">"timestamp"</span>: <span class="string">"2024-01-15T10:30:15.000Z"</span>,
+  <span class="string">"isFinal"</span>: <span class="keyword">true</span>
+}</code></pre>
+            </div>
+
+            <h4>Event: interim</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"type"</span>: <span class="string">"interim"</span>,
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>,
+  <span class="string">"text"</span>: <span class="string">"Partial transcription..."</span>,
+  <span class="string">"timestamp"</span>: <span class="string">"2024-01-15T10:30:15.000Z"</span>
+}</code></pre>
+            </div>
+
+            <h4>Event: connected</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"type"</span>: <span class="string">"connected"</span>,
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>
+}</code></pre>
+            </div>
+
+            <h4>Event: disconnected</h4>
+            <div class="code-block">
+                <pre><code>{
+  <span class="string">"type"</span>: <span class="string">"disconnected"</span>,
+  <span class="string">"callId"</span>: <span class="string">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span>
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Local Testing -->
+        <section id="local-testing">
+            <h2>Local Testing</h2>
+
+            <h3>1. Start the Server</h3>
+            <div class="code-block">
+                <pre><code><span class="comment"># Development mode with auto-reload</span>
+npm run dev
+
+<span class="comment"># Or production mode</span>
+npm start</code></pre>
+            </div>
+
+            <h3>2. Expose with ngrok</h3>
+            <p>Azure needs a public HTTPS URL for callbacks. Use ngrok to expose your local server.</p>
+            <div class="code-block">
+                <pre><code><span class="comment"># Install ngrok</span>
+npm install -g ngrok
+
+<span class="comment"># Start ngrok</span>
+ngrok http 3000</code></pre>
+            </div>
+
+            <h3>3. Update Environment Variables</h3>
+            <p>Copy the ngrok HTTPS URL and update your .env file:</p>
+            <div class="code-block">
+                <pre><code>CALLBACK_URL=https://xxxx-xx-xx-xxx-xx.ngrok.io/api/callbacks
+WEBSOCKET_URL=wss://xxxx-xx-xx-xxx-xx.ngrok.io/audio</code></pre>
+            </div>
+
+            <h3>4. Update Azure Event Grid</h3>
+            <p>Update the Event Grid subscription endpoint to use your ngrok URL.</p>
+
+            <h3>5. Test the Frontend</h3>
+            <p>Open your browser and navigate to:</p>
+            <div class="code-block">
+                <pre><code>http://localhost:3000</code></pre>
+            </div>
+
+            <div class="alert alert-info">
+                <span class="alert-icon">💡</span>
+                <div>
+                    <strong>Demo Mode:</strong> Open browser console and type <code>startDemo()</code> to test the UI without a real meeting.
+                </div>
+            </div>
+        </section>
+
+        <!-- Azure Deployment -->
+        <section id="azure-deployment">
+            <h2>Azure Deployment</h2>
+
+            <h3>Option 1: Azure CLI</h3>
+            <div class="code-block">
+                <pre><code><span class="comment"># Login to Azure</span>
+az login
+
+<span class="comment"># Set subscription</span>
+az account set --subscription "Your Subscription Name"
+
+<span class="comment"># Deploy to App Service</span>
+az webapp up --name app-teams-transcription --resource-group rg-teams-transcription --runtime "NODE:18-lts"</code></pre>
+            </div>
+
+            <h3>Option 2: GitHub Actions</h3>
+            <p>Create <code>.github/workflows/deploy.yml</code>:</p>
+            <div class="code-block">
+                <pre><code><span class="variable">name</span>: Deploy to Azure
+
+<span class="variable">on</span>:
+  <span class="variable">push</span>:
+    <span class="variable">branches</span>: [ main ]
+
+<span class="variable">jobs</span>:
+  <span class="variable">build-and-deploy</span>:
+    <span class="variable">runs-on</span>: ubuntu-latest
+    
+    <span class="variable">steps</span>:
+    - <span class="variable">uses</span>: actions/checkout@v3
+    
+    - <span class="variable">name</span>: Setup Node.js
+      <span class="variable">uses</span>: actions/setup-node@v3
+      <span class="variable">with</span>:
+        <span class="variable">node-version</span>: '18'
+    
+    - <span class="variable">name</span>: Install dependencies
+      <span class="variable">run</span>: npm ci
+    
+    - <span class="variable">name</span>: Deploy to Azure
+      <span class="variable">uses</span>: azure/webapps-deploy@v2
+      <span class="variable">with</span>:
+        <span class="variable">app-name</span>: app-teams-transcription
+        <span class="variable">publish-profile</span>: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}</code></pre>
+            </div>
+
+            <h3>Post-Deployment Checklist</h3>
+            <ul class="checklist">
+                <li>
+                    <span class="checklist-checkbox"></span>
+                    Verify environment variables are set in App Service
+                </li>
+                <li>
+                    <span class="checklist-checkbox"></span>
+                    WebSockets are enabled
+                </li>
+                <li>
+                    <span class="checklist-checkbox"></span>
+                    Event Grid subscription points to production URL
+                </li>
+                <li>
+                    <span class="checklist-checkbox"></span>
+                    Health endpoint returns OK: <code>/health</code>
+                </li>
+                <li>
+                    <span class="checklist-checkbox"></span>
+                    Test joining a real Teams meeting
+                </li>
+            </ul>
+        </section>
+
+        <!-- Troubleshooting -->
+        <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+
+            <h3>Common Issues</h3>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">❌</span>
+                    <span class="card-title">Bot fails to join meeting</span>
+                </div>
+                <p><strong>Possible causes:</strong></p>
+                <ul>
+                    <li>Invalid meeting link format</li>
+                    <li>Meeting is from external organization</li>
+                    <li>Bot permissions not granted admin consent</li>
+                    <li>ACS connection string is invalid</li>
+                </ul>
+                <p><strong>Solution:</strong> Verify all credentials, ensure admin consent is granted, and check that the meeting is from your organization.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">❌</span>
+                    <span class="card-title">No audio streaming</span>
+                </div>
+                <p><strong>Possible causes:</strong></p>
+                <ul>
+                    <li>WebSocket URL is incorrect</li>
+                    <li>Media streaming not enabled in ACS</li>
+                    <li>Firewall blocking WebSocket connections</li>
+                </ul>
+                <p><strong>Solution:</strong> Check WebSocket URL format, verify Event Grid subscription, and ensure WebSockets are enabled in App Service.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-icon">❌</span>
+                    <span class="card-title">Soniox transcription not working</span>
+                </div>
+                <p><strong>Possible causes:</strong></p>
+                <ul>
+                    <li>Invalid Soniox API key</li>
+                    <li>Wrong audio format sent to Soniox</li>
+                    <li>Network connectivity issues</li>
+                </ul>
+                <p><strong>Solution:</strong> Verify API key, ensure audio is 16-bit PCM at 16kHz, and check Soniox dashboard for errors.</p>
+            </div>
+
+            <h3>Debug Logging</h3>
+            <p>Enable detailed logging by setting environment variable:</p>
+            <div class="code-block">
+                <pre><code>DEBUG=true</code></pre>
+            </div>
+        </section>
+
+        <!-- Credentials Template -->
+        <section id="credentials-template">
+            <h2>Credentials Template</h2>
+
+            <p>Use this template for Azure Admin to provide credentials to the developer:</p>
+
+            <div class="code-block">
+                <pre><code>===============================================================
+TEAMS TRANSCRIPTION - AZURE CREDENTIALS
+Generated: [DATE]
+===============================================================
+
+AZURE COMMUNICATION SERVICES
+-----------------------------
+Resource Name: acs-transcription
+Connection String: endpoint=https://[name].communication.azure.com/;accesskey=[key]
+
+AZURE BOT SERVICE
+-----------------------------
+Bot Name: bot-teams-transcription
+App ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+App Secret: [secret]
+
+AZURE AD APP REGISTRATION
+-----------------------------
+App Name: Teams Transcription App
+Client ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+Client Secret: [secret]
+Tenant ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+AZURE APP SERVICE
+-----------------------------
+App Name: app-teams-transcription
+URL: https://app-teams-transcription.azurewebsites.net
+WebSocket URL: wss://app-teams-transcription.azurewebsites.net
+
+NOTES
+-----------------------------
+- All secrets expire on: [DATE]
+- Admin consent has been granted for all permissions
+- Event Grid subscription is configured
+
+===============================================================</code></pre>
+            </div>
+        </section>
+
+        <!-- Checklist -->
+        <section id="checklist">
+            <h2>Complete Checklist</h2>
+
+            <h3>Azure Admin Tasks</h3>
+            <ol class="checklist">
+                <li><span class="checklist-number">1</span> Create Resource Group</li>
+                <li><span class="checklist-number">2</span> Create Communication Services</li>
+                <li><span class="checklist-number">3</span> Create Azure Bot Service</li>
+                <li><span class="checklist-number">4</span> Enable Teams Channel</li>
+                <li><span class="checklist-number">5</span> Create App Registration</li>
+                <li><span class="checklist-number">6</span> Add API Permissions</li>
+                <li><span class="checklist-number">7</span> Grant Admin Consent</li>
+                <li><span class="checklist-number">8</span> Create App Service</li>
+                <li><span class="checklist-number">9</span> Enable WebSockets</li>
+                <li><span class="checklist-number">10</span> Configure Event Grid</li>
+                <li><span class="checklist-number">11</span> Set Environment Variables</li>
+                <li><span class="checklist-number">12</span> Send Credentials to Developer</li>
+            </ol>
+
+            <h3>Developer Tasks</h3>
+            <ol class="checklist">
+                <li><span class="checklist-number">1</span> Get Soniox API Key</li>
+                <li><span class="checklist-number">2</span> Setup Development Environment</li>
+                <li><span class="checklist-number">3</span> Clone/Create Project</li>
+                <li><span class="checklist-number">4</span> Install Dependencies</li>
+                <li><span class="checklist-number">5</span> Configure .env File</li>
+                <li><span class="checklist-number">6</span> Implement Server</li>
+                <li><span class="checklist-number">7</span> Implement Soniox Integration</li>
+                <li><span class="checklist-number">8</span> Create Frontend UI</li>
+                <li><span class="checklist-number">9</span> Test Locally with ngrok</li>
+                <li><span class="checklist-number">10</span> Deploy to Azure</li>
+                <li><span class="checklist-number">11</span> Integration Testing</li>
+                <li><span class="checklist-number">12</span> Documentation</li>
+            </ol>
+        </section>
+
+        <!-- Glossary -->
+        <section id="glossary">
+            <h2>Glossary</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ACS</strong></td>
+                        <td>Azure Communication Services - Microsoft's cloud communication platform</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Azure AD</strong></td>
+                        <td>Azure Active Directory - Microsoft's identity and access management service</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bot Framework</strong></td>
+                        <td>Microsoft's framework for building conversational AI bots</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Call Automation</strong></td>
+                        <td>ACS feature for programmatically controlling calls</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Event Grid</strong></td>
+                        <td>Azure's event routing service for webhooks</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Graph API</strong></td>
+                        <td>Microsoft's REST API for accessing Microsoft 365 services</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ngrok</strong></td>
+                        <td>Tool to expose local servers to the internet</td>
+                    </tr><tr>
+                    <td><strong>PCM</strong></td>
+                    <td>Pulse Code Modulation - raw audio format</td>
+                </tr>
+                <tr>
+                    <td><strong>Soniox</strong></td>
+                    <td>Real-time speech-to-text transcription service</td>
+                </tr>
+                <tr>
+                    <td><strong>WebSocket</strong></td>
+                    <td>Protocol for two-way communication between client and server</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Footer -->
+    <div style="margin-top: 60px; padding-top: 30px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+        <p>Teams Transcription Solution Documentation v1.0</p>
+        <p>Last Updated: January 2024</p>
+    </div>
+</main>
+
+<script>
+    // Smooth scroll for navigation links
+    document.querySelectorAll('.nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Update active state
+                    document.querySelectorAll('.nav a').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            }
+        });
+    });
+
+    // Highlight current section in navigation
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
+    });
+
+    // Copy code functionality
+    document.querySelectorAll('.code-block').forEach(block => {
+        const pre = block.querySelector('pre');
+        if (pre) {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = 'Copy';
+            btn.addEventListener('click', () => {
+                navigator.clipboard.writeText(pre.textContent);
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            });
+            block.style.position = 'relative';
+            block.appendChild(btn);
+        }
+    });
+</script>

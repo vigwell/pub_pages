@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams Transcription - Soniox</title>
+    <style>
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        input[type="text"]:focus, input[type="password"]:focus, select:focus {
+            outline: none;
+            border-color: #6264A7;
+            box-shadow: 0 0 0 3px rgba(98, 100, 167, 0.1);
+        }
+        
+        input::placeholder {
+            color: #aaa;
+        }
+        
+        .input-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 6px;
+        }
+        
+        /* Button Styles */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 160px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6264A7 0%, #4b4d8c 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(98, 100, 167, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        /* Status Styles */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .status-bar.disconnected { 
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); 
+            color: #721c24; 
+        }
+        .status-bar.connecting { 
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%); 
+            color: #856404; 
+        }
+        .status-bar.connected { 
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); 
+            color: #155724; 
+        }
+        .status-bar.transcribing { 
+            background: linear-gradient(135deg, #cce5ff 0%, #b8daff 100%); 
+            color: #004085; 
+        }
+        
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .status-bar.disconnected .status-dot { background: #dc3545; }
+        .status-bar.connecting .status-dot { 
+            background: #ffc107; 
+            animation: pulse 1s infinite;
+        }
+        .status-bar.connected .status-dot { background: #28a745; }
+        .status-bar.transcribing .status-dot { 
+            background: #007bff; 
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+        
+        .status-text {
+            font-weight: 600;
+            flex-grow: 1;
+        }
+        
+        .status-time {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #6264A7;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* Transcript Styles */
+        .transcript-container {
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+        
+        .transcript-entry {
+            padding: 16px;
+            margin-bottom: 12px;
+            background: white;
+            border-radius: 12px;
+            border-left: 5px solid #6264A7;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .transcript-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .speaker {
+            font-weight: 700;
+            color: #6264A7;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .speaker-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #6264A7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .timestamp {
+            color: #999;
+            font-size: 12px;
+        }
+        
+        .confidence {
+            font-size: 11px;
+            color: #28a745;
+            background: #d4edda;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+        
+        .transcript-text {
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .interim-text {
+            padding: 12px 16px;
+            background: #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-style: italic;
+            color: #666;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #888;
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e8e8e8;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .tab:hover {
+            color: #6264A7;
+        }
+        
+        .tab.active {
+            color: #6264A7;
+            border-bottom-color: #6264A7;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Config Section */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .config-section h4 {
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Action Log */
+        .action-log {
+            background: #1e1e1e;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+        }
+        
+        .log-entry {
+            color: #d4d4d4;
+            margin-bottom: 4px;
+        }
+        
+        .log-entry.info { color: #4fc3f7; }
+        .log-entry.success { color: #81c784; }
+        .log-entry.error { color: #e57373; }
+        .log-entry.warning { color: #ffb74d; }
+        
+        .log-time {
+            color: #888;
+            margin-right: 8px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast {
+            background: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastIn 0.3s ease;
+            max-width: 350px;
+        }
+        
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .toast.success { border-left: 4px solid #28a745; }
+        .toast.error { border-left: 4px solid #dc3545; }
+        .toast.info { border-left: 4px solid #007bff; }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: #0a58ca;
+            margin-bottom: 8px;
+        }
+
+        .info-box p {
+            color: #055160;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-box code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎙️ Teams Meeting Transcription</h1>
+            <p>Real-time transcription of Microsoft Teams meetings using Soniox</p>
+        </div>
+        
+        <!-- Main Control Card -->
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('meeting')">📅 Meeting</div>
+                <div class="tab" onclick="switchTab('config')">⚙️ Settings</div>
+                <div class="tab" onclick="switchTab('logs')">📋 Logs</div>
+            </div>
+            
+            <!-- Meeting Tab -->
+            <div id="meetingTab" class="tab-content active">
+                <div class="form-group">
+                    <label>🔗 Teams Meeting Link</label>
+                    <input type="text" id="meetingLink" placeholder="Paste your Teams meeting link here...">
+                    <div class="input-hint">Copy the link from your Teams meeting invitation</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>🤖 Bot Display Name</label>
+                    <input type="text" id="displayName" value="Transcription Bot">
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="joinBtn" onclick="joinMeeting()">
+                        <span id="joinBtnText">▶️ Join Meeting</span>
+                    </button>
+                    <button class="btn btn-danger" id="leaveBtn" onclick="leaveMeeting()" disabled>
+                        ⏹️ Leave Meeting
+                    </button>
+                    <button class="btn btn-success" id="downloadBtn" onclick="downloadTranscript()" disabled>
+                        📥 Download Transcript
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearTranscript()">
+                        🗑️ Clear
+                    </button>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="entryCount">0</div>
+                        <div class="stat-label">Sentences</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="wordCount">0</div>
+                        <div class="stat-label">Words</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="speakerCount">0</div>
+                        <div class="stat-label">Speakers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="duration">00:00</div>
+                        <div class="stat-label">Duration</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Config Tab -->
+            <div id="configTab" class="tab-content">
+                <div class="config-grid">
+                    <div class="config-section">
+                        <h4>☁️ Azure Settings</h4>
+                        <div class="form-group">
+                            <label>Server URL</label>
+                            <input type="text" id="serverUrl" value="http://localhost:3000">
+                        </div>
+                        <div class="form-group">
+                            <label>WebSocket URL</label>
+                            <input type="text" id="wsUrl" value="ws://localhost:3000/ui">
+                        </div>
+                    </div>
+                    
+                    <div class="config-section">
+                        <h4>🎤 Soniox Settings</h4>
+                        <div class="form-group">
+                            <label>API Key</label>
+                            <input type="password" id="sonioxKey" placeholder="Enter your Soniox API key">
+                        </div>
+                        <div class="form-group">
+                            <label>Language</label>
+                            <select id="language">
+                                <option value="en">English</option>
+                                <option value="he">Hebrew</option>
+                                <option value="ar">Arabic</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="ru">Russian</option>
+                                <option value="zh">Chinese</option>
+                                <option value="ja">Japanese</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="saveConfig()">💾 Save Settings</button>
+                    <button class="btn btn-secondary" onclick="testConnection()">🔌 Test Connection</button>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ Configuration Help</h4>
+                    <p>
+                        <strong>Server URL:</strong> The URL of your backend server running the Teams transcription service.<br>
+                        <strong>WebSocket URL:</strong> The WebSocket endpoint for real-time transcript updates.<br>
+                        <strong>Soniox API Key:</strong> Get your API key from <a href="https://soniox.com" target="_blank">soniox.com</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Logs Tab -->
+            <div id="logsTab" class="tab-content">
+                <div class="action-log" id="actionLog">
+                    <div class="log-entry info">
+                        <span class="log-time">[--:--:--]</span> System initialized
+                    </div>
+                </div>
+                <div class="btn-group" style="margin-top: 16px;">
+                    <button class="btn btn-secondary" onclick="clearLogs()">🗑️ Clear Logs</button>
+                    <button class="btn btn-secondary" onclick="exportLogs()">📤 Export Logs</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transcript Card -->
+        <div class="card">
+            <div class="card-title">📝 Real-time Transcript</div>
+            
+            <!-- Status Bar -->
+            <div class="status-bar disconnected" id="statusBar">
+                <span class="status-dot"></span>
+                <span class="status-text" id="statusText">Disconnected</span>
+                <span class="status-time" id="statusTime"></span>
+            </div>
+            
+            <!-- Transcript Container -->
+            <div class="transcript-container" id="transcriptContainer">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">🎤</div>
+                    <h3>Waiting for Transcription</h3>
+                    <p>Join a Teams meeting to start automatic transcription</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Card -->
+        <div class="card" style="background: #f8f9fa;">
+            <div class="card-title">ℹ️ How It Works</div>
+            <p style="color: #666; line-height: 1.8;">
+                <strong>Steps:</strong><br>
+                1. Enter your Teams meeting link<br>
+                2. Click "Join Meeting"<br>
+                3. The bot joins the meeting and starts transcribing in real-time<br>
+                4. Download the transcript when finished<br><br>
+                <strong>Requirements:</strong> The backend server must be running with Azure Communication Services and Soniox API configured.<br><br>
+                <strong>Demo Mode:</strong> Open browser console and type <code>startDemo()</code> to see a simulated transcription.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const state = {
+            currentCallId: null,
+            socket: null,
+            transcriptEntries: [],
+            speakers: new Set(),
+            startTime: null,
+            durationInterval: null,
+            isConnected: false,
+            config: {
+                serverUrl: 'http://localhost:3000',
+                wsUrl: 'ws://localhost:3000/ui',
+                sonioxKey: '',
+                language: 'en'
+            }
+        };
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const elements = {
+            joinBtn: document.getElementById('joinBtn'),
+            joinBtnText: document.getElementById('joinBtnText'),
+            leaveBtn: document.getElementById('leaveBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            statusBar: document.getElementById('statusBar'),
+            statusText: document.getElementById('statusText'),
+            statusTime: document.getElementById('statusTime'),
+            transcriptContainer: document.getElementById('transcriptContainer'),
+            emptyState: document.getElementById('emptyState'),
+            entryCount: document.getElementById('entryCount'),
+            wordCount: document.getElementById('wordCount'),
+            speakerCount: document.getElementById('speakerCount'),
+            duration: document.getElementById('duration'),
+            meetingLink: document.getElementById('meetingLink'),
+            displayName: document.getElementById('displayName'),
+            actionLog: document.getElementById('actionLog'),
+            toastContainer: document.getElementById('toastContainer')
+        };
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            log('info', 'System initialized successfully');
+        });
+
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        function loadConfig() {
+            const saved = localStorage.getItem('teamsTranscriptionConfig');
+            if (saved) {
+                state.config = { ...state.config, ...JSON.parse(saved) };
+                document.getElementById('serverUrl').value = state.config.serverUrl;
+                document.getElementById('wsUrl').value = state.config.wsUrl;
+                document.getElementById('sonioxKey').value = state.config.sonioxKey;
+                document.getElementById('language').value = state.config.language;
+            }
+        }
+
+        function saveConfig() {
+            state.config.serverUrl = document.getElementById('serverUrl').value;
+            state.config.wsUrl = document.getElementById('wsUrl').value;
+            state.config.sonioxKey = document.getElementById('sonioxKey').value;
+            state.config.language = document.getElementById('language').value;
+            
+            localStorage.setItem('teamsTranscriptionConfig', JSON.stringify(state.config));
+            showToast('success', 'Settings saved successfully');
+            log('success', 'Settings saved');
+        }
+
+        async function testConnection() {
+            log('info', 'Testing server connection...');
+            try {
+                const response = await fetch(`${state.config.serverUrl}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast('success', 'Server connection successful!');
+                    log('success', `Connection OK: ${JSON.stringify(data)}`);
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                showToast('error', `Connection failed: ${error.message}`);
+                log('error', `Connection error: ${error.message}`);
+            }
+        }
+
+        // ============================================
+        // TABS
+        // ============================================
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+
+        // ============================================
+        // STATUS MANAGEMENT
+        // ============================================
+        function setStatus(statusType, message) {
+            elements.statusBar.className = `status-bar ${statusType}`;
+            elements.statusText.textContent = message;
+            
+            if (statusType === 'connected' || statusType === 'transcribing') {
+                elements.statusTime.textContent = formatTime(new Date());
+            }
+        }
+
+        // ============================================
+        // MEETING FUNCTIONS
+        // ============================================
+        async function joinMeeting() {
+            const meetingLink = elements.meetingLink.value.trim();
+            const displayName = elements.displayName.value.trim();
+
+            if (!meetingLink) {
+                showToast('error', 'Please enter a meeting link');
+                return;
+            }
+
+            // Update UI
+            elements.joinBtn.disabled = true;
+            elements.joinBtnText.innerHTML = '<span class="spinner"></span> Connecting...';
+            setStatus('connecting', 'Connecting to meeting...');
+            log('info', `Attempting to join meeting: ${meetingLink.substring(0, 50)}...`);
+
+            try {
+                // Call server API
+                const response = await fetch(`${state.config.serverUrl}/api/join-meeting`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ teamsMeetingLink: meetingLink, displayName })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    state.currentCallId = data.callId;
+                    state.startTime = Date.now();
+                    
+                    // Start duration timer
+                    state.durationInterval = setInterval(updateDuration, 1000);
+                    
+                    // Connect WebSocket for real-time updates
+                    connectWebSocket();
+                    
+                    // Update UI
+                    elements.joinBtn.disabled = true;
+                    elements.leaveBtn.disabled = false;
+                    elements.downloadBtn.disabled = false;
+                    elements.joinBtnText.textContent = '✅ Connected';
+                    
+                    setStatus('connected', 'Connected to meeting');
+                    showToast('success', 'Successfully joined the meeting!');
+                    log('success', `Joined meeting: ${data.callId}`);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Join error:', error);
+                elements.joinBtn.disabled = false;
+                elements.joinBtnText.textContent = '▶️ Join Meeting';
+                setStatus('disconnected', 'Connection failed');
+                showToast('error', `Error: ${error.message}`);
+                log('error', `Connection error: ${error.message}`);
+            }
+        }
+
+        async function leaveMeeting() {
+            if (!state.currentCallId) return;
+
+            log('info', 'Leaving meeting...');
+
+            try {
+                await fetch(`${state.config.serverUrl}/api/leave-meeting`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ callId: state.currentCallId })
+                });
+
+                disconnectMeeting();
+                showToast('info', 'Left the meeting');
+                log('success', 'Successfully left the meeting');
+            } catch (error) {
+                console.error('Leave error:', error);
+                log('error', `Error leaving meeting: ${error.message}`);
+            }
+        }
+
+        function disconnectMeeting() {
+            // Clear timer
+            if (state.durationInterval) {
+                clearInterval(state.durationInterval);
+                state.durationInterval = null;
+            }
+
+            // Close WebSocket
+            if (state.socket) {
+                state.socket.close();
+                state.socket = null;
+            }
+
+            // Reset state
+            state.currentCallId = null;
+            state.isConnected = false;
+
+            // Update UI
+            elements.joinBtn.disabled = false;
+            elements.leaveBtn.disabled = true;
+            elements.joinBtnText.textContent = '▶️ Join Meeting';
+            setStatus('disconnected', 'Disconnected');
+        }
+
+        // ============================================
+        // WEBSOCKET CONNECTION
+        // ============================================
+        function connectWebSocket() {
+            if (state.socket) {
+                state.socket.close();
+            }
+
+            log('info', `Connecting to WebSocket: ${state.config.wsUrl}`);
+
+            try {
+                state.socket = new WebSocket(state.config.wsUrl);
+
+                state.socket.onopen = () => {
+                    state.isConnected = true;
+                    log('success', 'WebSocket connected');
+                    setStatus('transcribing', 'Transcribing...');
+                };
+
+                state.socket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleWebSocketMessage(data);
+                    } catch (e) {
+                        console.error('WebSocket message parse error:', e);
+                    }
+                };
+
+                state.socket.onclose = () => {
+                    state.isConnected = false;
+                    log('warning', 'WebSocket disconnected');
+                    
+                    // Attempt reconnect if still in meeting
+                    if (state.currentCallId) {
+                        setTimeout(connectWebSocket, 3000);
+                    }
+                };
+
+                state.socket.onerror = (error) => {
+                    log('error', `WebSocket error: ${error.message || 'Unknown'}`);
+                };
+            } catch (error) {
+                log('error', `WebSocket error: ${error.message}`);
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'transcript':
+                    if (data.isFinal && data.text) {
+                        addTranscriptEntry({
+                            speaker: data.speaker || 'Speaker',
+                            text: data.text,
+                            timestamp: data.timestamp || new Date(),
+                            confidence: data.confidence
+                        });
+                    }
+                    break;
+
+                case 'interim':
+                    showInterimText(data.text);
+                    break;
+
+                case 'connected':
+                    setStatus('transcribing', 'Transcribing...');
+                    log('success', 'Meeting connection established');
+                    break;
+
+                case 'disconnected':
+                    disconnectMeeting();
+                    log('info', 'Meeting ended');
+                    break;
+
+                case 'error':
+                    showToast('error', data.message);
+                    log('error', data.message);
+                    break;
+            }
+        }
+
+        // ============================================
+        // TRANSCRIPT FUNCTIONS
+        // ============================================
+        function addTranscriptEntry(entry) {
+            // Hide empty state
+            if (elements.emptyState) {
+                elements.emptyState.style.display = 'none';
+            }
+
+            // Remove interim text
+            const interim = document.querySelector('.interim-text');
+            if (interim) interim.remove();
+
+            // Create entry element
+            const div = document.createElement('div');
+            div.className = 'transcript-entry';
+            
+            const initials = entry.speaker.substring(0, 2).toUpperCase();
+            const confidenceHtml = entry.confidence 
+                ? `<span class="confidence">${Math.round(entry.confidence * 100)}%</span>` 
+                : '';
+            
+            div.innerHTML = `
+                <div class="transcript-header">
+                    <span class="speaker">
+                        <span class="speaker-avatar">${initials}</span>
+                        ${entry.speaker}
+                    </span>
+                    <span>
+                        ${confidenceHtml}
+                        <span class="timestamp">${formatTime(entry.timestamp)}</span>
+                    </span>
+                </div>
+                <div class="transcript-text">${entry.text}</div>
+            `;
+            
+            elements.transcriptContainer.appendChild(div);
+            elements.transcriptContainer.scrollTop = elements.transcriptContainer.scrollHeight;
+
+            // Update state
+            state.transcriptEntries.push(entry);
+            state.speakers.add(entry.speaker);
+
+            // Update stats
+            updateStats();
+        }
+
+        function showInterimText(text) {
+            if (!text) return;
+
+            let interim = document.querySelector('.interim-text');
+            
+            if (!interim) {
+                interim = document.createElement('div');
+                interim.className = 'interim-text';
+                elements.transcriptContainer.appendChild(interim);
+            }
+            
+            interim.textContent = `${text}...`;
+            elements.transcriptContainer.scrollTop = elements.transcriptContainer.scrollHeight;
+        }
+
+        function clearTranscript() {
+            state.transcriptEntries = [];
+            state.speakers.clear();
+            
+            elements.transcriptContainer.innerHTML = `
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-icon">🎤</div>
+                    <h3>Waiting for Transcription</h3>
+                    <p>Join a Teams meeting to start automatic transcription</p>
+                </div>
+            `;
+            
+            updateStats();
+            log('info', 'Transcript cleared');
+        }
+
+        function downloadTranscript() {
+            if (state.transcriptEntries.length === 0) {
+                showToast('error', 'No transcript to download');
+                return;
+            }
+
+            // Create formatted transcript
+            let text = '='.repeat(60) + '\n';
+            text += 'TEAMS MEETING TRANSCRIPT\n';
+            text += `Generated: ${new Date().toLocaleString()}\n`;
+            text += `Duration: ${elements.duration.textContent}\n`;
+            text += `Speakers: ${state.speakers.size}\n`;
+            text += `Total Sentences: ${state.transcriptEntries.length}\n`;
+            text += '='.repeat(60) + '\n\n';
+
+            text += state.transcriptEntries
+                .map(e => `[${formatTime(e.timestamp)}] ${e.speaker}:\n${e.text}\n`)
+                .join('\n');
+
+            text += '\n' + '='.repeat(60) + '\n';
+            text += 'End of Transcript\n';
+
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transcript-${formatDate(new Date())}.txt`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showToast('success', 'Transcript downloaded successfully');
+            log('success', 'Transcript downloaded');
+        }
+
+        // ============================================
+        // STATS
+        // ============================================
+        function updateStats() {
+            const wordCount = state.transcriptEntries
+                .reduce((sum, e) => sum + e.text.split(/\s+/).length, 0);
+
+            elements.entryCount.textContent = state.transcriptEntries.length;
+            elements.wordCount.textContent = wordCount;
+            elements.speakerCount.textContent = state.speakers.size;
+        }
+
+        function updateDuration() {
+            if (state.startTime) {
+                const seconds = Math.floor((Date.now() - state.startTime) / 1000);
+                elements.duration.textContent = formatDuration(seconds);
+            }
+        }
+
+        // ============================================
+        // LOGGING
+        // ============================================
+        function log(type, message) {
+            const time = formatTime(new Date());
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+            
+            elements.actionLog.appendChild(entry);
+            elements.actionLog.scrollTop = elements.actionLog.scrollHeight;
+        }
+
+        function clearLogs() {
+            elements.actionLog.innerHTML = '';
+            log('info', 'Logs cleared');
+        }
+
+        function exportLogs() {
+            const logs = elements.actionLog.innerText;
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs-${formatDate(new Date())}.txt`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            showToast('success', 'Logs exported');
+        }
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+        function showToast(type, message) {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            toast.innerHTML = `<span style="font-size:20px">${icon}</span><span>${message}</span>`;
+            
+            elements.toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toastIn 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatTime(date) {
+            return new Date(date).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        function formatDate(date) {
+            return new Date(date).toISOString().split('T')[0];
+        }
+
+        function formatDuration(seconds) {
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hrs > 0) {
+                return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // ============================================
+        // DEMO MODE (for testing without server)
+        // ============================================
+        function startDemo() {
+            log('info', 'Demo mode activated');
+            setStatus('transcribing', 'Demo Mode - Transcribing...');
+            
+            if (elements.emptyState) {
+                elements.emptyState.style.display = 'none';
+            }
+            
+            state.startTime = Date.now();
+            state.durationInterval = setInterval(updateDuration, 1000);
+            
+            elements.joinBtn.disabled = true;
+            elements.leaveBtn.disabled = false;
+            elements.downloadBtn.disabled = false;
+            elements.joinBtnText.textContent = '✅ Demo Mode';
+
+            // Simulate transcripts
+            const demoTexts = [
+                { speaker: 'John Smith', text: 'Hello everyone, thank you for joining today\'s meeting.' },
+                { speaker: 'Sarah Johnson', text: 'Hi John, glad to be here.' },
+                { speaker: 'John Smith', text: 'Let\'s start with a quick overview of the project status.' },
+                { speaker: 'Mike Chen', text: 'I\'d like to hear about the development progress.' },
+                { speaker: 'Sarah Johnson', text: 'The team has completed the first phase successfully.' },
+                { speaker: 'John Smith', text: 'Excellent! What are the next steps?' },
+                { speaker: 'Mike Chen', text: 'We need to finalize the integration testing.' },
+                { speaker: 'Sarah Johnson', text: 'I can have the test results ready by Friday.' },
+                { speaker: 'John Smith', text: 'Perfect. Let\'s schedule a follow-up meeting for Monday.' },
+                { speaker: 'Mike Chen', text: 'Sounds good. I\'ll send out the calendar invite.' }
+            ];
+
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < demoTexts.length) {
+                    // Show interim first
+                    const words = demoTexts[index].text.split(' ');
+                    let interimIndex = 0;
+                    
+                    const interimInterval = setInterval(() => {
+                        if (interimIndex < words.length - 1) {
+                            showInterimText(words.slice(0, interimIndex + 1).join(' '));
+                            interimIndex++;
+                        } else {
+                            clearInterval(interimInterval);
+                            addTranscriptEntry({
+                                ...demoTexts[index],
+                                timestamp: new Date(),
+                                confidence: 0.85 + Math.random() * 0.15
+                            });
+                            index++;
+                        }
+                    }, 150);
+                } else {
+                    clearInterval(interval);
+                    log('info', 'Demo completed');
+                }
+            }, 3500);
+
+            // Store interval for cleanup
+            window.demoInterval = interval;
+        }
+
+        function stopDemo() {
+            if (window.demoInterval) {
+                clearInterval(window.demoInterval);
+            }
+            disconnectMeeting();
+            log('info', 'Demo stopped');
+        }
+
+        // Expose demo functions to console
+        window.startDemo = startDemo;
+        window.stopDemo = stopDemo;
+    </script>
+</body>
+</html>
