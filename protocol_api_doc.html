@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Protocol Analyzer API — Developer Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #0a0c10;
+    --surface:   #111318;
+    --border:    #1e2230;
+    --border2:   #2a3045;
+    --text:      #c8d0e0;
+    --muted:     #5a6480;
+    --heading:   #eef0f8;
+    --blue:      #4f8fff;
+    --blue-dim:  #1a2a4a;
+    --green:     #34d399;
+    --green-dim: #0d2a20;
+    --amber:     #fbbf24;
+    --amber-dim: #2a1f00;
+    --red:       #f87171;
+    --red-dim:   #2a1010;
+    --purple:    #a78bfa;
+    --purple-dim:#1e1530;
+    --code-bg:   #0d1117;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .shell { display: flex; min-height: 100vh; }
+
+  nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  .nav-logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .nav-logo .label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .nav-logo .title {
+    font-family: var(--sans);
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.2;
+  }
+  .nav-logo .base-url {
+    font-size: 10px;
+    color: var(--blue);
+    margin-top: 6px;
+    word-break: break-all;
+  }
+
+  .nav-section { padding: 4px 0; }
+  .nav-section-title {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 10px 24px 4px;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 24px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    transition: color .15s, background .15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-link:hover { color: var(--text); background: rgba(255,255,255,.03); }
+  .nav-link.active { color: var(--blue); border-left-color: var(--blue); background: var(--blue-dim); }
+  .method-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    letter-spacing: .05em;
+    flex-shrink: 0;
+  }
+  .post { background: var(--blue-dim); color: var(--blue); }
+
+  main {
+    flex: 1;
+    max-width: 860px;
+    padding: 48px 56px;
+    overflow-x: hidden;
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    margin-bottom: 52px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header .eyebrow {
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--blue);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .page-header h1 {
+    font-family: var(--sans);
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .page-header p {
+    color: var(--muted);
+    font-size: 13px;
+    max-width: 600px;
+    line-height: 1.8;
+  }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 36px 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 11.5px;
+    color: var(--text);
+    text-align: center;
+    min-width: 110px;
+  }
+  .flow-step .num {
+    font-family: var(--sans);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--blue);
+    display: block;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .flow-arrow {
+    color: var(--border2);
+    font-size: 18px;
+    font-weight: 300;
+  }
+
+  /* ── Endpoint card ── */
+  .endpoint {
+    margin-bottom: 60px;
+    scroll-margin-top: 32px;
+  }
+  .endpoint-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .endpoint-badge {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: .06em;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .endpoint-badge.post { background: var(--blue-dim); color: var(--blue); border: 1px solid #1e3a6a; }
+  .endpoint-title {
+    font-family: var(--sans);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--heading);
+    line-height: 1.2;
+  }
+  .endpoint-path {
+    font-size: 12px;
+    color: var(--blue);
+    margin-top: 3px;
+  }
+  .endpoint-desc {
+    color: var(--muted);
+    font-size: 12.5px;
+    margin-bottom: 20px;
+    max-width: 680px;
+    line-height: 1.8;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    margin-top: 24px;
+  }
+
+  /* ── Code block ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.75;
+    position: relative;
+  }
+  pre .copy-hint {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: .06em;
+  }
+  .k  { color: var(--purple); }  /* key */
+  .s  { color: var(--green); }   /* string */
+  .n  { color: var(--amber); }   /* number */
+  .b  { color: var(--blue); }    /* boolean */
+  .cm { color: var(--muted); font-style: italic; } /* comment */
+
+  /* ── Info cards ── */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+  .info-card .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 4px; }
+  .info-card .value { font-size: 13px; color: var(--heading); }
+
+  /* ── Alert boxes ── */
+  .alert {
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 12.5px;
+    margin: 18px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    line-height: 1.7;
+  }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert.info    { background: var(--blue-dim);   border: 1px solid #1e3a6a; color: #90b8f8; }
+  .alert.warning { background: var(--amber-dim);  border: 1px solid #3a2c00; color: #fcd34d; }
+  .alert.success { background: var(--green-dim);  border: 1px solid #0d3a25; color: #6ee7b7; }
+  .alert.tip     { background: var(--purple-dim); border: 1px solid #2e2050; color: #c4b5fd; }
+
+  /* ── Field table ── */
+  .field-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12.5px; }
+  .field-table th {
+    text-align: left;
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .field-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .field-table tr:last-child td { border-bottom: none; }
+  .field-table .field-name { color: var(--green); font-weight: 600; }
+  .field-table .field-type { color: var(--amber); font-size: 11px; }
+  .field-table .field-req  { color: var(--red); font-size: 11px; }
+  .field-table .field-opt  { color: var(--muted); font-size: 11px; }
+  .field-table .field-desc { color: var(--text); }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  /* ── Inline code ── */
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: var(--green);
+    font-family: var(--mono);
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ─────────────────────── NAV ─────────────────────── -->
+<nav>
+  <div class="nav-logo">
+    <div class="label">API Reference</div>
+    <div class="title">Protocol<br/>Analyzer</div>
+    <div class="base-url">devvetsapimanagement.azure-api.net/<br/>WixReportingMicroservice</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Overview</div>
+    <a href="#overview" class="nav-link active">How it works</a>
+    <a href="#auth" class="nav-link">Authentication</a>
+    <a href="#errors" class="nav-link">Errors</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Endpoints</div>
+    <a href="#upload" class="nav-link">
+      <span class="method-badge post">POST</span>
+      UploadReferralFile
+    </a>
+    <a href="#analyze" class="nav-link">
+      <span class="method-badge post">POST</span>
+      AnalyzeReferral
+    </a>
+    <a href="#extract" class="nav-link">
+      <span class="method-badge post">POST</span>
+      ExtractReferralText
+    </a>
+    <a href="#anatomies" class="nav-link">
+      <span class="method-badge post">POST</span>
+      GetAnatomies
+    </a>
+    <a href="#protocols" class="nav-link">
+      <span class="method-badge post">POST</span>
+      GetProtocols
+    </a>
+    <a href="#detect" class="nav-link">
+      <span class="method-badge post">POST</span>
+      DetectAnatomy
+    </a>
+    <a href="#select" class="nav-link">
+      <span class="method-badge post">POST</span>
+      SelectProtocol
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Integration</div>
+    <a href="#flow-detail" class="nav-link">Standard flow</a>
+    <a href="#autofill" class="nav-link">Auto-analyze flow</a>
+  </div>
+</nav>
+
+<!-- ─────────────────────── MAIN ─────────────────────── -->
+<main>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="eyebrow">medilis.ai · Internal API</div>
+    <h1>Protocol Analyzer<br/>API Reference</h1>
+    <p>REST API for automatic medical imaging protocol recommendation. Upload a patient referral (image or PDF), and the system extracts text via OCR, identifies the anatomical region, and recommends the most suitable imaging protocol using AI.</p>
+  </div>
+
+  <!-- ── OVERVIEW ── -->
+  <section id="overview">
+    <div class="section-label">Base URL</div>
+    <pre><span class="s">https://devvetsapimanagement.azure-api.net/WixReportingMicroservice</span></pre>
+
+    <div class="section-label" style="margin-top:28px;">Two-call flow — recommended</div>
+    <p style="color:var(--muted);font-size:12.5px;margin-bottom:16px;line-height:1.8;">Every analysis requires exactly two API calls: first upload the file, then analyze it with the returned <code>fileId</code>.</p>
+
+    <div class="flow">
+      <div class="flow-step"><span class="num">1</span>Upload file<br/><span style="color:var(--muted);font-size:10px;">→ get fileId</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><span class="num">2</span>AnalyzeReferral<br/><span style="color:var(--muted);font-size:10px;">fileId + model</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><span class="num">✓</span>Full result<br/><span style="color:var(--muted);font-size:10px;">protocol + explanation</span></div>
+    </div>
+
+    <div class="alert info">
+      <span class="alert-icon">ℹ</span>
+      <div><strong>Temp file lifecycle:</strong> uploaded files are stored in a private temp folder in Azure Blob and deleted automatically after ~2 hours. You only need the <code>fileId</code> long enough to call <code>AnalyzeReferral</code>.</div>
+    </div>
+  </section>
+
+  <!-- ── AUTH ── -->
+  <section id="auth">
+    <div class="section-label" style="margin-top:36px;">Authentication</div>
+    <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px;line-height:1.8;">All endpoints require a JWT bearer token. Pass it in the <code>Authorization</code> header on every request.</p>
+    <pre>Authorization: Bearer &lt;your-jwt-token&gt;
+Content-Type: application/json   <span class="cm">// for JSON body endpoints</span></pre>
+
+    <div class="alert warning">
+      <span class="alert-icon">⚠</span>
+      <div><strong>UploadReferralFile only:</strong> use <code>Content-Type: multipart/form-data</code> — not JSON. All other endpoints use JSON.</div>
+    </div>
+  </section>
+
+  <!-- ── ERRORS ── -->
+  <section id="errors">
+    <div class="section-label" style="margin-top:36px;">Response envelope</div>
+    <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px;line-height:1.8;">Every response (success or error) is wrapped in the same envelope. Always check <code>success</code> before reading <code>payload</code>.</p>
+    <pre>{
+  <span class="k">"success"</span>:   <span class="b">true</span> <span class="cm">// or false</span>
+  <span class="k">"payload"</span>:   { <span class="cm">/* endpoint-specific data */</span> },
+  <span class="k">"errorInfo"</span>: <span class="b">null</span> <span class="cm">// populated when success = false</span>
+}</pre>
+
+    <div class="section-label" style="margin-top:20px;">Error shape</div>
+    <pre>{
+  <span class="k">"success"</span>:   <span class="b">false</span>,
+  <span class="k">"payload"</span>:   <span class="b">null</span>,
+  <span class="k">"errorInfo"</span>: {
+    <span class="k">"message"</span>: <span class="s">"Anatomy could not be identified."</span>,
+    <span class="k">"code"</span>:    <span class="s">"400"</span>
+  }
+}</pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 1 — UploadReferralFile
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="upload">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">UploadReferralFile</div>
+        <div class="endpoint-path">/api/Protocol/UploadReferralFile</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">
+      Uploads a referral image or PDF to temporary blob storage. Returns a short <code>fileId</code> to pass into subsequent calls.
+      This is always the <strong>first step</strong> — no analysis happens here.
+    </p>
+
+    <div class="info-grid">
+      <div class="info-card"><div class="label">Content-Type</div><div class="value">multipart/form-data</div></div>
+      <div class="info-card"><div class="label">Accepted formats</div><div class="value">jpg · jpeg · png · gif · bmp · pdf</div></div>
+      <div class="info-card"><div class="label">Max file size</div><div class="value">30 MB</div></div>
+      <div class="info-card"><div class="label">Field name</div><div class="value">file</div></div>
+    </div>
+
+    <div class="section-label">Request — form fields</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr>
+        <td class="field-name">file</td>
+        <td class="field-type">binary</td>
+        <td class="field-req">required</td>
+        <td class="field-desc">The referral file. Use <code>&lt;input type="file"&gt;</code> or FormData in JS.</td>
+      </tr>
+    </table>
+
+    <div class="section-label">JavaScript example</div>
+    <pre><span class="cm">// Using fetch + FormData</span>
+const formData = new FormData();
+formData.append(<span class="s">'file'</span>, selectedFile); <span class="cm">// File from &lt;input&gt;</span>
+
+const res = await fetch(
+  <span class="s">'https://devvetsapimanagement.azure-api.net/WixReportingMicroservice/api/Protocol/UploadReferralFile'</span>,
+  {
+    method: <span class="s">'POST'</span>,
+    headers: { <span class="k">Authorization</span>: <span class="s">`Bearer ${token}`</span> },
+    body: formData  <span class="cm">// ⚠ Do NOT set Content-Type — browser sets it with boundary</span>
+  }
+);
+const data = await res.json();
+const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_referral.jpeg"</span></pre>
+
+    <div class="section-label">Success response</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"fileId"</span>:           <span class="s">"20260225110514_referral.jpeg"</span>,  <span class="cm">// ← save this</span>
+    <span class="k">"originalFileName"</span>: <span class="s">"referral.jpeg"</span>,
+    <span class="k">"fileSizeBytes"</span>:    <span class="n">245120</span>
+  }
+}</pre>
+
+    <div class="alert tip">
+      <span class="alert-icon">💡</span>
+      <div>Store <code>fileId</code> in component state immediately. Pass it to <code>AnalyzeReferral</code> or <code>ExtractReferralText</code>. The full blob URL is never exposed — the server resolves it internally.</div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 2 — AnalyzeReferral
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="analyze">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">AnalyzeReferral</div>
+        <div class="endpoint-path">/api/Protocol/AnalyzeReferral</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">
+      <strong>Main endpoint.</strong> Runs the complete pipeline in a single call:
+      OCR the image → detect anatomy → filter protocols → select best protocol with Hebrew explanation.
+      Use this for both auto-analyze and manual-analyze flows.
+    </p>
+
+    <div class="section-label">Request body</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr>
+        <td class="field-name">fileId</td>
+        <td class="field-type">string</td>
+        <td class="field-req">required</td>
+        <td class="field-desc">Returned by <code>UploadReferralFile</code>. e.g. <code>"20260225110514_referral.jpeg"</code></td>
+      </tr>
+      <tr>
+        <td class="field-name">model</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc"><code>"medilis.ai.V1(faster)"</code> (default) or <code>"medilis.ai.V2(deeper)"</code></td>
+      </tr>
+    </table>
+
+    <div class="alert warning">
+      <span class="alert-icon">⚠</span>
+      <div><strong>extractedText contains duplicate content.</strong> The OCR engine returns the full text block followed by individual comma-separated tokens. When displaying to the user, take only the text <em>before</em> the first comma-separated token sequence — i.e. split on the pattern <code>, מתאריך,</code> or simply truncate at the first occurrence of a repeated phrase. Alternatively, display the raw string in a collapsible panel so it doesn't dominate the UI.</div>
+    </div>
+
+    <div class="section-label">Request example</div>
+    <pre>{
+  <span class="k">"fileId"</span>: <span class="s">"20260225110514_B39DA252F6F54E5EB7305ADF39DB4331_p1.jpeg"</span>,
+  <span class="k">"model"</span>:  <span class="s">"medilis.ai.V1(faster)"</span>
+}</pre>
+
+    <div class="section-label">Full response — anatomy found (real example)</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+
+    <span class="cm">// ── Step 1: OCR output ──────────────────────────────────────</span>
+    <span class="k">"extractedText"</span>: <span class="s">"פרטי המטופל:\nת.לידה:\n02/12/1962\nשירות שנבחר\nקוד שירות\n..."</span>,
+
+    <span class="cm">// ── Step 2: Detected anatomy ────────────────────────────────</span>
+    <span class="k">"detectedAnatomy"</span>: <span class="s">"אגן רקמות רכות - רקמות רכות"</span>,
+
+    <span class="cm">// ── Step 3: All protocols matching the anatomy ──────────────</span>
+    <span class="k">"recommendedProtocols"</span>: [
+      {
+        <span class="k">"anathomy"</span>:        <span class="s">"אגן רקמות רכות - רקמות רכות"</span>,
+        <span class="k">"domain"</span>:          <span class="s">"Body MRI"</span>,
+        <span class="k">"protocolName"</span>:    <span class="s">"Pelvis Soft Tissue MRI - Soft Tissue"</span>,
+        <span class="k">"additionalFields"</span>: {
+          <span class="k">"protocol_number"</span>: <span class="s">"809"</span>,
+          <span class="k">"contrast"</span>:        <span class="s">"yes"</span>,
+          <span class="k">"Tesla"</span>:           <span class="s">"3"</span>
+        }
+      }
+    ],
+
+    <span class="cm">// ── Step 4: AI selection + Hebrew explanation ───────────────</span>
+    <span class="k">"explanation"</span>: <span class="s">"בהתאם להפניה, המטופל סובל מפיסטולה אנאלית ומאבצס פריאנאלי,</span>
+<span class="s">                  עם רקע של ניתוח ניקוז קודם וכאבים מתמשכים באזור פי הטבעת.
+                  נדרשת הערכה מדויקת של מבני הרקמות הרכות באגן לצורך
+                  אפיון הפיסטולה והיקף התהליך הדלקתי.
+                  לפיכך, הפרוטוקול המתאים ביותר הוא MRI אגן לרקמות רכות."</span>,
+
+    <span class="k">"selectedProtocolName"</span>: <span class="s">"Pelvis Soft Tissue MRI - Soft Tissue"</span>,
+
+    <span class="k">"selectedProtocol"</span>: {
+      <span class="k">"anathomy"</span>:        <span class="s">"אגן רקמות רכות - רקמות רכות"</span>,
+      <span class="k">"domain"</span>:          <span class="s">"Body MRI"</span>,
+      <span class="k">"protocolName"</span>:    <span class="s">"Pelvis Soft Tissue MRI - Soft Tissue"</span>,
+      <span class="k">"additionalFields"</span>: {
+        <span class="k">"protocol_number"</span>: <span class="s">"809"</span>,
+        <span class="k">"contrast"</span>:        <span class="s">"yes"</span>,
+        <span class="k">"Tesla"</span>:           <span class="s">"3"</span>
+      }
+    }
+  }
+}</pre>
+
+    <div class="section-label">Response — anatomy NOT found (pipeline stops at step 2)</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,  <span class="cm">// still success — anatomy unknown is a valid outcome</span>
+  <span class="k">"payload"</span>: {
+    <span class="k">"extractedText"</span>:       <span class="s">"..."</span>,
+    <span class="k">"detectedAnatomy"</span>:     <span class="s">"unknown"</span>,
+    <span class="k">"recommendedProtocols"</span>: [],
+    <span class="k">"explanation"</span>:         <span class="s">""</span>,
+    <span class="k">"selectedProtocolName"</span>: <span class="s">""</span>,
+    <span class="k">"selectedProtocol"</span>:     <span class="b">null</span>
+  }
+}</pre>
+
+    <div class="alert warning">
+      <span class="alert-icon">⚠</span>
+      <div>When <code>detectedAnatomy === "unknown"</code> the response is still <code>success: true</code>. Check for this case explicitly and show the user a warning: <em>"Anatomy could not be identified — try uploading a clearer image or switch to V2 model."</em></div>
+    </div>
+
+    <div class="section-label">Response fields reference</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      <tr><td class="field-name">extractedText</td><td class="field-type">string</td><td class="field-desc">Raw OCR output. Display in a read-only textarea with character count.</td></tr>
+      <tr><td class="field-name">detectedAnatomy</td><td class="field-type">string</td><td class="field-desc">Anatomy name or <code>"unknown"</code>. Show as a badge. If unknown, stop rendering further results.</td></tr>
+      <tr><td class="field-name">recommendedProtocols</td><td class="field-type">array</td><td class="field-desc">All protocols matching the anatomy. Render in a data grid. Hide <code>anathomy</code> and <code>domain</code> columns.</td></tr>
+      <tr><td class="field-name">explanation</td><td class="field-type">string</td><td class="field-desc">Hebrew AI clinical justification. Render in a right-aligned RTL panel.</td></tr>
+      <tr><td class="field-name">selectedProtocolName</td><td class="field-type">string</td><td class="field-desc">The AI-chosen protocol name. Use to highlight matching row in the grid.</td></tr>
+      <tr><td class="field-name">selectedProtocol</td><td class="field-type">object | null</td><td class="field-desc">Full protocol row. Render as a highlighted card. Null when anatomy is unknown.</td></tr>
+      <tr><td class="field-name">additionalFields</td><td class="field-type">object</td><td class="field-desc">Dynamic columns from the protocols table (e.g. <code>contrast</code>, <code>Tesla</code>, <code>protocol_number</code>). Render key/value pairs as table columns.</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 3 — ExtractReferralText
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="extract">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">ExtractReferralText</div>
+        <div class="endpoint-path">/api/Protocol/ExtractReferralText</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">OCR only — returns extracted text without running AI steps. Useful if you want to show the text to the user before triggering analysis. Images use Google Cloud Vision; PDFs use Azure Document Intelligence.</p>
+
+    <div class="section-label">Request body</div>
+    <pre>{
+  <span class="k">"fileId"</span>: <span class="s">"20260225110514_referral.jpeg"</span>
+}</pre>
+
+    <div class="section-label">Success response</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"extractedText"</span>: <span class="s">"פרטי המטופל:\nת.לידה:\n02/12/1962\n..."</span>
+  }
+}</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 4 — GetAnatomies
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="anatomies">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">GetAnatomies</div>
+        <div class="endpoint-path">/api/Protocol/GetAnatomies</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">Returns the full list of anatomy values loaded from the protocols data source. Call once on app startup and cache in state — used to pre-populate UI dropdowns and as context for the AI.</p>
+
+    <div class="section-label">Request body</div>
+    <pre>{}  <span class="cm">// empty object — no parameters needed</span></pre>
+
+    <div class="section-label">Success response</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"anatomies"</span>:      [<span class="s">"Abdomen"</span>, <span class="s">"Ankle"</span>, <span class="s">"Brain"</span>, <span class="s">"..."</span>],
+    <span class="k">"commaDelimited"</span>: <span class="s">"Abdomen,Ankle,Brain,..."</span>
+  }
+}</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 5 — GetProtocols
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="protocols">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">GetProtocols</div>
+        <div class="endpoint-path">/api/Protocol/GetProtocols</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">Returns all protocols. When <code>anathomy</code> is provided, filters to matching rows only. Call once on startup (no filter) and again after anatomy detection (with filter).</p>
+
+    <div class="section-label">Request body</div>
+    <pre>{
+  <span class="k">"anathomy"</span>: <span class="s">"Brain"</span>  <span class="cm">// optional — omit to get all</span>
+}</pre>
+
+    <div class="section-label">Success response</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"protocols"</span>: [
+      {
+        <span class="k">"anathomy"</span>:        <span class="s">"Brain"</span>,
+        <span class="k">"domain"</span>:          <span class="s">"Neuro MRI"</span>,
+        <span class="k">"protocolName"</span>:    <span class="s">"Brain MRI with Contrast"</span>,
+        <span class="k">"additionalFields"</span>: { <span class="k">"contrast"</span>: <span class="s">"yes"</span>, <span class="k">"Tesla"</span>: <span class="s">"3"</span> }
+      }
+    ]
+  }
+}</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 6 — DetectAnatomy
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="detect">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">DetectAnatomy</div>
+        <div class="endpoint-path">/api/Protocol/DetectAnatomy</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">AI step 1 only. Takes extracted referral text and returns the detected anatomy. Use when you need to run steps individually rather than the full pipeline.</p>
+
+    <div class="section-label">Request body</div>
+    <pre>{
+  <span class="k">"referralText"</span>: <span class="s">"פרטי המטופל: ..."</span>,
+  <span class="k">"model"</span>:        <span class="s">"medilis.ai.V1(faster)"</span>
+}</pre>
+
+    <div class="section-label">Success response</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"detectedAnatomy"</span>: <span class="s">"Brain"</span>,
+    <span class="k">"found"</span>:           <span class="b">true</span>   <span class="cm">// false when anatomy = "unknown"</span>
+  }
+}</pre>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ENDPOINT 7 — SelectProtocol
+  ════════════════════════════════════════════════════════════ -->
+  <section class="endpoint" id="select">
+    <div class="endpoint-header">
+      <span class="endpoint-badge post">POST</span>
+      <div>
+        <div class="endpoint-title">SelectProtocol</div>
+        <div class="endpoint-path">/api/Protocol/SelectProtocol</div>
+      </div>
+    </div>
+    <p class="endpoint-desc">AI step 2 only. Given the referral text and detected anatomy, selects the best matching protocol and returns a Hebrew clinical explanation.</p>
+
+    <div class="section-label">Request body</div>
+    <pre>{
+  <span class="k">"referralText"</span>:    <span class="s">"פרטי המטופל: ..."</span>,
+  <span class="k">"detectedAnatomy"</span>: <span class="s">"Brain"</span>,
+  <span class="k">"model"</span>:           <span class="s">"medilis.ai.V2(deeper)"</span>
+}</pre>
+
+    <div class="section-label">Success response</div>
+    <pre>{
+  <span class="k">"success"</span>: <span class="b">true</span>,
+  <span class="k">"payload"</span>: {
+    <span class="k">"explanation"</span>:          <span class="s">"בהתאם להפניה, המטופל..."</span>,
+    <span class="k">"selectedProtocolName"</span>: <span class="s">"Brain MRI with Contrast"</span>,
+    <span class="k">"selectedProtocol"</span>: {
+      <span class="k">"anathomy"</span>:        <span class="s">"Brain"</span>,
+      <span class="k">"domain"</span>:          <span class="s">"Neuro MRI"</span>,
+      <span class="k">"protocolName"</span>:    <span class="s">"Brain MRI with Contrast"</span>,
+      <span class="k">"additionalFields"</span>: { <span class="k">"contrast"</span>: <span class="s">"yes"</span>, <span class="k">"Tesla"</span>: <span class="s">"3"</span> }
+    }
+  }
+}</pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ── INTEGRATION GUIDE ── -->
+  <section id="flow-detail">
+    <div class="section-label">Standard flow — React pseudocode</div>
+    <pre><span class="cm">// 1. On app startup — load reference data once</span>
+const [anatomies, setAnatomies] = useState([]);
+const [allProtocols, setAllProtocols] = useState([]);
+
+useEffect(() => {
+  const [a, p] = await Promise.all([
+    api.post(<span class="s">'/GetAnatomies'</span>, {}),
+    api.post(<span class="s">'/GetProtocols'</span>, {})
+  ]);
+  setAnatomies(a.payload.anatomies);
+  setAllProtocols(p.payload.protocols);
+}, []);
+
+<span class="cm">// 2. User drops a file</span>
+const onFileDrop = async (file) => {
+  const formData = new FormData();
+  formData.append(<span class="s">'file'</span>, file);
+  const res  = await api.upload(<span class="s">'/UploadReferralFile'</span>, formData);
+  setFileId(res.payload.fileId);        <span class="cm">// store fileId in state</span>
+  if (autoAnalyze) startAnalysis(res.payload.fileId);
+};
+
+<span class="cm">// 3. Analyze</span>
+const startAnalysis = async (fileId) => {
+  const res = await api.post(<span class="s">'/AnalyzeReferral'</span>, { fileId, model });
+
+  const { detectedAnatomy, recommendedProtocols,
+          explanation, selectedProtocol, extractedText } = res.payload;
+
+  <span class="cm">// anatomy unknown → show warning, stop here</span>
+  if (detectedAnatomy === <span class="s">'unknown'</span>) {
+    showWarning(<span class="s">'Anatomy not identified — try V2 or a clearer image'</span>);
+    return;
+  }
+
+  setResults({ extractedText, detectedAnatomy,
+               recommendedProtocols, explanation, selectedProtocol });
+};</pre>
+  </section>
+
+  <section id="autofill" style="margin-top:40px;">
+    <div class="section-label">Model selector mapping</div>
+    <pre><span class="cm">// UI label           →  API value to send in "model" field</span>
+<span class="s">"medilis.ai.V1(faster)"</span>  →  GPT-3.5 · faster · cheaper · default
+<span class="s">"medilis.ai.V2(deeper)"</span>  →  GPT-4   · slower · better accuracy</pre>
+
+    <div class="alert success" style="margin-top:24px;">
+      <span class="alert-icon">✓</span>
+      <div><strong>Tip:</strong> hide <code>anathomy</code> and <code>domain</code> columns when rendering <code>recommendedProtocols</code> in the data grid — those are internal routing fields. Show only <code>protocolName</code> and keys from <code>additionalFields</code>.</div>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>
