@@ -435,6 +435,36 @@
     <pre>Authorization: Bearer &lt;your-jwt-token&gt;
 Content-Type: application/json   <span class="cm">// for JSON body endpoints</span></pre>
 
+    <div class="section-label" style="margin-top:24px;">Base request fields (all JSON endpoints)</div>
+    <p style="color:var(--muted);font-size:12.5px;margin-bottom:10px;line-height:1.8;">Every JSON request body (except <code>UploadReferralFile</code>) inherits these four fields from <code>BaseRequestWixAuthenticated</code>:</p>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr>
+        <td class="field-name">companyIdFromUserToken</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">Company ID extracted from the JWT token. Passed automatically by the client SDK.</td>
+      </tr>
+      <tr>
+        <td class="field-name">sessionId</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">Current session identifier for request tracing.</td>
+      </tr>
+      <tr>
+        <td class="field-name">userID</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">Authenticated user ID.</td>
+      </tr>
+      <tr>
+        <td class="field-name">email</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">Authenticated user email.</td>
+      </tr>
+    </table>
+
     <div class="alert warning">
       <span class="alert-icon">⚠</span>
       <div><strong>UploadReferralFile only:</strong> use <code>Content-Type: multipart/form-data</code> — not JSON. All other endpoints use JSON.</div>
@@ -551,6 +581,30 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
     <table class="field-table">
       <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
       <tr>
+        <td class="field-name">companyIdFromUserToken</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td>
+      </tr>
+      <tr>
+        <td class="field-name">sessionId</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td>
+      </tr>
+      <tr>
+        <td class="field-name">userID</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td>
+      </tr>
+      <tr>
+        <td class="field-name">email</td>
+        <td class="field-type">string</td>
+        <td class="field-opt">optional</td>
+        <td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td>
+      </tr>
+      <tr>
         <td class="field-name">fileId</td>
         <td class="field-type">string</td>
         <td class="field-req">required</td>
@@ -571,6 +625,10 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
 
     <div class="section-label">Request example</div>
     <pre>{
+  <span class="k">"companyIdFromUserToken"</span>: <span class="s">"your-company-id"</span>,
+  <span class="k">"sessionId"</span>:             <span class="s">"session-xyz"</span>,
+  <span class="k">"userID"</span>:                <span class="s">"user-123"</span>,
+  <span class="k">"email"</span>:                 <span class="s">"user@example.com"</span>,
   <span class="k">"fileId"</span>: <span class="s">"20260225110514_B39DA252F6F54E5EB7305ADF39DB4331_p1.jpeg"</span>,
   <span class="k">"model"</span>:  <span class="s">"medilis.ai.V1(faster)"</span>
 }</pre>
@@ -667,7 +725,19 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
     <p class="endpoint-desc">OCR only — returns extracted text without running AI steps. Useful if you want to show the text to the user before triggering analysis. Images use Google Cloud Vision; PDFs use Azure Document Intelligence.</p>
 
     <div class="section-label">Request body</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">companyIdFromUserToken</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">sessionId</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">userID</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">email</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">fileId</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">The file ID returned by <code>UploadReferralFile</code>.</td></tr>
+    </table>
     <pre>{
+  <span class="k">"companyIdFromUserToken"</span>: <span class="s">"your-company-id"</span>,
+  <span class="k">"sessionId"</span>:             <span class="s">"session-xyz"</span>,
+  <span class="k">"userID"</span>:                <span class="s">"user-123"</span>,
+  <span class="k">"email"</span>:                 <span class="s">"user@example.com"</span>,
   <span class="k">"fileId"</span>: <span class="s">"20260225110514_referral.jpeg"</span>
 }</pre>
 
@@ -694,7 +764,19 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
     <p class="endpoint-desc">Returns the full list of anatomy values loaded from the protocols data source. Call once on app startup and cache in state — used to pre-populate UI dropdowns and as context for the AI.</p>
 
     <div class="section-label">Request body</div>
-    <pre>{}  <span class="cm">// empty object — no parameters needed</span></pre>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">companyIdFromUserToken</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">sessionId</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">userID</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">email</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+    </table>
+    <pre>{
+  <span class="k">"companyIdFromUserToken"</span>: <span class="s">"your-company-id"</span>,
+  <span class="k">"sessionId"</span>:             <span class="s">"session-xyz"</span>,
+  <span class="k">"userID"</span>:                <span class="s">"user-123"</span>,
+  <span class="k">"email"</span>:                 <span class="s">"user@example.com"</span>
+}</pre>
 
     <div class="section-label">Success response</div>
     <pre>{
@@ -720,7 +802,19 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
     <p class="endpoint-desc">Returns all protocols. When <code>anathomy</code> is provided, filters to matching rows only. Call once on startup (no filter) and again after anatomy detection (with filter).</p>
 
     <div class="section-label">Request body</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">companyIdFromUserToken</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">sessionId</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">userID</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">email</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">anathomy</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">Filter by anatomy. Omit to return all protocols.</td></tr>
+    </table>
     <pre>{
+  <span class="k">"companyIdFromUserToken"</span>: <span class="s">"your-company-id"</span>,
+  <span class="k">"sessionId"</span>:             <span class="s">"session-xyz"</span>,
+  <span class="k">"userID"</span>:                <span class="s">"user-123"</span>,
+  <span class="k">"email"</span>:                 <span class="s">"user@example.com"</span>,
   <span class="k">"anathomy"</span>: <span class="s">"Brain"</span>  <span class="cm">// optional — omit to get all</span>
 }</pre>
 
@@ -754,7 +848,20 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
     <p class="endpoint-desc">AI step 1 only. Takes extracted referral text and returns the detected anatomy. Use when you need to run steps individually rather than the full pipeline.</p>
 
     <div class="section-label">Request body</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">companyIdFromUserToken</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">sessionId</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">userID</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">email</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">referralText</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">Extracted referral text (from OCR step).</td></tr>
+      <tr><td class="field-name">model</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc"><code>"medilis.ai.V1(faster)"</code> or <code>"medilis.ai.V2(deeper)"</code>.</td></tr>
+    </table>
     <pre>{
+  <span class="k">"companyIdFromUserToken"</span>: <span class="s">"your-company-id"</span>,
+  <span class="k">"sessionId"</span>:             <span class="s">"session-xyz"</span>,
+  <span class="k">"userID"</span>:                <span class="s">"user-123"</span>,
+  <span class="k">"email"</span>:                 <span class="s">"user@example.com"</span>,
   <span class="k">"referralText"</span>: <span class="s">"פרטי המטופל: ..."</span>,
   <span class="k">"model"</span>:        <span class="s">"medilis.ai.V1(faster)"</span>
 }</pre>
@@ -783,7 +890,21 @@ const fileId = data.payload.fileId; <span class="cm">// e.g. "20260225110514_ref
     <p class="endpoint-desc">AI step 2 only. Given the referral text and detected anatomy, selects the best matching protocol and returns a Hebrew clinical explanation.</p>
 
     <div class="section-label">Request body</div>
+    <table class="field-table">
+      <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+      <tr><td class="field-name">companyIdFromUserToken</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">sessionId</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">userID</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">email</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">See <a href="#auth" style="color:var(--blue);">Base request fields</a>.</td></tr>
+      <tr><td class="field-name">referralText</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">The extracted referral text from OCR.</td></tr>
+      <tr><td class="field-name">detectedAnatomy</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc">The anatomy string returned by <code>DetectAnatomy</code>.</td></tr>
+      <tr><td class="field-name">model</td><td class="field-type">string</td><td class="field-opt">optional</td><td class="field-desc"><code>"medilis.ai.V1(faster)"</code> or <code>"medilis.ai.V2(deeper)"</code>.</td></tr>
+    </table>
     <pre>{
+  <span class="k">"companyIdFromUserToken"</span>: <span class="s">"your-company-id"</span>,
+  <span class="k">"sessionId"</span>:             <span class="s">"session-xyz"</span>,
+  <span class="k">"userID"</span>:                <span class="s">"user-123"</span>,
+  <span class="k">"email"</span>:                 <span class="s">"user@example.com"</span>,
   <span class="k">"referralText"</span>:    <span class="s">"פרטי המטופל: ..."</span>,
   <span class="k">"detectedAnatomy"</span>: <span class="s">"Brain"</span>,
   <span class="k">"model"</span>:           <span class="s">"medilis.ai.V2(deeper)"</span>
