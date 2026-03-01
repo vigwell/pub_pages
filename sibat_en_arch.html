@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<!-- saved from url=(0109)file:///C:/Users/vigens/Downloads/SIBAT_%D7%90%D7%A8%D7%9B%D7%99%D7%98%D7%A7%D7%98%D7%95%D7%A8%D7%94_AWS.html -->
+<html lang="he" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פורטל סיב"ט — ארכיטקטורת AWS</title>
+<link href="./sibat_en_arch_files/css2" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Assistant', 'Arial', sans-serif;
+    font-size: 11.5pt;
+    line-height: 1.65;
+    color: #000;
+    background: #fff;
+    direction: rtl;
+  }
+
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 72px 80px;
+  }
+
+  /* ── כותרות ── */
+  h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 12pt;
+    text-align: center;
+    margin-bottom: 4px;
+    color: #222;
+  }
+
+  .meta {
+    font-size: 10pt;
+    text-align: center;
+    color: #555;
+    margin-bottom: 36px;
+  }
+
+  hr.title-rule {
+    border: none;
+    border-top: 1px solid #000;
+    margin-bottom: 36px;
+  }
+
+  h2 {
+    font-size: 13.5pt;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 3px;
+  }
+
+  h3 {
+    font-size: 11.5pt;
+    font-weight: 700;
+    margin-top: 18px;
+    margin-bottom: 6px;
+  }
+
+  /* ── פסקאות ── */
+  p {
+    margin-bottom: 10px;
+    text-align: justify;
+  }
+
+  p.note {
+    font-style: italic;
+    color: #444;
+    margin-top: 4px;
+  }
+
+  /* ── רשימות ── */
+  ul {
+    margin: 6px 0 10px 0;
+    padding-right: 22px;
+    list-style-type: disc;
+  }
+
+  ul ul {
+    list-style-type: circle;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding-right: 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  ol.decisions {
+    padding-right: 20px;
+    margin: 0;
+  }
+
+  ol.decisions li {
+    margin-bottom: 10px;
+    text-align: justify;
+  }
+
+  /* ── טבלאות ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px 0;
+    font-size: 10.5pt;
+    direction: rtl;
+  }
+
+  th {
+    background: #1f4e79;
+    color: #fff;
+    font-weight: 700;
+    padding: 7px 10px;
+    text-align: right;
+    border: 1px solid #1f4e79;
+  }
+
+  td {
+    padding: 6px 10px;
+    border: 1px solid #bbb;
+    vertical-align: top;
+    text-align: right;
+  }
+
+  tr:nth-child(even) td {
+    background: #f3f7fb;
+  }
+
+  /* מינימום רוחב לעמודות שמכילות מונחים טכניים */
+  td:first-child, th:first-child {
+    white-space: nowrap;
+  }
+
+  /* ── קישור תרשים ── */
+  .diagram-link-box {
+    border: 1px solid #1f4e79;
+    padding: 12px 16px;
+    margin: 20px 0 28px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11pt;
+  }
+
+  .diagram-link-box a {
+    color: #1f4e79;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .diagram-link-box a:hover {
+    text-decoration: underline;
+  }
+
+  .diagram-link-box .arrow {
+    font-size: 13pt;
+    flex-shrink: 0;
+  }
+
+  /* ── תחתית עמוד ── */
+  .footer-note {
+    font-size: 9.5pt;
+    color: #777;
+    font-style: italic;
+    margin-top: 40px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    text-align: center;
+  }
+
+  /* ── hacks לסדר בידי ── */
+  /* מונחים אנגליים בתוך טקסט עברי */
+  span.en {
+    unicode-bidi: embed;
+    direction: ltr;
+    display: inline-block;
+  }
+
+  @media print {
+    .page { padding: 40px 50px; }
+    a { color: #000; text-decoration: none; }
+    .diagram-link-box a::after { content: " (" attr(href) ")"; font-size: 9pt; color: #555; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- כותרת -->
+  <h1>פורטל סיב"ט — ארכיטקטורת <span class="en">AWS</span></h1>
+  <p class="subtitle">מסמך ארכיטקטורה ברמה גבוהה | פברואר 2026</p>
+  <p class="meta">מוגש על ידי: קבוצת אלעד | עבור: אגף סיב"ט, משרד הביטחון</p>
+  <hr class="title-rule">
+
+  <!-- קישור לתרשים -->
+  <div class="diagram-link-box">
+    <span class="arrow">📐</span>
+    <span>תרשים ארכיטקטורה מלא:&nbsp;
+      <a href="https://vigwell.github.io/pub_pages/sibat_arch.png" target="_blank">
+        vigwell.github.io/pub_pages/sibat_arch.png
+      </a>
+    </span>
+  </div>
+
+  <!-- 1 -->
+  <h2>1. סקירה כללית</h2>
+  <p>
+    פורטל סיב"ט האנגלי הוא אתר ממשלתי קטלוגי הפונה לקהל ציבורי גלובלי, המציג חברות מהתעשייה הביטחונית הישראלית.
+    המערכת בנויה על ארכיטקטורת <span class="en">Umbraco CMS</span> ב‑<span class="en">Headless mode</span> —
+    עורכי תוכן מנהלים את כל המידע דרך <span class="en">Umbraco</span>, ואילו הפרונטאנד
+    <span class="en">Next.js/React</span> מרנדר אותו סטטית או <span class="en">Server-Side</span>
+    לביצועי <span class="en">SEO</span> מרביים ונגישות ציבורית מלאה.
+  </p>
+  <p>
+    הארכיטקטורה היא <span class="en">Cloud-Native</span> מלאה על <span class="en">AWS</span>,
+    עם הפרדה קפדנית בין שכבת ה‑<span class="en">Edge</span> הציבורית,
+    שכבת ה‑<span class="en">CMS/API</span> הפנימית, ושכבת הנתונים —
+    הכל בתוך <span class="en">VPC</span> מנוהל עם תת-רשתות פרטיות.
+    האתר ציבורי לחלוטין — ללא הרשמה או כניסה למבקרים, אימות מיועד לעורכי <span class="en">CMS</span> בלבד.
+  </p>
+
+  <!-- 2 -->
+  <h2>2. ארכיטקטורה לפי שכבות</h2>
+
+  <h3>שכבה 1: <span class="en">Edge</span> ציבורי — <span class="en">WAF</span> ו‑<span class="en">CloudFront</span></h3>
+  <p>כל תעבורה ציבורית נכנסת דרך שכבת <span class="en">Edge</span> כפולה לאבטחה וביצועים גלובליים:</p>
+  <ul>
+    <li><strong><span class="en">AWS WAF (Web Application Firewall)</span></strong>
+      <ul>
+        <li>יושב לפני <span class="en">CloudFront</span>. חוסם <span class="en">SQL Injection</span>, <span class="en">XSS</span>, ותקיפות מבוססות קצב.</li>
+        <li>כללים מותאמים לדרישות אבטחה ממשלתיות (חסימה גיאוגרפית לפי הצורך).</li>
+      </ul>
+    </li>
+    <li><strong><span class="en">Amazon CloudFront</span> (<span class="en">CDN</span> גלובלי)</strong>
+      <ul>
+        <li>מגיש דפי <span class="en">Next.js</span> סטטיים ומדיה לכל העולם בזמן תגובה נמוך.</li>
+        <li>דפי <span class="en">SSG/ISR</span> מוגשים ישירות מ‑<span class="en">CloudFront + S3</span> — ללא עומס על ה‑<span class="en">ECS</span>.</li>
+        <li>דפי <span class="en">SSR</span> מועברים דרך <span class="en">CloudFront</span> ל‑<span class="en">Application Load Balancer</span>.</li>
+        <li>קבצי מדיה (לוגואים, מסמכים) מוגשים מ‑<span class="en">S3</span> דרך <span class="en">Origin Access Control</span>.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>שכבה 2: רשת — <span class="en">VPC</span>, <span class="en">Subnets</span> ו‑<span class="en">Load Balancers</span></h3>
+  <ul>
+    <li><span class="en">VPC</span> מותאם עם תת-רשתות ציבוריות (<span class="en">ALB</span>) ותת-רשתות פרטיות (<span class="en">ECS, RDS, Lambda</span>).</li>
+    <li><strong><span class="en">Application Load Balancer (ALB)</span> — ציבורי</strong>
+      <ul>
+        <li>פונה לאינטרנט. מקבל תעבורה מ‑<span class="en">CloudFront</span> לשירות <span class="en">Next.js</span> ול‑<span class="en">.NET API</span>.</li>
+      </ul>
+    </li>
+    <li><strong><span class="en">Network Load Balancer (NLB)</span> — פנימי</strong>
+      <ul>
+        <li>פנימי בלבד. מנתב תעבורה בין שירותי <span class="en">ECS</span> (למשל <span class="en">API</span> שקורא ל‑<span class="en">Umbraco</span>).</li>
+        <li><span class="en">Target Group</span> נפרד לכל שירות <span class="en">Backend</span> לבידוד מלא.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>שכבה 3: <span class="en">Compute</span> — <span class="en">ECS Fargate</span></h3>
+  <p>כל <span class="en">Containers</span> רצים על <span class="en">ECS Fargate (Serverless)</span> — ללא ניהול שרתים:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>שירות</th>
+        <th>טכנולוגיה</th>
+        <th>תפקיד</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>פרונטאנד</td>
+        <td><span class="en">Next.js (React)</span></td>
+        <td>רינדור <span class="en">SSR/SSG/ISR</span>. שואב תוכן מ‑<span class="en">Umbraco Content Delivery API</span>. פונה לציבור. סורק על ידי מנועי חיפוש.</td>
+      </tr>
+      <tr>
+        <td><span class="en">CMS</span></td>
+        <td><span class="en">Umbraco (Headless)</span></td>
+        <td>ניהול תוכן לעורכים. חושף <span class="en">Content Delivery API</span> ל‑<span class="en">Next.js</span>. אין חשיפה ציבורית ישירה.</td>
+      </tr>
+      <tr>
+        <td><span class="en">API Server</span></td>
+        <td><span class="en">.NET Web API (C#)</span></td>
+        <td>לוגיקה עסקית: שאילתות חיפוש, טפסי יצירת קשר, הורדת מסמכים, אירועי אנליטיקה.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="note">הערה: <span class="en">Umbraco</span> רץ ב‑<span class="en">Headless mode</span> — עורכים ניגשים ל‑<span class="en">Backoffice</span> דרך נתיב נפרד מוגן, שאינו חשוף לציבור ואינו מאונדקס. <span class="en">Next.js</span> קורא רק את <span class="en">Content Delivery API</span> לקריאה בלבד.</p>
+
+  <h3>שכבה 4: חיפוש — <span class="en">Amazon OpenSearch</span></h3>
+  <p>עבור חיפוש מתקדם וסינון (לפי תחום, טכנולוגיה, מיקום):</p>
+  <ul>
+    <li><span class="en">Amazon OpenSearch Service</span> מחליף <span class="en">ELK</span> עצמאי על <span class="en">EC2</span>.
+      <ul>
+        <li>מנוהל במלואו — ללא <span class="en">EC2</span> לתחזוקה. מתרחב באופן עצמאי.</li>
+        <li><span class="en">Lambda</span> מסנכרן נתוני חברות מ‑<span class="en">RDS/Umbraco</span> לאינדקס <span class="en">OpenSearch</span> כל כמה דקות.</li>
+      </ul>
+    </li>
+    <li>ה‑<span class="en">.NET API</span> שולח שאילתות ל‑<span class="en">OpenSearch</span> עבור בקשות חיפוש וסינון מהפרונטאנד.</li>
+    <li><span class="en">OpenSearch</span> נמצא בתת-רשת פרטית — ללא גישה ציבורית, רק דרך <span class="en">NLB</span> פנימי.</li>
+  </ul>
+
+  <h3>שכבה 5: נתונים — <span class="en">RDS</span> ו‑<span class="en">S3</span></h3>
+  <ul>
+    <li><strong><span class="en">Amazon RDS (SQL Server)</span></strong>
+      <ul>
+        <li>מסד נתונים רלציוני ראשי: רשומות חברות, טקסונומיה, מטה-דאטה.</li>
+        <li><span class="en">Multi-AZ</span> לזמינות גבוהה. בתת-רשת פרטית בלבד.</li>
+      </ul>
+    </li>
+    <li><strong><span class="en">Amazon S3</span> — דלי מדיה (<span class="en">sibat-media</span>)</strong>
+      <ul>
+        <li>לוגואים של חברות, מסמכי <span class="en">PDF</span> להורדה, תמונות ממוזערות לוידאו.</li>
+        <li>נגיש דרך <span class="en">CloudFront</span> עם <span class="en">Origin Access Control</span> — ללא <span class="en">URL</span> ציבורי ל‑<span class="en">S3</span>.</li>
+        <li><span class="en">Umbraco</span> מוגדר לשמור מדיה ב‑<span class="en">S3</span>.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>שכבה 6: אימות — <span class="en">Backoffice</span> עורכים בלבד</h3>
+  <p>האתר פונה לציבור ללא צורך ברישום או התחברות. אימות נדרש רק לעורכי <span class="en">CMS</span>:</p>
+  <ul>
+    <li>אימות מובנה של <span class="en">Umbraco</span> לניהול כניסת עורכים (שם משתמש + סיסמה).</li>
+    <li><span class="en">RBAC</span> — הרשאות מבוססות תפקיד: טיוטה / אישור / פרסום.</li>
+    <li><span class="en">MFA</span> (אימות דו-שלבי) מחויב לכל חשבונות העורכים.</li>
+    <li><span class="en">Cognito User Pool</span> אפשרי כתוסף עתידי לאינטגרציה עם מערכות זהות ממשלתיות.</li>
+  </ul>
+
+  <!-- 3 -->
+  <h2>3. פונקציות <span class="en">Lambda</span> — עבודות רקע</h2>
+  <p>
+    עבודות רקע רצות כפונקציות <span class="en">Lambda</span> המופעלות על ידי
+    <span class="en">Amazon EventBridge (Cron)</span> או אירועי <span class="en">S3/SNS</span>.
+    זה מחסל צורך ב‑<span class="en">Job Runner</span> קבוע ומוריד עלויות:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>שם הפונקציה</th>
+        <th>מטרה</th>
+        <th>טריגר</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="en">UpdateIndex</span></td>
+        <td>מסנכרן נתוני חברות מ‑<span class="en">RDS</span> ו‑<span class="en">Umbraco</span> לאינדקס <span class="en">OpenSearch</span> לצורך חיפוש.</td>
+        <td><span class="en">EventBridge</span> — כל 3 דקות</td>
+      </tr>
+      <tr>
+        <td><span class="en">SitemapGenerator</span></td>
+        <td>מייצר מחדש <span class="en">XML Sitemap</span> לכל דפי הישויות ומגיש ל‑<span class="en">Google Search Console</span>.</td>
+        <td><span class="en">EventBridge</span> — יומי / פרסום תוכן</td>
+      </tr>
+      <tr>
+        <td><span class="en">MediaProcessor</span></td>
+        <td>מעבד תמונות/וידאו שהועלו (שינוי גודל, דחיסה, תמונות ממוזערות) ושומר ל‑<span class="en">S3</span>.</td>
+        <td><span class="en">S3 Event</span> — בעת העלאה</td>
+      </tr>
+      <tr>
+        <td><span class="en">ContactFormHandler</span></td>
+        <td>מקבל פניות מטופס יצירת קשר, מאמת ומעביר לצוות סיב"ט דרך <span class="en">SendGrid</span>.</td>
+        <td><span class="en">API Gateway POST</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">DocumentExpiry</span></td>
+        <td>בודק תאריכי תפוגה של קבצים להורדה ומסמן/מסיר קבצים לא עדכניים.</td>
+        <td><span class="en">EventBridge</span> — יומי</td>
+      </tr>
+      <tr>
+        <td><span class="en">CacheInvalidator</span></td>
+        <td>מפעיל <span class="en">CloudFront Cache Invalidation</span> כאשר עורכים מפרסמים תוכן חדש.</td>
+        <td><span class="en">Umbraco Webhook / SNS</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">HealthReporter</span></td>
+        <td>אוסף ציוני <span class="en">Lighthouse</span> וביצועים ושולח דו"ח חודשי לבעלי עניין.</td>
+        <td><span class="en">EventBridge</span> — חודשי</td>
+      </tr>
+      <tr>
+        <td><span class="en">AnalyticsSync</span></td>
+        <td>שולף נתוני <span class="en">GA4</span> ומרכז מונחי חיפוש פופולריים ודפי חברות נצפים לדשבורד עריכה.</td>
+        <td><span class="en">EventBridge</span> — שבועי</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 4 -->
+  <h2>4. ניהול סודות וקונפיגורציה</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>מאגר</th>
+        <th>מה הוא מחזיק</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="en">AWS Secrets Manager</span></td>
+        <td>פרטי גישה ל‑<span class="en">RDS</span>, מפתח <span class="en">API</span> של <span class="en">SendGrid</span>, מחרוזת חיבור ל‑<span class="en">Umbraco DB</span>, פרטי <span class="en">OpenSearch</span>. כל <span class="en">Tasks</span> ו‑<span class="en">Lambdas</span> שולפים סודות דרך <span class="en">IAM Role</span> — ללא <span class="en">Hardcoding</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">AWS Parameter Store</span></td>
+        <td>ערכי קונפיגורציה: נתיבי <span class="en">NLB</span> פנימיים, שמות <span class="en">Buckets</span> ב‑<span class="en">S3</span>, שמות אינדקסים ב‑<span class="en">OpenSearch</span>, דגלים לפי סביבה. מוזרקים כ‑<span class="en">Environment Variables</span> לתוך <span class="en">ECS Task Definitions</span>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 5 -->
+  <h2>5. ארכיטקטורת אבטחה</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>בקרה</th>
+        <th>יישום</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>כללי <span class="en">WAF</span></td>
+        <td><span class="en">AWS WAF</span> עם <span class="en">OWASP Managed Rule Group</span>. הגבלת קצב. כללים מותאמים לעמידה בדרישות ממשלתיות.</td>
+      </tr>
+      <tr>
+        <td>תת-רשתות פרטיות</td>
+        <td>כל שירותי <span class="en">ECS</span>, <span class="en">RDS</span>, <span class="en">Lambda</span> ו‑<span class="en">OpenSearch</span> רצים בתת-רשתות פרטיות. אין גישת אינטרנט ישירה.</td>
+      </tr>
+      <tr>
+        <td><span class="en">VPC Private Endpoints</span></td>
+        <td><span class="en">PrivateLink Endpoints</span> ל‑<span class="en">Secrets Manager</span>, <span class="en">Parameter Store</span> ו‑<span class="en">S3</span> — כל התעבורה נשארת בתשתית <span class="en">AWS</span>, לא עוברת ברשת הציבורית.</td>
+      </tr>
+      <tr>
+        <td><span class="en">IAM Least Privilege</span></td>
+        <td>כל <span class="en">ECS Task</span> ו‑<span class="en">Lambda</span> מקבלים <span class="en">IAM Role</span> ייעודי עם ההרשאות המינימליות הנדרשות בלבד. ללא פרטי גישה משותפים.</td>
+      </tr>
+      <tr>
+        <td><span class="en">TLS</span> בכל מקום</td>
+        <td><span class="en">HTTPS</span> מחויב ב‑<span class="en">CloudFront</span> (תעודת <span class="en">ACM</span>). <span class="en">NLB</span> פנימי גם הוא עם <span class="en">TLS</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">WCAG 2.1 AA</span></td>
+        <td>עמידה בנגישות נאכפת דרך בדיקות <span class="en">Lighthouse CI</span> אוטומטיות בצינור <span class="en">CI/CD</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">MFA + RBAC</span> ב‑<span class="en">Umbraco</span></td>
+        <td>כל עורכי <span class="en">CMS</span> משתמשים ב‑<span class="en">MFA</span>. הרשאות מבוססות תפקיד: כותב ← מאשר ← מפרסם.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 6 -->
+  <h2>6. אסטרטגיית <span class="en">SEO</span> וביצועים</h2>
+  <p>
+    <span class="en">SEO</span> הוא מטרה מרכזית — הפורטל חייב להיות מאונדקס במלואו על ידי <span class="en">Google</span>
+    ומנועי חיפוש אחרים. ארכיטקטורת <span class="en">Next.js</span> משרתת מטרה זו ישירות:
+  </p>
+  <ul>
+    <li><span class="en">Static Site Generation (SSG)</span> לדפי חברות — <span class="en">HTML</span> מרונדר מראש, בוטים קוראים תוכן אמיתי (לא <span class="en">JavaScript</span> ריק).</li>
+    <li><span class="en">Incremental Static Regeneration (ISR)</span> — דפים מתחדשים אוטומטית כאשר עורכים מפרסמים עדכונים ב‑<span class="en">Umbraco</span>, ללא <span class="en">Build</span> מחדש.</li>
+    <li><span class="en">Server-Side Rendering (SSR)</span> לדפי חיפוש/סינון — תוצאות דינמיות מרונדרות בצד השרת לנגישות בוטים.</li>
+    <li><span class="en">JSON-LD</span> מובנה (<span class="en">Schema.org</span>) בכל דף חברה — שדה הניתן לעריכה דרך <span class="en">Umbraco CMS</span>.</li>
+    <li>תגיות <span class="en">OpenGraph + Twitter Card</span> מיוצרות אוטומטית משדות תוכן <span class="en">Umbraco</span>.</li>
+    <li><span class="en">XML Sitemap</span> מיוצר אוטומטית על ידי <span class="en">Lambda SitemapGenerator</span> ומוגש ל‑<span class="en">Google Search Console</span>.</li>
+    <li><span class="en">CDN CloudFront</span> מבטיח <span class="en">TTFB &lt; 100ms</span> גלובלית לדפים סטטיים.</li>
+  </ul>
+
+  <!-- 7 -->
+  <h2>7. ניטור ותצפיתיות</h2>
+  <ul>
+    <li><span class="en">Amazon CloudWatch</span> — לוגים של <span class="en">Containers</span>, מדדי <span class="en">ECS</span>, לוגי ביצוע <span class="en">Lambda</span>, התראות.</li>
+    <li><span class="en">AWS X-Ray</span> — <span class="en">Distributed Tracing</span> בין קריאות <span class="en">API</span> ו‑<span class="en">Lambda</span>.</li>
+    <li><span class="en">Google Analytics 4 (GA4)</span> — אנליטיקת התנהגות משתמשים בפרונטאנד.</li>
+    <li><span class="en">Google Search Console</span> — ביצועי חיפוש אורגני, כיסוי אינדקס.</li>
+    <li><span class="en">Lighthouse CI</span> — ציוני ביצועים ונגישות אוטומטיים בצינור <span class="en">CI/CD</span>.</li>
+    <li>דו"חות חודשיים מיוצרים על ידי <span class="en">Lambda HealthReporter</span> ונשלחים בדוא"ל לבעלי עניין.</li>
+  </ul>
+
+  <!-- 8 -->
+  <h2>8. <span class="en">CI/CD</span> ותשתית</h2>
+  <ul>
+    <li><span class="en">Infrastructure as Code</span> דרך <span class="en">AWS CDK</span> — כל משאבי <span class="en">AWS</span> בניהול גרסאות.</li>
+    <li><span class="en">GitHub Actions</span> (או <span class="en">AWS CodePipeline</span>) — צינור <span class="en">Build</span>, <span class="en">Test</span> ו‑<span class="en">Deploy</span> אוטומטי.</li>
+    <li>סביבות נפרדות: פיתוח ← <span class="en">Staging</span> ← ייצור, כל אחת ב‑<span class="en">VPC</span> מבודד.</li>
+    <li><span class="en">ECS Rolling Deployments</span> עם <span class="en">Health Checks</span> — עדכונים ללא <span class="en">Downtime</span>.</li>
+    <li><span class="en">Lambda Deployments</span> דרך <span class="en">AWS SAM</span> או <span class="en">CDK</span> — גרסאות עם יכולת <span class="en">Rollback</span>.</li>
+  </ul>
+
+  <!-- 9 -->
+  <h2>9. טבלת רכיבים מלאה</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>קטגוריה</th>
+        <th>רכיב</th>
+        <th>תפקיד ופרטים</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="en">Edge</span></td>
+        <td><span class="en">AWS WAF</span></td>
+        <td>חוסם תעבורה זדונית לפני הגעה לאפליקציה. כללי <span class="en">OWASP</span> + הגבלת קצב.</td>
+      </tr>
+      <tr>
+        <td><span class="en">Edge</span></td>
+        <td><span class="en">Amazon CloudFront</span></td>
+        <td><span class="en">CDN</span> גלובלי. מגיש דפי <span class="en">Next.js</span> סטטיים ומדיה. מעביר <span class="en">SSR</span> ל‑<span class="en">ALB</span>.</td>
+      </tr>
+      <tr>
+        <td>רשת</td>
+        <td><span class="en">VPC</span> מותאם</td>
+        <td>תת-רשתות ציבוריות ופרטיות על פני 2 <span class="en">Availability Zones</span>.</td>
+      </tr>
+      <tr>
+        <td>רשת</td>
+        <td><span class="en">ALB</span> (ציבורי)</td>
+        <td>פונה לאינטרנט. מנתב מ‑<span class="en">CloudFront</span> ל‑<span class="en">Next.js ECS</span> ול‑<span class="en">API ECS</span>.</td>
+      </tr>
+      <tr>
+        <td>רשת</td>
+        <td><span class="en">NLB</span> (פנימי)</td>
+        <td>פנימי בלבד. מנתב בין שירותי <span class="en">ECS</span>. <span class="en">Target Groups</span> מרובים.</td>
+      </tr>
+      <tr>
+        <td><span class="en">Compute</span></td>
+        <td><span class="en">ECS Fargate — Next.js</span></td>
+        <td>פרונטאנד ציבורי. <span class="en">SSG/ISR/SSR</span>. מותאם <span class="en">SEO</span>. קורא <span class="en">Umbraco Content Delivery API</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">Compute</span></td>
+        <td><span class="en">ECS Fargate — Umbraco</span></td>
+        <td><span class="en">CMS</span> ב‑<span class="en">Headless mode</span>. <span class="en">Backoffice</span> לעורכים (נתיב פרטי). <span class="en">Content Delivery API</span> ל‑<span class="en">Next.js</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">Compute</span></td>
+        <td><span class="en">ECS Fargate — .NET API</span></td>
+        <td>לוגיקה עסקית: חיפוש, טפסים, אירועי אנליטיקה. <span class="en">Endpoints</span> מוגנים ב‑<span class="en">JWT</span>.</td>
+      </tr>
+      <tr>
+        <td>חיפוש</td>
+        <td><span class="en">Amazon OpenSearch</span></td>
+        <td>חיפוש מנוהל. מאונדקס על ידי <span class="en">Lambda UpdateIndex</span>. מוחלש על ידי <span class="en">.NET API</span>.</td>
+      </tr>
+      <tr>
+        <td>מסד נתונים</td>
+        <td><span class="en">Amazon RDS (SQL Server)</span></td>
+        <td>מאגר רלציוני ראשי. <span class="en">Multi-AZ</span>. תת-רשת פרטית בלבד.</td>
+      </tr>
+      <tr>
+        <td>אחסון</td>
+        <td><span class="en">Amazon S3 (sibat-media)</span></td>
+        <td>תמונות חברות, <span class="en">PDF</span> להורדה, נכסי וידאו. מוגש דרך <span class="en">CloudFront OAC</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">Serverless</span></td>
+        <td><span class="en">Lambda ×8</span></td>
+        <td>עבודות רקע: אינדוקס, <span class="en">Sitemap</span>, עיבוד מדיה, <span class="en">Cache Invalidation</span>, דוא"ל, אנליטיקה.</td>
+      </tr>
+      <tr>
+        <td>אימות</td>
+        <td><span class="en">Umbraco RBAC + MFA</span></td>
+        <td>אימות עורכים. הרשאות פרסום מבוססות תפקיד. <span class="en">MFA</span> מחויב.</td>
+      </tr>
+      <tr>
+        <td>סודות</td>
+        <td><span class="en">AWS Secrets Manager</span></td>
+        <td>פרטי גישה ל‑<span class="en">DB</span>, מפתחות <span class="en">API</span>. נשלפים דרך <span class="en">IAM Role</span> — ללא <span class="en">Hardcoding</span>.</td>
+      </tr>
+      <tr>
+        <td>קונפיגורציה</td>
+        <td><span class="en">Parameter Store</span></td>
+        <td>קונפיגורציה, נתיבי <span class="en">NLB</span>, שמות <span class="en">Buckets</span>. מוזרק כ‑<span class="en">Env Vars</span>.</td>
+      </tr>
+      <tr>
+        <td><span class="en">VPC Endpoints</span></td>
+        <td><span class="en">PrivateLink</span></td>
+        <td><span class="en">Secrets Manager</span>, <span class="en">Parameter Store</span>, <span class="en">S3</span> — תעבורה נשארת בתשתית <span class="en">AWS</span>.</td>
+      </tr>
+      <tr>
+        <td>ניטור</td>
+        <td><span class="en">CloudWatch + X-Ray</span></td>
+        <td>לוגים, מדדים, <span class="en">Distributed Tracing</span>, התראות.</td>
+      </tr>
+      <tr>
+        <td>אנליטיקה</td>
+        <td><span class="en">GA4 + GSC</span></td>
+        <td>אנליטיקת התנהגות משתמשים ומדדי ביצועי חיפוש אורגני.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 10 -->
+  <h2>10. החלטות מפתח והנחות</h2>
+  <ol class="decisions">
+    <li>אתר ציבורי = ללא כניסת משתמשים בפרונטאנד. אימות מיועד לעורכי <span class="en">CMS</span> בלבד. זה מפשט את הארכיטקטורה משמעותית — ללא צורך ב‑<span class="en">Cognito Pool</span> למבקרים ציבוריים.</li>
+    <li><span class="en">Next.js</span> נבחר על פני <span class="en">React</span> רגיל בשל תמיכה מובנית ב‑<span class="en">SSG/ISR</span> — קריטי עבור <span class="en">SEO</span> (אינדוקס דפי חברות על ידי מנועי חיפוש) ועמידה ב‑<span class="en">WCAG</span>/ביצועים.</li>
+    <li><span class="en">OpenSearch</span> (מנוהל על ידי <span class="en">AWS</span>) עדיף על <span class="en">ELK</span> עצמאי ב‑<span class="en">EC2</span>. מחסל תקורה תפעולית של ניהול אשכול <span class="en">EC2</span> עבור <span class="en">Elasticsearch</span>, עם יכולות חיפוש שקולות.</li>
+    <li><span class="en">Umbraco</span> ב‑<span class="en">Headless mode</span> נשמר כפי שצוין. <span class="en">Content Delivery API</span> נצרך רק על ידי <span class="en">Next.js</span> (פנימי, דרך <span class="en">NLB</span>). <span class="en">Backoffice</span> של <span class="en">Umbraco</span> אינו נגיש לציבור — מנותב לנתיב נפרד מוגן ברמת ה‑<span class="en">ALB</span>.</li>
+    <li>פונקציות <span class="en">Lambda</span> מטפלות בכל העבודה ברקע ובעבודה מונעת אירועים. זה שומר שירותי <span class="en">ECS</span> קלים (<span class="en">Stateless</span>, <span class="en">HTTP</span> בלבד) ומונע משימות מתוזמנות הרצות בתוך <span class="en">Containers</span>.</li>
+    <li>רישיונות צד שלישי (<span class="en">Maps API</span> למפה האינטראקטיבית) נותרים באחריות צוות תשתיות הלקוח, כפי שצוין בהנחות ההצעה.</li>
+  </ol>
+
+  <p class="footer-note">גרסת מסמך: 1.0 | תאריך: מרץ 2026 | מחבר: צוות ארכיטקטורה — קבוצת אלעד</p>
+
+</div>
+
+
+</body></html>
