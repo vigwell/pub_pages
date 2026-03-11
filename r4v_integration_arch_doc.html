@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medilis / Rad4Vets Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --green: #2ea043;
+    --green-light: #3fb950;
+    --yellow: #d29922;
+    --yellow-light: #e3b341;
+    --red: #da3633;
+    --red-light: #f85149;
+    --blue: #1f6feb;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --prod-accent: #2ea043;
+    --test-accent: #1f6feb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #e6edf3 30%, #8b949e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 6px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .legend-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .legend-item.green { border-color: var(--green); color: var(--green-light); }
+  .legend-item.yellow { border-color: var(--yellow); color: var(--yellow-light); }
+  .legend-item.red { border-color: var(--red); color: var(--red-light); }
+
+  /* Environments */
+  .environments {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto 48px;
+  }
+
+  @media (max-width: 760px) {
+    .environments { grid-template-columns: 1fr; }
+  }
+
+  .env-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .env-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .env-card.production::before { background: var(--green); }
+  .env-card.test::before { background: var(--blue); }
+
+  .env-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .env-card.production .env-label { color: var(--green-light); }
+  .env-card.test .env-label { color: #58a6ff; }
+
+  .env-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  .production .env-dot { background: var(--green-light); box-shadow: 0 0 6px var(--green); }
+  .test .env-dot { background: #58a6ff; box-shadow: 0 0 6px var(--blue); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Flow */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .node {
+    border-radius: 10px;
+    padding: 14px 18px;
+    border: 1.5px solid;
+    position: relative;
+  }
+
+  .node-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .status-badge {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .node-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .node-url {
+    font-size: 0.72rem;
+    color: var(--muted);
+    word-break: break-all;
+    margin-left: 38px;
+    line-height: 1.5;
+  }
+
+  .node-desc {
+    font-size: 0.68rem;
+    margin-top: 6px;
+    margin-left: 38px;
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+
+  /* Status colors */
+  .node.status-green {
+    background: rgba(46, 160, 67, 0.07);
+    border-color: rgba(46, 160, 67, 0.4);
+  }
+  .node.status-green .status-badge { background: rgba(46,160,67,0.2); }
+  .node.status-green .node-title { color: var(--green-light); }
+
+  .node.status-yellow {
+    background: rgba(210, 153, 34, 0.07);
+    border-color: rgba(210, 153, 34, 0.4);
+  }
+  .node.status-yellow .status-badge { background: rgba(210,153,34,0.2); }
+  .node.status-yellow .node-title { color: var(--yellow-light); }
+
+  .node.status-red {
+    background: rgba(218, 54, 51, 0.07);
+    border-color: rgba(218, 54, 51, 0.4);
+  }
+  .node.status-red .status-badge { background: rgba(218,54,51,0.2); }
+  .node.status-red .node-title { color: var(--red-light); }
+
+  /* Arrow connector */
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 4px 0;
+  }
+
+  .connector-line {
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, var(--border), var(--muted));
+  }
+
+  .connector-arrow {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--muted);
+  }
+
+  .connector-label {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  /* Action items */
+  .actions-section {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .actions-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .actions-section h2::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 760px) {
+    .actions-grid { grid-template-columns: 1fr; }
+  }
+
+  .action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+
+  .action-card h3 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-card.green h3 { color: var(--green-light); }
+  .action-card.yellow h3 { color: var(--yellow-light); }
+  .action-card.red h3 { color: var(--red-light); }
+
+  .action-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .action-card ul li {
+    font-size: 0.72rem;
+    color: var(--muted);
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    display: flex;
+    gap: 8px;
+    line-height: 1.5;
+  }
+
+  .action-card ul li:last-child { border-bottom: none; }
+  .action-card ul li::before { content: '→'; opacity: 0.4; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Medilis · Rad4Vets Architecture</h1>
+  <p>Service Connectivity Map — Production &amp; Test Environments</p>
+</header>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item green"><span class="legend-icon">✅</span> Exists &amp; Operational</div>
+  <div class="legend-item yellow"><span class="legend-icon">⚠️</span> Exists, Needs Modifications</div>
+  <div class="legend-item red"><span class="legend-icon">❌</span> Missing — Must Be Installed</div>
+</div>
+
+<!-- Environment Cards -->
+<div class="environments">
+
+  <!-- PRODUCTION -->
+  <div class="env-card production">
+    <div class="env-label"><span class="env-dot"></span>Rad4Vets — Production</div>
+    <div class="flow">
+
+      <div class="node status-yellow">
+        <div class="node-header">
+          <div class="status-badge">⚠️</div>
+          <div class="node-title">Medilis Frontend</div>
+        </div>
+        <div class="node-url">https://app.medilis.ai/</div>
+        <div class="node-desc">Web application frontend. Exists and live — requires configuration updates to align with reporting endpoint changes.</div>
+      </div>
+
+      <div class="connector">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+        <div class="connector-label">API Call</div>
+      </div>
+
+      <div class="node status-green">
+        <div class="node-header">
+          <div class="status-badge">✅</div>
+          <div class="node-title">Reporting Microservice</div>
+        </div>
+        <div class="node-url">https://prodradsforvetswebapp-reporting.azurewebsites.net/<br>ReportingMicroservice/api/Report</div>
+        <div class="node-desc">Azure-hosted reporting service. Fully operational and responding to requests.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TEST -->
+  <div class="env-card test">
+    <div class="env-label"><span class="env-dot"></span>Rad4Vets — Test</div>
+    <div class="flow">
+
+      <div class="node status-red">
+        <div class="node-header">
+          <div class="status-badge">❌</div>
+          <div class="node-title">Medilis Test Frontend</div>
+        </div>
+        <div class="node-url">https://testapp.medilis.ai/</div>
+        <div class="node-desc">Test environment frontend. Does not yet exist — deployment required. Must be provisioned and configured to connect to the dev API management gateway.</div>
+      </div>
+
+      <div class="connector">
+        <div class="connector-line"></div>
+        <div class="connector-arrow"></div>
+        <div class="connector-label">API Call</div>
+      </div>
+
+      <div class="node status-green">
+        <div class="node-header">
+          <div class="status-badge">✅</div>
+          <div class="node-title">Dev API Management Gateway</div>
+        </div>
+        <div class="node-url">https://devvetsapimanagement.azure-api.net/<br>ReportingMicroservice/api/Report</div>
+        <div class="node-desc">Azure API Management gateway for the test environment. Operational — awaiting connection from the test frontend once deployed.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Action Items -->
+<div class="actions-section">
+  <h2>Action Items</h2>
+  <div class="actions-grid">
+
+    <div class="action-card green">
+      <h3>✅ No Action Required</h3>
+      <ul>
+        <li>Production Reporting Microservice is live and healthy</li>
+        <li>Dev API Management Gateway is live and healthy</li>
+        <li>Both backend services are ready to receive traffic</li>
+      </ul>
+    </div>
+
+    <div class="action-card yellow">
+      <h3>⚠️ Modifications Needed</h3>
+      <ul>
+        <li>Update <code>app.medilis.ai</code> endpoint configuration</li>
+        <li>Verify API call routing to production reporting service</li>
+        <li>Re-test production flow after configuration change</li>
+      </ul>
+    </div>
+
+    <div class="action-card red">
+      <h3>❌ Must Be Installed</h3>
+      <ul>
+        <li>Provision <code>testapp.medilis.ai</code> hosting environment</li>
+        <li>Deploy test frontend build to Azure</li>
+        <li>Configure test app to call dev API management URL</li>
+        <li>Validate end-to-end test environment connectivity</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
