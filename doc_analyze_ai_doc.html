@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Analysis API — v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdfdfd;
+    --surface: #ffffff;
+    --text: #1a1a2e;
+    --text-secondary: #5a5a72;
+    --accent: #3b5bdb;
+    --accent-light: #edf2ff;
+    --border: #e4e4ec;
+    --code-bg: #f6f6f9;
+    --green: #2b8a3e;
+    --green-bg: #ebfbee;
+    --orange: #e67700;
+    --orange-bg: #fff9db;
+    --red: #c92a2a;
+    --red-bg: #fff5f5;
+    --header-bg: #1a1a2e;
+    --header-text: #edf2ff;
+    --radius: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    font-size: 15px;
+    padding: 0 20px 80px;
+    max-width: 880px;
+    margin: 0 auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ─────────────────────── */
+  .doc-header {
+    text-align: center;
+    padding: 48px 0 36px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .doc-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .doc-header .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  .doc-header .version-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 4px 14px;
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Sections ───────────────────── */
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 44px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+    letter-spacing: -0.3px;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 28px 0 8px;
+    color: var(--text);
+  }
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 18px 0 6px;
+    color: var(--text-secondary);
+  }
+
+  p { margin-bottom: 10px; }
+
+  /* ── Endpoint badge ─────────────── */
+  .endpoint {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px 0 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+  }
+  .endpoint .method {
+    background: var(--accent);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  .endpoint .path {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ── Tables ─────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 18px;
+    font-size: 13.5px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  thead th {
+    background: var(--header-bg);
+    color: var(--header-text);
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) { background: #fafafc; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ── Code blocks ────────────────── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 8px 0 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  pre .comment { color: #868e96; }
+  pre .string { color: #2b8a3e; }
+  pre .keyword { color: #5c7cfa; }
+
+  /* ── Callout boxes ──────────────── */
+  .callout {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 12px 0 18px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout.tip { background: var(--green-bg); border-left: 3px solid var(--green); }
+  .callout.warn { background: var(--orange-bg); border-left: 3px solid var(--orange); }
+  .callout.note { background: var(--accent-light); border-left: 3px solid var(--accent); }
+
+  /* ── Bullets ────────────────────── */
+  ul { margin: 6px 0 14px 22px; }
+  ul li { margin-bottom: 5px; }
+
+  /* ── Pipeline steps ─────────────── */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 14px 0 20px;
+  }
+  .pipeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    position: relative;
+  }
+  .pipeline-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 38px;
+    bottom: -2px;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .step-content { flex: 1; padding-top: 5px; }
+  .step-content strong { display: block; margin-bottom: 2px; }
+
+  /* ── Footer ─────────────────────── */
+  .doc-footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  @media print {
+    body { max-width: 100%; padding: 0; font-size: 12px; }
+    pre { font-size: 10px; }
+    h2 { break-after: avoid; }
+    .pipeline-step { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <h1>AI Microservice — Document Analysis API</h1>
+  <div class="subtitle">Developer Integration Guide</div>
+  <div class="version-badge">v2.0 — PDF Support</div>
+  <div class="subtitle" style="margin-top:8px;font-size:12px;">
+    Base URL: <code style="font-size:11px">https://devvetsapimanagement.azure-api.net/AiMicroservice</code>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>Overview</h2>
+<p>
+  The Document Analysis API allows you to submit images or PDF documents for AI-powered analysis.
+  It supports both single-file and batch analysis via HTTP <code>multipart/form-data</code> POST requests.
+  <strong>PDF files are automatically detected</strong> and converted to page images for analysis.
+</p>
+<p>All endpoints require <strong>Bearer token</strong> authorization in the request header.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>ModelSpeed Parameter</h2>
+<p>Controls which underlying AI model is used. Case-insensitive.</p>
+<table>
+  <thead><tr><th>Value</th><th>Speed</th><th>Use Case</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>"fastest"</code> (default)</td>
+      <td>~1-2s</td>
+      <td>Routine screening, quick triage, high-volume workflows</td>
+    </tr>
+    <tr>
+      <td><code>"smarter"</code></td>
+      <td>3-4s+</td>
+      <td>Deep investigation, complex or clinically critical cases. Significantly higher quality.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>PdfStrategy Parameter</h2>
+<p>
+  When a submitted file is a PDF, the API converts it to page images and analyzes them.
+  The <strong>PdfStrategy</strong> parameter controls how many pages are analyzed. Case-insensitive.
+</p>
+<table>
+  <thead><tr><th>Value</th><th>Behavior</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>"AllPages"</code> (default)</td>
+      <td>
+        Every page is analyzed individually, then a final AI aggregation call produces one overall
+        classification. If <strong>any</strong> page is classified as medical, the whole document is marked medical.
+      </td>
+    </tr>
+    <tr>
+      <td><code>"FirstPageOnly"</code></td>
+      <td>
+        Only the first page is analyzed. Faster and cheaper — suitable when the first page is
+        sufficient to determine document type.
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <span>Start with <code>"AllPages"</code> for accurate classification. Switch to <code>"FirstPageOnly"</code> only when speed is critical and you're confident the first page is representative.</span>
+</div>
+<div class="callout note">
+  <span class="callout-icon">ℹ️</span>
+  <span>For non-PDF files (images), the PdfStrategy parameter is ignored.</span>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>Endpoints</h2>
+
+<!-- ── Analyze ────────────────────── -->
+<div class="endpoint">
+  <span class="method">POST</span>
+  <span class="path">/api/DocumentAnalysis/Analyze</span>
+</div>
+<p>Analyzes a single file (image or PDF). Returns a <strong>DocumentAnalysisResponse</strong>.</p>
+
+<h4>Request Parameters</h4>
+<table>
+  <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>File</code></td><td>File (binary)</td><td>Yes</td><td>The image or PDF document to analyze (multipart)</td></tr>
+    <tr><td><code>AnalyzeType</code></td><td>string</td><td>Yes</td><td>Analysis type, e.g. <code>"MedicalImage"</code></td></tr>
+    <tr><td><code>ModelSpeed</code></td><td>string</td><td>No</td><td>AI model tier. Default: <code>"fastest"</code></td></tr>
+  </tbody>
+</table>
+
+<h4>C# Example — Image</h4>
+<pre><span class="keyword">var</span> options = <span class="keyword">new</span> RestClientOptions(
+    <span class="string">"https://devvetsapimanagement.azure-api.net"</span>) { MaxTimeout = -1 };
+<span class="keyword">var</span> client = <span class="keyword">new</span> RestClient(options);
+<span class="keyword">var</span> request = <span class="keyword">new</span> RestRequest(
+    <span class="string">"/AiMicroservice/api/DocumentAnalysis/Analyze"</span>, Method.Post);
+request.AddHeader(<span class="string">"Authorization"</span>, <span class="string">"Bearer &lt;your-token&gt;"</span>);
+request.AlwaysMultipartFormData = <span class="keyword">true</span>;
+request.AddFile(<span class="string">"File"</span>, <span class="string">"/path/to/your/image.jpg"</span>);
+request.AddParameter(<span class="string">"AnalyzeType"</span>, <span class="string">"MedicalImage"</span>);
+request.AddParameter(<span class="string">"ModelSpeed"</span>, <span class="string">"fastest"</span>);
+RestResponse response = <span class="keyword">await</span> client.ExecuteAsync(request);</pre>
+
+<h4>C# Example — PDF</h4>
+<pre><span class="keyword">var</span> request = <span class="keyword">new</span> RestRequest(
+    <span class="string">"/AiMicroservice/api/DocumentAnalysis/Analyze"</span>, Method.Post);
+request.AddHeader(<span class="string">"Authorization"</span>, <span class="string">"Bearer &lt;your-token&gt;"</span>);
+request.AlwaysMultipartFormData = <span class="keyword">true</span>;
+request.AddFile(<span class="string">"File"</span>, <span class="string">"/path/to/document.pdf"</span>);
+request.AddParameter(<span class="string">"AnalyzeType"</span>, <span class="string">"MedicalImage"</span>);
+request.AddParameter(<span class="string">"ModelSpeed"</span>, <span class="string">"smarter"</span>);
+<span class="comment">// PDF auto-detected; AllPages strategy used by default</span>
+RestResponse response = <span class="keyword">await</span> client.ExecuteAsync(request);</pre>
+
+<h4>Sample Response — Image</h4>
+<pre>{
+  <span class="string">"isSuccess"</span>: <span class="keyword">true</span>,
+  <span class="string">"error"</span>: <span class="keyword">null</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"isMedical"</span>: <span class="keyword">true</span>,
+    <span class="string">"classification"</span>: <span class="string">"Medical Image"</span>,
+    <span class="string">"confidence"</span>: <span class="string">"Yes"</span>,
+    <span class="string">"confidencePct"</span>: 97,
+    <span class="string">"notes"</span>: <span class="string">"X-ray image of left lung"</span>,
+    <span class="string">"fileName"</span>: <span class="string">"image.jpg"</span>,
+    <span class="string">"totalUsedTokens"</span>: 340
+  }
+}</pre>
+
+<h4>Sample Response — PDF (AllPages)</h4>
+<pre>{
+  <span class="string">"isSuccess"</span>: <span class="keyword">true</span>,
+  <span class="string">"error"</span>: <span class="keyword">null</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"isMedical"</span>: <span class="keyword">true</span>,
+    <span class="string">"classification"</span>: <span class="string">"Lab Report"</span>,
+    <span class="string">"confidence"</span>: <span class="string">"Yes"</span>,
+    <span class="string">"confidencePct"</span>: 94,
+    <span class="string">"notes"</span>: <span class="string">"[PDF AllPages — 3 pages analyzed] Lab report with..."</span>,
+    <span class="string">"fileName"</span>: <span class="string">"bloodwork.pdf"</span>,
+    <span class="string">"totalUsedTokens"</span>: 1280,
+    <span class="string">"pageCount"</span>: 3,
+    <span class="string">"analyzedPages"</span>: 3,
+    <span class="string">"pageResults"</span>: [
+      { <span class="string">"pageNumber"</span>: 1, <span class="string">"isMedical"</span>: <span class="keyword">true</span>,  <span class="string">"classification"</span>: <span class="string">"Lab Report"</span>, <span class="string">"confidencePct"</span>: 96 },
+      { <span class="string">"pageNumber"</span>: 2, <span class="string">"isMedical"</span>: <span class="keyword">true</span>,  <span class="string">"classification"</span>: <span class="string">"Lab Report"</span>, <span class="string">"confidencePct"</span>: 91 },
+      { <span class="string">"pageNumber"</span>: 3, <span class="string">"isMedical"</span>: <span class="keyword">false</span>, <span class="string">"classification"</span>: <span class="string">"Other"</span>,      <span class="string">"confidencePct"</span>: 78 }
+    ]
+  }
+}</pre>
+
+<!-- ── AnalyzeBatch ───────────────── -->
+<div class="endpoint">
+  <span class="method">POST</span>
+  <span class="path">/api/DocumentAnalysis/AnalyzeBatch</span>
+</div>
+<p>
+  Analyzes multiple files in a single request. All files are processed in parallel.
+  PDF files within the batch are automatically detected and processed according to the
+  <code>PdfStrategy</code> parameter.
+</p>
+
+<h4>Request Parameters</h4>
+<table>
+  <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>Files</code></td><td>File[] (binary)</td><td>Yes</td><td>Array of files to analyze (multipart). Supports images and PDFs.</td></tr>
+    <tr><td><code>AnalyzeType</code></td><td>string</td><td>Yes</td><td>Analysis type applied to all files.</td></tr>
+    <tr><td><code>ModelSpeed</code></td><td>string</td><td>No</td><td>AI model tier. Default: <code>"fastest"</code></td></tr>
+    <tr><td><code>PdfStrategy</code></td><td>string</td><td>No</td><td><code>"AllPages"</code> (default) or <code>"FirstPageOnly"</code>. Applies to all PDFs in the batch.</td></tr>
+    <tr><td><code>StudyId</code></td><td>Guid</td><td>No</td><td>Optional study identifier for WebSocket event targeting.</td></tr>
+  </tbody>
+</table>
+
+<h4>C# Example — Mixed Batch (Images + PDF)</h4>
+<pre><span class="keyword">var</span> options = <span class="keyword">new</span> RestClientOptions(
+    <span class="string">"https://devvetsapimanagement.azure-api.net"</span>) { MaxTimeout = -1 };
+<span class="keyword">var</span> client = <span class="keyword">new</span> RestClient(options);
+<span class="keyword">var</span> request = <span class="keyword">new</span> RestRequest(
+    <span class="string">"/AiMicroservice/api/DocumentAnalysis/AnalyzeBatch"</span>, Method.Post);
+request.AddHeader(<span class="string">"Authorization"</span>, <span class="string">"Bearer &lt;your-token&gt;"</span>);
+request.AlwaysMultipartFormData = <span class="keyword">true</span>;
+request.AddFile(<span class="string">"Files"</span>, <span class="string">"/path/to/xray.jpg"</span>);
+request.AddFile(<span class="string">"Files"</span>, <span class="string">"/path/to/labresults.pdf"</span>);
+request.AddFile(<span class="string">"Files"</span>, <span class="string">"/path/to/invoice.png"</span>);
+request.AddParameter(<span class="string">"AnalyzeType"</span>, <span class="string">"MedicalImage"</span>);
+request.AddParameter(<span class="string">"ModelSpeed"</span>, <span class="string">"smarter"</span>);
+request.AddParameter(<span class="string">"PdfStrategy"</span>, <span class="string">"AllPages"</span>);
+RestResponse response = <span class="keyword">await</span> client.ExecuteAsync(request);</pre>
+
+<h4>Sample Response</h4>
+<pre>{
+  <span class="string">"isSuccess"</span>: <span class="keyword">true</span>,
+  <span class="string">"error"</span>: <span class="keyword">null</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"totalFiles"</span>: 3,
+    <span class="string">"medicalCount"</span>: 2,
+    <span class="string">"results"</span>: [
+      {
+        <span class="string">"isMedical"</span>: <span class="keyword">true</span>,
+        <span class="string">"classification"</span>: <span class="string">"Medical Image"</span>,
+        <span class="string">"confidencePct"</span>: 95,
+        <span class="string">"fileName"</span>: <span class="string">"xray.jpg"</span>
+      },
+      {
+        <span class="string">"isMedical"</span>: <span class="keyword">true</span>,
+        <span class="string">"classification"</span>: <span class="string">"Lab Report"</span>,
+        <span class="string">"confidencePct"</span>: 92,
+        <span class="string">"fileName"</span>: <span class="string">"labresults.pdf"</span>,
+        <span class="string">"pageCount"</span>: 4,
+        <span class="string">"analyzedPages"</span>: 4,
+        <span class="string">"notes"</span>: <span class="string">"[PDF AllPages — 4 pages analyzed] ..."</span>
+      },
+      {
+        <span class="string">"isMedical"</span>: <span class="keyword">false</span>,
+        <span class="string">"classification"</span>: <span class="string">"Invoice"</span>,
+        <span class="string">"confidencePct"</span>: 88,
+        <span class="string">"fileName"</span>: <span class="string">"invoice.png"</span>
+      }
+    ]
+  }
+}</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>PDF Processing Details</h2>
+<p>When a PDF file is submitted (detected by MIME type <code>application/pdf</code> or <code>.pdf</code> extension), the following pipeline is executed:</p>
+
+<div class="pipeline">
+  <div class="pipeline-step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <strong>Conversion</strong>
+      The PDF is converted to PNG images (one per page) at 300 DPI via the internal PDF-to-image conversion service.
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <strong>Per-Page Analysis</strong>
+      Each page image is sent to the AI model for classification (bounded by a concurrency limit of 5 parallel calls).
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <strong>Aggregation (AllPages only)</strong>
+      A final AI call receives all per-page results and produces one overall classification for the entire document.
+    </div>
+  </div>
+  <div class="pipeline-step">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <strong>Medical Override</strong>
+      If any individual page is classified as medical, the final result is <strong>guaranteed</strong> to be marked as medical — even if the aggregation AI disagrees.
+    </div>
+  </div>
+</div>
+
+<h3>Additional Response Fields for PDFs</h3>
+<table>
+  <thead><tr><th>Field</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>pageCount</code></td><td>Total number of pages in the source PDF.</td></tr>
+    <tr><td><code>analyzedPages</code></td><td>How many pages were sent to the AI (1 for FirstPageOnly, all for AllPages).</td></tr>
+    <tr><td><code>pageResults</code></td><td>Array of per-page results (AllPages only). Each entry includes <code>pageNumber</code>, <code>isMedical</code>, <code>classification</code>, <code>confidencePct</code>.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>Choosing the Right Parameters</h2>
+
+<h3>ModelSpeed</h3>
+<ul>
+  <li><code>"fastest"</code> (default) — High-volume, real-time, or initial screening. Fast turnaround, suitable for most standard cases.</li>
+  <li><code>"smarter"</code> — When accuracy matters most. Triggers deeper reasoning. Expect 10-30+ seconds but substantially higher quality. Ideal for ambiguous or clinically critical documents.</li>
+</ul>
+
+<h3>PdfStrategy</h3>
+<ul>
+  <li><code>"AllPages"</code> (default) — Best accuracy. Every page is analyzed and aggregated. Use for multi-page medical documents where important information may appear on any page.</li>
+  <li><code>"FirstPageOnly"</code> — Fastest. Only the first page is analyzed. Use when the first page is sufficient (cover pages, single-page documents, quick triage).</li>
+</ul>
+
+<div class="callout tip">
+  <span class="callout-icon">💡</span>
+  <span>Start with <code>ModelSpeed="fastest"</code> and <code>PdfStrategy="AllPages"</code>. Switch to <code>"smarter"</code> for complex cases and <code>"FirstPageOnly"</code> only when speed is critical.</span>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>Error Handling</h2>
+<p>The API always returns HTTP 200. Check the <code>isSuccess</code> field to determine if the call succeeded.</p>
+<table>
+  <thead><tr><th>Scenario</th><th>Behavior</th></tr></thead>
+  <tbody>
+    <tr><td>No file attached</td><td>Returns error: <code>"No file provided"</code></td></tr>
+    <tr><td>AnalyzeType missing</td><td>Returns error: <code>"analyzeType is required"</code></td></tr>
+    <tr><td>No files in batch</td><td>Returns error: <code>"No files provided"</code></td></tr>
+    <tr><td>Auth missing / invalid</td><td>Returns HTTP 401 Unauthorized</td></tr>
+    <tr><td>PDF conversion fails</td><td>Returns result with notes: <code>"PDF conversion returned no pages"</code></td></tr>
+    <tr><td>Invalid PdfStrategy value</td><td>Falls back to <code>"AllPages"</code> (default)</td></tr>
+    <tr><td>Invalid ModelSpeed value</td><td>Falls back to default configured model</td></tr>
+  </tbody>
+</table>
+
+<h4>Error Response Example</h4>
+<pre>{
+  <span class="string">"isSuccess"</span>: <span class="keyword">false</span>,
+  <span class="string">"error"</span>: {
+    <span class="string">"code"</span>: <span class="string">"VALIDATION_ERROR"</span>,
+    <span class="string">"message"</span>: <span class="string">"analyzeType is required"</span>
+  },
+  <span class="string">"data"</span>: <span class="keyword">null</span>
+}</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>WebSocket Real-Time Events (Batch)</h2>
+<p>During batch processing, the API emits WebSocket events so the frontend can update the UI in real time.</p>
+<table>
+  <thead><tr><th>Event</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>IMAGE_ANALYSIS_START</code></td><td>Batch started. Frontend shows spinners on all rows.</td></tr>
+    <tr><td><code>IMAGE_ANALYSIS_ITEM_COMPLETE</code></td><td>One file completed. Frontend updates that row with the result.</td></tr>
+    <tr><td><code>IMAGE_ANALYSIS_ERROR</code></td><td>One file failed. Frontend shows error on that row.</td></tr>
+    <tr><td><code>IMAGE_ANALYSIS_BATCH_COMPLETE</code></td><td>All files done. Frontend updates summary bar and enables Submit button.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="doc-footer">
+  AI Microservice — Document Analysis API &nbsp;|&nbsp; Internal Developer Reference &nbsp;|&nbsp; v2.0
+</div>
+
+</body>
+</html>
