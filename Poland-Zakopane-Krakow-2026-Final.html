@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Татры и Краков · 18–23 декабря 2026</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Layout: вертикальная лента дней, слева время, картинка, блок; наверху схема маршрута */
+:root{
+  --bg:#f3f5f6; --paper:#ffffff; --fg:#1b2a2e; --muted:#5b6b70; --line:#d9e1e3;
+  --pine:#1f4d45; --frost:#2f6f9a; --amber:#b5651d;
+  --car-bg:#fbe9d7; --car-fg:#8a4512;
+  --park-bg:#dcefe8; --park-fg:#1f5a49;
+  --taxi-bg:#e1ecf6; --taxi-fg:#24557a;
+  --warn-bg:#fff4d6; --warn-fg:#6b4d00;
+  --display:"Literata",Georgia,serif; --body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111a1c; --paper:#172326; --fg:#e4ecee; --muted:#93a5aa; --line:#2a3a3e;
+  --pine:#7cc4b2; --frost:#86b9e0; --amber:#e3a467;
+  --car-bg:#3a2717; --car-fg:#f2c194; --park-bg:#163329; --park-fg:#93d8bf;
+  --taxi-bg:#172d40; --taxi-fg:#a6cdef; --warn-bg:#352b10; --warn-fg:#f0d58c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111a1c; --paper:#172326; --fg:#e4ecee; --muted:#93a5aa; --line:#2a3a3e;
+  --pine:#7cc4b2; --frost:#86b9e0; --amber:#e3a467;
+  --car-bg:#3a2717; --car-fg:#f2c194; --park-bg:#163329; --park-fg:#93d8bf;
+  --taxi-bg:#172d40; --taxi-fg:#a6cdef; --warn-bg:#352b10; --warn-fg:#f0d58c; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:860px;margin:0 auto;padding-block:32px 64px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(28px,5vw,40px);color:var(--pine)}
+h2{font-size:24px}
+h3{font-size:17px}
+a{color:var(--frost)} a:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
+.lead{color:var(--muted);max-width:65ch;margin:8px 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tag{font-size:12px;letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--muted);align-items:center}
+.chip{display:inline-block;font-size:12px;font-weight:600;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.c-car{background:var(--car-bg);color:var(--car-fg)}
+.c-park{background:var(--park-bg);color:var(--park-fg)}
+.c-taxi{background:var(--taxi-bg);color:var(--taxi-fg)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px}
+.overview{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:700px){.overview{grid-template-columns:1fr}}
+.overview svg{width:100%;height:auto;max-width:320px}
+.fixes{margin:0;padding-left:18px;display:grid;gap:8px}
+.fixes li{max-width:65ch}
+nav.days{display:flex;flex-wrap:wrap;gap:8px}
+nav.days a{text-decoration:none;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 12px;color:var(--fg);font-size:14px}
+nav.days a b{color:var(--pine)}
+.day{display:grid;gap:14px;scroll-margin-top:16px}
+.dayhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:2px solid var(--pine);padding-bottom:8px}
+.dayhead .date{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.route{font-size:14px;font-weight:600;text-decoration:none;border:1px solid var(--frost);border-radius:8px;padding:5px 12px}
+.slot{display:grid;grid-template-columns:104px 60px minmax(0,1fr);gap:14px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
+.slot:last-child{border-bottom:0}
+.thumb{width:60px;height:60px;border-radius:10px;display:grid;place-items:center;text-decoration:none}
+.thumb svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+a.thumb:hover{filter:brightness(.92)}
+.thumb.photo{overflow:hidden;border:1px solid var(--line);background:var(--line)}
+.thumb.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.t-food{background:var(--car-bg);color:var(--car-fg)}
+.t-nat{background:var(--taxi-bg);color:var(--taxi-fg)}
+.t-cult{background:var(--park-bg);color:var(--park-fg)}
+.t-log{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.time{font-variant-numeric:tabular-nums;font-weight:600;color:var(--pine);font-size:14px}
+.slot .body{min-width:0;display:grid;gap:6px}
+.slot .title{font-weight:600}
+.slot p{margin:0;color:var(--fg)}
+.slot .try{color:var(--muted);font-size:14px}
+.slot .links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
+.food{border-left:3px solid var(--amber);padding-left:10px}
+@media (max-width:520px){.slot{grid-template-columns:60px minmax(0,1fr);gap:6px 12px}.slot .time{grid-column:1 / -1}}
+.note{background:var(--warn-bg);color:var(--warn-fg);border-radius:8px;padding:10px 12px;font-size:14px}
+.remind{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.remind .panel{display:grid;gap:6px;align-content:start}
+.remind h3{font-size:16px;color:var(--pine)}
+.remind p{margin:0;font-size:14px}
+footer{color:var(--muted);font-size:13px}
+.hotels{display:grid;gap:12px}
+.hotel{display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:start}
+.hotel .rank{font-family:var(--display);font-size:22px;font-weight:700;color:var(--pine);font-variant-numeric:tabular-nums;line-height:1.2}
+.hotel .body{min-width:0;display:grid;gap:6px}
+.hotel h3{font-size:17px}
+.hotel p{margin:0;font-size:14px}
+.hotel .facts{display:flex;flex-wrap:wrap;gap:6px}
+.hotel .links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px}
+.c-ok{background:var(--park-bg);color:var(--park-fg)}
+.c-check{background:var(--warn-bg);color:var(--warn-fg)}
+.c-info{background:var(--taxi-bg);color:var(--taxi-fg)}
+#hotels{scroll-margin-top:16px}
+#budget{scroll-margin-top:16px}
+.sum{display:flex;flex-wrap:wrap;gap:8px}
+.sum span{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--pine);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:600}
+.sum span b{font-weight:500;color:var(--amber);margin-left:6px;white-space:nowrap}
+.budget{display:grid;gap:12px}
+.bday{display:grid;gap:8px}
+.bday .bhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px}
+.bday .bsum{font-family:var(--display);font-size:22px;font-weight:700;color:var(--pine);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bday .bsum small{font-family:var(--body);font-size:13px;font-weight:500;color:var(--muted)}
+.btab{width:100%;border-collapse:collapse;font-size:14px}
+.btab td{padding:5px 0;border-top:1px solid var(--line);vertical-align:top}
+.btab td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;padding-left:12px}
+.btab td.n.nis{color:var(--muted)}
+.btotal{background:var(--paper);border:2px solid var(--pine);border-radius:12px;padding:20px;display:grid;gap:8px}
+.btotal .big{font-family:var(--display);font-size:clamp(28px,5vw,36px);font-weight:700;color:var(--pine);font-variant-numeric:tabular-nums}
+
+.logistics,.flow{display:grid;gap:14px;scroll-margin-top:16px}
+.flowgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.flowcard{padding:14px;min-width:0}
+.flowcard h3{margin-bottom:12px}
+.flowcard h3 a{text-decoration:none;color:var(--pine)}
+.flowsteps{list-style:none;margin:0;padding:0;display:grid;gap:17px}
+.flowsteps li{position:relative;text-align:center;min-width:0}
+.flowsteps li + li::before{content:"↓";position:absolute;top:-17px;left:0;right:0;color:var(--muted);font-size:13px;line-height:17px}
+.flowsteps li > span,.branches span{display:block;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.branches span{background:var(--park-bg);color:var(--park-fg);display:grid;place-items:center}
+@media(max-width:670px){.flowgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.flowgrid{grid-template-columns:minmax(0,1fr)}}
+@media print{.flowcard,.remind .panel,.slot{break-inside:avoid}.wrap{max-width:none;padding-block:0}.flowgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.booking-wrap{overflow-x:auto;max-width:100%;padding-block:8px}.booking-table{border-collapse:collapse;width:100%;font-size:14px;table-layout:auto}.booking-table th,.booking-table td{text-align:left;vertical-align:top;padding:9px 7px;border-bottom:1px solid var(--line);min-width:75px}.booking-table thead th{color:var(--pine);background:var(--bg)}.booking-table tbody th{font-weight:600}.booking-table tbody td:nth-child(4){font-weight:600;color:var(--pine)}.booking-table tr:last-child>*{border-bottom:0}.booking-table td:last-child{min-width:165px}
+#bookings{min-width:0}.wrap{grid-template-columns:minmax(0,1fr)}
+.restaurant-photo{width:min(100%,318px);margin:6px 0 2px;font-size:13px;color:var(--muted)}.restaurant-photo img{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:var(--line);border-radius:9px}.restaurant-photo figcaption{margin-top:5px;line-height:1.35}.restaurant-photo.unavailable>a{display:none}
+.poi-photo-grid{display:flex;flex-wrap:wrap;gap:12px;margin:3px 0}.poi-photo-grid>.restaurant-photo{flex:1 1 160px;max-width:240px}.note>.poi-photo-grid{margin-top:8px}
+.dayrail{display:flex;overflow-x:auto;list-style:none;padding:0 0 .7em;margin:.6em 0;scrollbar-width:thin}.dayrail li{flex:1 0 6.4em;border-top:2px solid #658479;padding:.45em .45em 0 0;font-size:.85em;line-height:1.3}.dayrail time{display:block;color:#285646;font-weight:700}.gearline{display:flex;gap:.35em 1em;flex-wrap:wrap;margin:.4em 0}.railalt{font-size:.85em;margin:0 0 .8em}@media print{.dayrail{overflow:visible;flex-wrap:wrap}.dayrail li{flex:1 1 6em}}
+#days>.stickyDays{position:sticky;top:0;z-index:8;background:#f7f7f1;display:flex;flex-wrap:nowrap;overflow:auto;padding:6px;gap:4px;margin:0;min-width:0}.stickyDays a{white-space:nowrap}.stickyDays [aria-current]{background:#225548;color:white}.day,.stopcard{scroll-margin-top:5rem}#days,.day{min-width:0}.switches{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.switches button{font:inherit;padding:6px 12px;border-radius:16px;border:1px solid #73877e;background:white;cursor:pointer}.switches [aria-pressed=true]{background:#235547;color:white}.dayrail a{display:block;color:inherit}.stopcard{padding:14px 16px;border-bottom:1px solid #d9ded9}.stopcard header{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap}.stopcard header time{font-weight:bold;color:#285646}.stopcard header a{margin-left:auto}.stopcard summary{cursor:pointer;color:#285646}.stopcard details,.departure{margin-top:5px}.departure{font-weight:600}@media print{#days>.stickyDays,.switches{display:none}}
+.activityKind{display:inline-block;white-space:nowrap;border-radius:18px;padding:2px 9px;background:#eef3ee;color:#304e42;font-size:.82em;line-height:1.55}.endsection{border:1px solid var(--line,#788886);border-radius:12px;padding:12px 16px;scroll-margin-top:5rem}.endsection summary{cursor:pointer}.endsection summary h2{display:inline;font-size:1.2rem}.endbody{display:grid;gap:14px;margin-top:14px}.switches button[aria-pressed=false]{background:#fff;color:#183e35;border:1px solid #648278}.switches button[aria-pressed=true]{color:#fff;background:#235547}.switches button:focus-visible{outline:3px solid #e98c20;outline-offset:2px}.stopcard header time,.dayrail a time{display:inline-block;color:#102e29;background:#c9f2df;border-radius:5px;padding:.15em .45em;font-weight:750;font-variant-numeric:tabular-nums}.dayrail a time{display:table;margin-bottom:.3em}</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Татры и Краков · 18–23 декабря 2026</h1>
+    <p class="lead">Виген и Таня проводят три ночи в Закопане и две ночи в Кракове с 21 декабря. В плане указаны места, время рейсов, логистика Alamo и время на пересадки и вход по билетам.</p>
+    <p class="note"><b>Эди, присоединяйся, где и когда тебе удобно.</b> Мы с Таней едем по этому плану. Если захочешь встретиться, напиши нам, какой день и место тебе подходят.</p>
+    <div class="meta">
+      <span class="tag">18–21 · Закопане</span><span class="tag">21–23 · Краков вдвоём</span><span class="tag">LY5119 / LY5120</span><span class="tag">Машина напрокат</span>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="chip c-car">Машина нужна</span> едем сами
+    <span class="chip c-park">Машина стоит</span> пешком
+    <span class="chip c-taxi">Такси</span> машину оставляем у отеля
+  </div>
+
+  <section class="panel overview" aria-label="Схема маршрута">
+    <svg viewBox="0 0 360 500" role="img" aria-label="Схема: аэропорт Кракова, Краков, Величка, Закопане и окрестности">
+      <path d="M200 474 L120 474 L80 494 L330 494 L290 469 Z" fill="var(--line)" opacity=".7"/>
+      <text x="230" y="490" font-size="11" fill="var(--muted)" font-family="var(--body)">Татры</text>
+      <polyline points="87,51 188,58 190,170 250,340 197,428" fill="none" stroke="var(--frost)" stroke-width="3" stroke-dasharray="6 5"/>
+      <polyline points="197,428 250,340 267,96 188,58 87,51" fill="none" stroke="var(--pine)" stroke-width="2.5" opacity=".8"/>
+      <polyline points="197,428 117,388" fill="none" stroke="var(--amber)" stroke-width="3"/>
+      <polyline points="197,428 297,408" fill="none" stroke="var(--amber)" stroke-width="3"/>
+      <line x1="197" y1="428" x2="217" y2="462" stroke="var(--frost)" stroke-width="2" stroke-dasharray="2 3"/>
+      <g font-family="var(--body)" font-size="12" fill="var(--fg)">
+        <circle cx="87" cy="51" r="6" fill="var(--amber)"/><text x="20" y="34">Аэропорт KRK</text>
+        <circle cx="188" cy="58" r="7" fill="var(--pine)"/><text x="160" y="84" font-weight="600">Краков</text>
+        <circle cx="267" cy="96" r="5" fill="var(--pine)"/><text x="248" y="118">Величка</text>
+        <circle cx="250" cy="340" r="4" fill="var(--muted)"/><text x="260" y="344" fill="var(--muted)">Новы-Тарг</text>
+        <circle cx="197" cy="428" r="7" fill="var(--pine)"/><text x="170" y="418" font-weight="600">Закопане</text>
+        <circle cx="330" cy="392" r="5" fill="var(--amber)"/><text x="300" y="366">Терма</text><text x="300" y="379">Бания</text>
+        <circle cx="297" cy="408" r="5" fill="var(--amber)"/><text x="262" y="394">Кулиг</text>
+        <circle cx="217" cy="462" r="4" fill="var(--frost)"/><text x="226" y="460">Каспровы</text>
+      </g>
+      <text x="20" y="250" font-size="11" fill="var(--muted)" font-family="var(--body)">≈110 км, 2–2,5 ч</text>
+    </svg>
+    <div style="display:grid;gap:12px;min-width:0">
+      <h2>Как устроена поездка</h2>
+      <ul class="fixes">
+        <li><b>18–21 декабря · Закопане.</b> Bachleda Hotel Kasprowy. Каспровы и кулиг в субботу. В воскресенье лыжи у отеля, обед в Czarci Jar и термы Bania. Губалувка — запасной вариант на утро.</li>
+        <li><b>21–23 декабря · Краков вдвоём.</b> Ярмарка и концерт Шопена в понедельник. Во вторник Величка, Вавель и Казимеж.</li>
+        <li><b>23 декабря · вылет в 10:00.</b> Выезд из центра в 05:35, возврат Alamo и терминал к 07:00.</li>
+        <li><b>Перед поездкой:</b> проверьте часы Alamo и гараж отеля в Кракове. <a href="#logistics">Билеты и логистика</a> · <a href="#bookings">Бронируйте</a> · <a href="#budget">Расходы</a>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="flow" id="flow" aria-label="Схема маршрута по дням">
+    <div><h2>Маршрут по дням</h2><p class="lead">Нажмите на дату, чтобы открыть почасовой план.</p></div>
+    <div class="flowgrid" id="flowList"></div>
+  </section>
+  
+  <nav class="days" aria-label="Дни">
+    <a href="#d1"><b>18</b> Пт · Прилёт</a><a href="#d2"><b>19</b> Сб · Каспровы и кулиг</a><a href="#d3"><b>20</b> Вс · Лыжи и термы</a><a href="#d4"><b>21</b> Пн · Краков вдвоём</a><a href="#d5"><b>22</b> Вт · Величка и Вавель</a><a href="#d6"><b>23</b> Ср · Вылет</a><a href="#hotels">Отель в Кракове</a><a href="#budget"><b>₪</b> Расходы</a>
+  </nav>
+
+  <div id="days" style="display:grid;gap:36px"></div>
+
+  <section id="bookings" class="logistics">
+    <div><h2>Бронируйте</h2><p class="lead">Даты ниже — ориентиры для бронирования. Заполните пустое поле после подтверждения. Отметки сохраняются в этом браузере.</p></div>
+    <div class="panel booking-wrap" role="region" aria-label="Сроки бронирования" tabindex="0">
+      <table class="booking-table">
+        <thead><tr><th scope="col">Что бронировать или подтвердить</th><th scope="col">Дата в плане</th><th scope="col">За сколько заранее</th><th scope="col">Когда бронировать</th><th scope="col">Бронь заранее</th><th scope="col">Статус</th><th scope="col">Примечание</th></tr></thead>
+        <tbody><tr><th scope="row"><a href="#hotels">Sheraton Grand Krakow</a></th><td>21–23.12</td><td>—</td><td>—</td><td>Оформлено</td><td><span class="chip c-park">Забронировано</span></td><td>Номер на двоих. Уточните въезд в гараж до заселения и выезд в 05:35.</td></tr>
+          <tr><th scope="row"><a href="#d2">Кулиг с факелами</a></th><td>19.12, вечер</td><td>2–3 недели</td><td>до 4 декабря</td><td>Обязательно для выбранного выезда <a href="https://kuligbukowinatatrzanska.pl/kontakt/">↗</a></td><td><input aria-label="Статус брони" data-book="1"></td><td>На двоих. Уточните место сбора, трансфер, ужин и условия при малом снеге.</td></tr>
+          <tr><th scope="row"><a href="#d5">Соляная шахта Величка</a></th><td>22.12, 09:30</td><td>2–3 недели</td><td>до 7 декабря</td><td>Желательно для 09:30 <a href="https://bilety.kopalnia.pl">↗</a></td><td><input aria-label="Статус брони" data-book="2"></td><td>Два билета на Tourist Route. Сначала проверьте язык экскурсии.</td></tr>
+          <tr><th scope="row"><a href="#d1">Bąkowo Zohylina Wyźnio</a></th><td>18.12, 19:00</td><td>1–2 недели</td><td>до 4 декабря</td><td>Уточнить по телефону <a href="https://wyznio.pl">↗</a></td><td><input aria-label="Статус брони" data-book="3"></td><td>Правило для двоих не опубликовано. Позвоните в Wyźnio: +48 18 201 20 45.</td></tr>
+          <tr><th scope="row"><a href="#d4">Miód Malina</a></th><td>21.12, 17:45</td><td>1–2 недели</td><td>до 7 декабря</td><td>Желательно до концерта <a href="https://miodmalina.pl">↗</a></td><td><input aria-label="Статус брони" data-book="4"></td><td>Позвоните, чтобы закрепить время ужина перед концертом.</td></tr><tr><th scope="row"><a href="#d5">Starka</a></th><td>22.12, 18:30</td><td>1–2 недели</td><td>до 7 декабря</td><td>Настоятельно рекомендуется <a href="https://starka-restauracja.pl/en/">↗</a></td><td><input aria-label="Статус брони" data-book="starka"></td><td>Всего 13 столиков. Ресторан рекомендует бронировать как можно раньше.</td></tr>
+          <tr><th scope="row"><a href="https://krakville.com/shop/51/chopin-concert-chopin-gallery">Концерт Шопена</a></th><td>21.12, 19:30</td><td>2 недели</td><td>до 7 декабря</td><td>Желательно для 19:30 <a href="https://krakville.com/shop/51/chopin-concert-chopin-gallery">↗</a></td><td><input aria-label="Статус брони" data-book="5"></td><td>Два билета в Chopin Gallery, Sławkowska 14. Подтвердите сеанс на нужную дату.</td></tr>
+          <tr><th scope="row"><a href="#d4">Rynek Underground</a></th><td>21.12, 14:45</td><td>1–2 недели</td><td>7–14 декабря</td><td>Желательно для 14:45 <a href="https://muzeumkrakowa.pl/en/opening-hours-and-ticket-prices">↗</a></td><td><input aria-label="Статус брони" data-book="6"></td><td>Два билета на 14:45.</td></tr>
+          <tr><th scope="row"><a href="#d2">Канатка на Каспровы Верх</a></th><td>19.12, около 09:30</td><td>1–2 недели</td><td>5–12 декабря</td><td>Желательно, чтобы избежать очереди <a href="https://www.pkl.pl">↗</a></td><td><input aria-label="Статус брони" data-book="7"></td><td>На двоих. Проверяйте открытие продажи, а накануне — ветер и статус канатки.</td></tr>
+          <tr><th scope="row"><a href="https://czarcijar.pl/rezerwacja-stolika/">Karczma Czarci Jar</a></th><td>20.12, 13:00</td><td>1–2 недели</td><td>6–13 декабря</td><td>По желанию <a href="https://czarcijar.pl">↗</a></td><td><input aria-label="Статус брони" data-book="8"></td><td>Стол на двоих. Ресторан принимает индивидуальные брони при наличии мест.</td></tr><tr><th scope="row">Урок лыж · Polana Szymoszkowa</th><td>20.12, 10:00</td><td>1–2 недели</td><td>до 13 декабря</td><td>Желательно для 10:00 <a href="https://szymoszkowa.pl/kontakt/">↗</a></td><td><input aria-label="Статус брони" data-book="ski"></td><td>Подтвердите учебный склон и инструктора. Урок в 10:00 оплатите до закрытия школы 19 декабря.</td></tr>
+          <tr><th scope="row"><a href="#d3">Термы Bania</a></th><td>20.12, после 16:00</td><td>3–7 дней</td><td>13–17 декабря</td><td>По желанию <a href="https://www.termabania.pl/en/pricelist">↗</a></td><td><input aria-label="Статус брони" data-book="9"></td><td>Два билета на вход в 16:00, зоны Fun и Relax.</td></tr>
+          <tr><th scope="row"><a href="#logistics">Alamo · выдача и возврат</a></th><td>18.12 и 23.12</td><td>За неделю</td><td>до 11 декабря</td><td>Оформлено</td><td><span class="chip c-park">Забронировано</span></td><td>Согласуйте выдачу после посадки в 08:55 и ранний возврат около 06:15–06:35.</td></tr>
+          <tr><th scope="row"><a href="#d5">Pod Aniołami</a></th><td>22.12, 15:20</td><td>За неделю</td><td>до 15 декабря</td><td>По желанию <a href="https://www.podaniolami.pl/rezerwacje/">↗</a></td><td><input aria-label="Статус брони" data-book="11"></td><td>Стол на двоих в 15:20.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  
+
+  
+
+  
+
+  <details class="endsection" id="logistics"><summary><h2>Билеты, машина и отели</h2></summary><div class="endbody">
+    <div>
+      
+      <p class="lead">Время местное для каждого города. В декабре Польша отстаёт от Израиля на один час.</p>
+    </div>
+    <div class="remind">
+      <article class="panel">
+        <h3>Рейсы для Вигена и Тани</h3>
+        <p><b>18.12 · LY5119</b> · TLV, терминал 3, <b>06:00</b> → KRK, <b>08:55</b>.</p>
+        <p><b>23.12 · LY5120</b> · KRK, <b>10:00</b> → TLV, терминал 3, <b>14:30</b>.</p>
+        <p>Выполняет EL AL от имени Sun d’Or. Economy Lite, 0PC зарегистрированного багажа в обоих направлениях. Норму ручной клади и условия сдачи чемодана у гейта сверяйте в брони. Паспорт, лекарства и ценности держите при себе. Сохраните маршрут-квитанции офлайн.</p>
+      </article>
+      <article class="panel">
+        <h3>Получение Alamo · 18.12</h3>
+        <p><b>09:00</b> по подтверждению, прилёт <b>08:55</b>. Сообщите номер рейса и согласуйте получение после паспортного контроля. Онлайн Accelerated Check-In может сократить оформление, в PDF он ещё не активирован.</p>
+        <p>KRK, Kapitana Medweckiego 1, Balice. Стойка на первом этаже над уровнем прилёта, в зоне <i>Rent a Car</i>, у перехода в многоуровневый паркинг.</p>
+        <p><a href="tel:+48222500216">+48 22 250 02 16</a> · <a href="https://www.alamo.com/en/car-rental-locations/pl/krakow-john-paul-ii-intl-airport-loak.html" target="_blank" rel="noopener">Филиал Alamo KRK ↗</a></p>
+      </article>
+      <article class="panel">
+        <h3>Документы и условия Alamo</h3>
+        <p>Водитель по брони — Виген. Нужны паспорт, действующие физические права, международное водительское удостоверение для израильских прав и физическая кредитная карта на имя Вигена. Для второго водителя нужны его документы и внесение в договор.</p>
+        <p>Kia Sportage или аналог, автомат, бензин. Ориентир <b>€265,17</b> к оплате на стойке, депозит по условиям категории <b>€500</b>, франшиза по брони <b>€1 000</b>. Включены CDW/TP, SLP и безлимитный пробег. Лимит карты должен покрывать оплату и депозит.</p>
+        <p>На выдаче проверьте шины с маркировкой 3PMSF, повреждения, тип топлива и полный бак. Сохраните телефон помощи на дороге из договора. Для центра Кракова проверьте допуск конкретной машины в SCT.</p>
+        <p><a href="https://sct.krakow.pl/" target="_blank" rel="noopener">Зона SCT Кракова ↗</a></p>
+      </article>
+      <article class="panel">
+        <h3>Возврат Alamo · 23.12</h3>
+        <p><b>09:00</b> в броне, <b>06:15–06:35</b> целевое время. По подтверждению стойка утром открывается в 06:30. При получении согласуйте ранний возврат и попросите показать конкретные места Alamo.</p>
+        <p>Многоуровневый паркинг у терминала, <b>уровень 5, сектор A</b>. При закрытой стойке положите ключи в ящик у стойки, как указано в брони. Сверьте расположение при получении. При возврате с полным баком сохраните чек и фото машины.</p>
+      </article>
+      <article class="panel">
+        <h3>Ночёвки</h3>
+        <p><b>18–21.12 · Bachleda Hotel Kasprowy</b>, Polana Szymoszkowa 1, Закопане. Три ночи. Отель отмечен в плане как забронированный.</p>
+        <p><b>21–23.12 · Краков</b>. Номер в Sheraton Grand Krakow, Powiśle 7, забронирован на две ночи. Уточните условия парковки и выезд из гаража в 05:35.</p>
+      </article>
+      <article class="panel">
+        <h3>Граница и ручная кладь</h3>
+        <p>На паспортном контроле в KRK оставьте запас на EES, если въезжаете по паспорту страны вне ЕС и система к вам применяется. Перед поездкой сверьте статус ETIAS для используемого паспорта.</p>
+        <p>При вылете из KRK аэропорт разрешает жидкости в ёмкостях до <b>2 л каждая</b>. Это правило досмотра в Кракове. На вылете из TLV действуют правила местного аэропорта и перевозчика.</p>
+        <p><a href="https://travel-europe.europa.eu/en/ees/faq" target="_blank" rel="noopener">EES ↗</a> · <a href="https://travel-europe.europa.eu/etias/faq" target="_blank" rel="noopener">ETIAS ↗</a> · <a href="https://krakowairport.pl/en/passenger/at-the-airport/security-control" target="_blank" rel="noopener">Досмотр KRK ↗</a></p>
+      </article>
+    </div>
+  </div></details>
+<details class="endsection" id="remarks"><summary><h2>Практические напоминания</h2></summary><div class="endbody">
+    
+    <div class="remind" id="remind"></div>
+  </div></details>
+<details class="endsection" id="hotels"><summary><h2>Sheraton Grand Krakow</h2></summary><div class="endbody">
+    
+    <div class="panel">
+      <p><b>21–23 декабря · Powiśle 7, Краков.</b> Номер на двоих забронирован. Заселение с 15:00. Marriott указывает парковку за 125 PLN в сутки. Согласуйте заезд до заселения, хранение багажа и выезд из гаража в 05:35.</p>
+      <p><a href="https://www.marriott.com/pl-pl/hotels/krksi-sheraton-grand-krakow/overview/" target="_blank" rel="noopener">Страница отеля ↗</a></p>
+    </div>
+  </div></details>
+<details class="endsection" id="budget"><summary><h2>Расходы по дням, в шекелях</h2></summary><div class="endbody">
+    
+    <p class="lead" style="margin:0">Оценка на двоих (Виген и Таня). Не входят: авиабилеты, аренда машины, Bachleda Kasprowy (уже забронирован), отель в Кракове и покупки. Курс около 1 PLN ≈ 0,82 ₪ (ноябрь 2026, курс колеблется в пределах 0,80–0,84); банк обычно добавляет 1–3 %. Цены ресторанов — средний чек с напитками и чаевыми ~10 %.</p>
+    <p class="lead">Оценка расходов на двоих по маршруту. Цены на билеты, такси и питание ориентировочные. Прокат лыж, урок и ски-пасс оплачиваются отдельно. Фуникулёр в смете относится к запасному варианту с Губалувкой.</p>
+    <div class="btotal" id="budgetTotal"></div>
+    <div class="budget" id="budgetList"></div>
+  </div></details>
+<footer>Часы работы и цены проверяйте на официальных сайтах ближе к дате: в предрождественскую неделю расписания меняются. Время в пути указано для зимней дороги. Фото-превью: Wikimedia Commons (свободные лицензии, авторы указаны на страницах файлов); у блюд — типичная подача, не снимки конкретных ресторанов; у терм — похожие термы Подгалья.</footer>
+</div>
+
+<script>
+/* Фото: Wikimedia Commons, уменьшенные превью 72×72 */
+const P="data:image/webp;base64,";
+const PHOTOS={
+airport:"UklGRkAEAABXRUJQVlA4IDQEAADwEwCdASpIAEgAPrVMnUonJCKhrhoraOAWiWUAyRb3Ng51Bub1NGZvgppHWfP7v6gnSoQG+s0K0IRQ/WNEt8/lZF607t8r6lAHOhKyvW/t3uCKRYV7rZIPxt5wndfHTLqHm22mK8jrYUJ07NxaJfP/o8hVHT/kEfm2m+3CqC5r3AI5fPuA1IbWcvk2ScPBjOa4S52baGDxRF3T1TBnuMSam7qShTEtA4AA/v0uc7+NPkZ/sPQ8hvCbDKuzOMw/ebp6yXOjLq3yK/qv4+0G+A+MSfOkkiGcSwKxljZ/LM81rFCJUagNbSly/xGW1FaejdSnTXnZOkuFDIf+7cw6arwqxUKHM63C2ibNxQyW8zDMaAxAbjmJK+W+1kDz9Vzq2ca4qVkVHHVE5dRZWEIPVj1iJJc/okTrCrAepCd1ChqBAiIA2XlnTbblXKzerUAkrYz2yfzSLtqSx3VAxYQebnbAQ24x9PmtQcd/UkYR/S/OPagMWS0T7oO6ggXgkqlrSUpekBb3pZgdo9/OlF6iEKsqRQDApaBSsQCoziDnxw1kGN2bOScvp//hSp/Sxlxb7hBwjCdzDpqjo7hPln6paB8zhT4fvs9EMQ8YIIf6ySKJAs2r+1MDAtMqLoSOcggLXTUVWkusCID55COCreKY9TQ9OomTQIco2cbShoNb5jtWz/QvmRbDZYqyjz0wauJMmHMdDqrn346OIKUaneIk8iwAjg3pWgVwi87JLJxAs+MFYUOUYrafC/Ig5iGjI61BUnnz0eMAs1XaWLUB7b3TuSxSBhNTfMD9H1U9F2qH6rbaADtxlKi7WWJa1xTht+oPvbhT3bEK1m4KllpR7sQdpM9gq1SgD2o9TEmVN/L6QcPrIlS89rMx5vqdJ3J2qvTacEVoNeQYoP2KKTWVO2hmrW3lf0uVMgyzKbxV3PzTmor23U6t4Xj+hpHg4ZPTsBWPmtjl0XJCKJHkwVyvzB8RwowHM4j4vWJD/hrbpaaxyp/Hiv2H0zx+tyM79W3oi9yCGGer3jC7lVAXeSG7o/gaUZZQ7UYnfiifu21plS2Lp7v4/dt9gfqqxi6iVrSt2R2noPALrx0BhN+2PwIKJi29RADkgQ30ZM+kq2j0XHTOfFPPAZAcwnlnLLUf48M8GwVj3UDwtiuMYZmjB0XDJa5RIVY/Q/lObLWKFt5NBYrQYg1REJS0WpGdPqMBHJjgYcz0/VgqtWGEeCvRo2TLyy8AyOztG21DISsbdhzmWpGp6if6GOZit6ytqGCIpGvx37zwCPki3nEzEQVipez9ISYnhh0mXV1EF1hUDwe4Hyn+UkVocr8R1mm1IH5DtlwEQ6vw48jtAYSyqV4ydiTF+UrJ2fcrG4p3UKPwPtqC0id8S5dmcclkGi4rA8Dxsf27ZEXqo1GMPFASU/48Kw5ABoXLVUKx1c2gAA==",
+road:"UklGRlIDAABXRUJQVlA4IEYDAAAwEgCdASpIAEgAPrVKoEynI6MiJ7gNCOAWiWMAwjySjAl/VZDdZZsqvJvIfYGhX23Lr3m2ka33Ap+mGFa5TdSeS14gu9qorcsUwGFX3sn+cBR9P1MP2hvHyBpFrKuyCsO3WO35V0pxHhtFscvY0Q59ht93SmYZOb5Q0NLh5noLvAEmYh5Eir5dwC/9gpq4qDKbPi/KWfNlOXEAAP6QK/+vCGQMZz9p1US+BGxUqgp2RGW3Aw3n1Y9/Uk354MMeZiCwpEKwBvtckqaJe4Aa9sb3E4CEDrfVFJj0hK/0io+eC7cqJgMXZhLw7ks4S+P0H7EslwoY1OQPM6pL5gM0BRsSJLc9ZX3k6Ujd9iGj3f2e0G0lLt8ONhigEy5X3KcZFkfdf7lXMeoVgOwkBkAvcB9ORJW9sKN8hjBKUEAQ5jq+WlK7ptn06yJdqe+eXrLUlULSHRp2sgx53xuNEr4zPTCZdhdjSEtzezwbY3ajUJWasTYVZwJrtc8ackqdZ/TIlpwdu17ZlsoTwD+K0bku2u5PiNMQYHUnnKbz0TdVsrHf+xpW3UTuky6cdJLS+Y9rKJ3Rh/dUYdN7SIUsdE+1jN7+NqknrMKXKy9vVjZxi3+cC+Wa9vmctJez39HOR1quTof9a3D+UJMwvI4EA1sAKdJv7Am5GwzpGGfqL8msEw0eb7z/bRyxFhZEUGC3bo4z/3BoQVcYjXwHlwk8ZTAWFmTFY/bJyucBBGjMm+KQF3DE6PxYK35+gmKHYU/MKrvIGO0/YoBzqAvPsei48hm4pVjS0hpcA6Jio2BDM+re3k0cxLtrsVjU50N1Il85zSrpm9KcOQMyG+v8VKPPYpsuS/yj6ew12OcNFs4sxomjy8lFt9Vvx12lpfC0Srw5Hm7KuOAZktZCi6D1pZviG0KTArMQZ+qMSbE+DGLNtu19IU/qepcEQVjsDGfShMNQVXpNa4/1g61qmwd4V2iFMeQI3A7dapNc4/gUitFntfREh0RDl28B03Pn0OstGrLcBgyl4uowFd+QIAJg4dBLoPI5K7LKs+HYTTDE5qIdm0ACEjrBna5TEcv7waBzwHJ0azok0mGXODd2U4Sjsp4nP8YSVMqVPbgcYAAA",
+krupowki:"UklGRoAFAABXRUJQVlA4IHQFAAAwFgCdASpIAEgAPrFCmkmnI6IhMfkuiOAWCWMAxYRIqUHTH8bkt1LDuVw0q0SAeknoOfcPUM6Yatv/f9AWrDSegXlunKPByJd06LSz/4XI1gq1e8kYDsp4AUHTgFCfJS6O2a02oVugowXxQxxs8nnSamshN25XOM1884H2Bx/NtXulDxabiwqDbyIZGQRth5VpmL9INqGIpy2THNNtKIV7FWNstTwKzctDbSjs5rOpgLDDI1gHsuD8kQAA/vghtJBG9tVO+3rXSpOb2JNpJfAQSdgEDfnTjSE/9tu/CoAOfH//JL72fbSpHGRxAWOq/OvS+dvA0lN4HQD/SMWGltXpf+jQ1g0ZVOrx5v3u19H8A/f+R73YjJaXj48p7FAJuFRA3yaqPJ5d6j+qFlPzg+zr11mLzKXUdxRs58YXxZh7u/BTT+Emw7rWtQjC2Py48hobNZK+V9BGd3hTcv66i3hJboeynj96GnTSmBVd0rahZ8xvDOhtUgyXQ9APHNH8TkiN9z32/gdpFBtz1U17R0cmhJ5+3AHXM4TGghLybIkTOfKGBsDGBKbH41mMujQBp4qP+Jm9BrAftml+F3i8V7nTmj5luRgUcMgwT2KmqfvrhOcvfaM2WIThNbZOruxnFKUbgbgDk2KgdkW0cKMbPBeTPkrdn0+dM8qOmAus3bh0UpmS4L2SfGgwky3y4Qk/z//z8+IY3WUf8RtR2guR5SFT1e8d55BaCCA7Fd09aK67yqqaSYgesByGW71SdSDnqsDWR/lWDjt1tF7pmqPnpxwsAAhoAcRw8EuDduzOLmdSybDNuGv8nvy203xaJZrj9HFU2dE3MMxjuYGf6j0xWbHmA8PexqDY9jqjy0tLE7tcw+M+DyjWzj/5L7La4R7HJ5NBAKyO6d/sNEtZb/AwXfzAbOWr5dixWGmNMrqlSzRp6Z9kWIT1JUIBmlThREl2w3fzX+10OEDmRKcJjISkI/ZTf8FKSDKhag6BZcOObgeYxgkQNI8dac1k49Hujz07bJlRrhzE6HSASpH+/iuADmcCGKgaB/09KYpBUzEFxmuqeEuItBHOrls9OCs7oKizq5ZgigFg1Z1ffrU11SjiLoqLwC/VHpbqbOZ3i2TUCVeBR5897KH/IUNriYnuNKwDX3K+EInVpN4yVIVlGDi/00erNgI2yhKP9/Mi/WO5joFxvE7poqvjlJndZ+Mp/b724zOHBvgYi3qTlY9hWTkl0dQ1txHz546r6u+TbKBCvy851rdd3J3R6dxr9aimEFXtZ4hXzaaHeTCHpLKsS5We8BecIG9K2Zw7wvDi+KxmSKVf0SYjhta/2orRkRS9qMjkTEhjCjC6YtGICoWjyv+q/QV/Xk4agcBqSyUnoHMePPtL1eqvc15ivGVJ5Z+SwdsqyXStQb+bPXflm1+dPmtgDo9gihjTYjqiYQqL4Qv+uEtnfu0phO550mEyvikfG0DLsixsjzcaGXpIzOfxpyUYKaSNpPGSn+2SfN68Q4Udlxb3Je3lhZcGBlIh7g/948CZ5cR+9n09IJMgNsihagihHUbfeDWjfT4D70qL5US2uBtjhSPgMtGaj+Y/5dPYRXl+ETGypo3DfgGazfjYLPuHkwirkiq9Vf5TKID0hz3W+1ngzkjED7l6T9geNeGhFJ5y6cfsaWQ5GF8NhHCzk8UdAclM0PgzY3XtYbj2bPukRdDnwAm372TKLYDKV35jtCqjm3MH2QH/OBAfq9FCEeOwgbTKjMF2vE/eN7EnVzbpn6szZdD7K/aON+KqdLiHJ0ScWaVIXne7cKAflfcSeRXj9dL8bX80FE3iJzDM53z7SnvjkF97BTH5uf+QauOvWgilxMcjgAAA",
+oscypek:"UklGRlIFAABXRUJQVlA4IEYFAAAwGQCdASpIAEgAPrVUoEwnJSMiJ7VdCOAWiWQAsR+vxkyZ8Jo/0OvcAc7WzUzNaF+OAu/l9addpYDhm0AyRBs9WyzLhNfqSeQwVMmRpv0+kEx0TU/RxdOF/Uj3pBPkOynAds3YpDYp3IVLkEOXXx5H9hkL5yLb808EUl3MTwgxif/e2sfmr/RWzof/zr9rvL9t+gyuIaipYPN57Kot/wl8BMJ7ZlnDMSVjwn5m28PlwCLhxU7qqHOdsZVzjq+usfbdWCBEUv6dRmaakTW14LhePAAA/pO8+ucrTVfdPNJYxmqnXtJghFJET5zdpN8M6GOEe86hQzQsbIKWIV+uno9s3b8RFn8gWC79KJhhkm7291O1XTDyItnwq0eHYrHLNqQFWac8QMFyK/1O9fkUVQjLCkhCbnsjvd5YgBE9K+NC6OZ8u8//MCZzgV+jss3nX0VUaZCaMJ3e9eMeMgAK/880xgd0JpDmyZYg5HJrpUo067NmmuHPp7rg+00ubbTa1Z/7mni9rRAa3on4//KEn9fsX0Ui3yLiWjcLukxEj95z77ErGKhJgzjwMSH8xA3u11it0KQNdSV0b4lU5j3aaki1tGL+zd+HfK9Znvahta5sVucmLYzQ2VVEgntiZ7JzBybgxLEPRO20A5VjMQPFXQD5vEKLZgBnbHJDMsr5kyIPzCfJGppx3cwFbIvuTJ+EDgMmtB3gpROR/HVl753KCCpVgMp0qvoW+351r/LpfI6rHON9QaIi10qxyhPzNZsPqKX/z6bNaQTD2B8uLsVFSyzoIprNiMLR3KpqKLUxrWj3xDrHxHrquydaBpyDIMrdnn37Y6sFowO9MVKfQHR8VN9tFQUbQGz2VVnXUYsmFRYJjkVvdk8+1fp6WdVZoKNOfs49mDUjFT7kkcG1StKUP/E6maPVCaijMDxSEP2arSLiMGbTljCP4aar1xdA9O2ppEvoxJgr800ePc3nKFFXhhqxxyFBbgQtWkGHu9Te1c2KLE0nubMMfTqrlqDxpz9QgYJPAVXP3JmRLYgZn75OtwJdV0CdvnRDChx2NXF4mDe+vStl9FcyIhvRw/NTqG1fLHRuFSemWhKSQDOuSZQd5lfYCz+By/ZZ9Nad3LMCRPJHvfrux7OqeXyS8kxUYxMIZk4dWup4MFa+KqLD6/Z14WTGlgRwl4eLe3BeA7DExiuvZ/YUQoQO/9bRe6bIpQO+9KwfBGbf2+M/s/u4TKSKrwU+0xUJ/QfaGxvEV7nBLpGdprz1RvCBcvbKraithgOWIayphooKSZgizQ5R+0qOrFs0l8z3jeUZ47Iaua+7PCp6hzL8ax4P13Oh6M5Px6mGQQ+122P6Z7ARQ2X+QQkZ8BSlD50TwFOhMBF7tyBQI0Rj5JIR3WwZMF3efeI3kLMco9+EW0x/CFtNGsESxkjnvCNUQ2dY8Ej2nA+EsMqLl6pSvE9DGflhMKxeZwtQcS0dg2KmS1GhHxWOcEr/W1MNsiIPhphp8+0hM4iSSfpeTKPaX/Ho5W9owP9kBNpgDj/G1euM4CfHl+khjQWh7ibguJ1WJjgTqNjIayCNZRWGEgwcQfkgnJgfDP3ccitdf83kqvaO8HMcnOV7/XsekNvKf73kMZfTqbVndl+LLzdZkdL4d0iM3xpRZc4u7ncvHx/OOxvb1+VRIT9fQW9c2AW8fbjEsLdEnUZOUwbiPVdF+gdmgmWOjPUqexSDdMcxfkx4LNpN3oOXfyyo730KK3zsOu6XU8WUodFNlbYkzEeo00vjbJJ2Ovjcs6uy13FEmCx+xSuieHDUAAA=",
+kwasnica:"UklGRuIEAABXRUJQVlA4INYEAAAQFwCdASpIAEgAPrVEnUmnI6KhMfgLoOAWiWQAuGQhzfGSi0c2+mDb388szYPFscPdnLP0uM8j3y/3EjzOC6S5NZeF3pIVlB1EHm4uvq9zIynOvvpF3iDL1xrK6zPAbtfd6G8gYuAK36SDev6eWKCgDhdvXOh0bo6kV+GbpQhmbE7Qelr38TjbAyMaFXdehDLLcx4lTJ68p56pI7qDj8Z3bPwPR60eH93EZGgt5VnnGITld+AR0lzjiQecZ+R1Y2sAAPxSCksBljIoHXrdBUc/XSRN9JyzKDvD473ISKLcnweCb/Ejq5dPlpmdlmwurbevl//66gkzxqg+g9ng/P4skL4j9YHOq3RZo3B0A1RVazTm+w3HISBClNwajCAMzIMiCYZW2gccZ4AbhbWY254Tik+i6VY+Bz26MlEoxIebskAqV3DHJsAA7BvndQsO4tDFTPJPdKyG3fHzO7ry55u5ViBmiRdiISjuj3hrKo9Dn9iECMaHyGCCqpmG1SfDA4lOPV0x1Zhe+eZlGCGbK1KW79bLsOhE79GznT/76GDr08dc2/iYXG6Vi80QAr/Es4vaAE46+i9RkoGU0PmUEPhPU56nWdaPHqAi++ZVqZ90jOmRE2RDwngY09sJKg/d9OFyBKMf+prJa+332S3nqy63A8faT1oB+TyiFhWJqYl9Uqtj/lggv6hCDBYdUCAAmieD+uG+a5CrXzjVsw6rMzZUCJNTwhhFBJn3ERd7WgQlvwqMVpjyznx/C/D4vzaTyO0q/4hK75XOJR0hpggycjc2a+CNkR+IovZSvypYXd+MCnPISg9Wdr34ovH4RsvOD3iWkN5QAhDunsKrRt5rrLEYrL/m1GYkXsqeAilJd8wiOxR8WP1CkM0+nkkUGarKgLJ7mAZZ8gAnC13wwzjxegYXgOP49W7TzrXrzIqfF/E9rvoBwVcxE2otAg90A6ivE+A2bktIVMO10x5dZ+fpvUN0xwljE1Cmi8hvL8goWY0w8UVJKouk50UCt9u0aRJSCbCOTlanxaFi6wjsOFp4Q7Dd8E4dVira33V6kw7K1S5a82qGFxBc139g5x/8AmP2Tfc81t+myht5AKnbtlouzcNUbX0/yFOPwR+3rXh+KV7kSr7bdKEFQyyyLwk7Mxc1/TNJcbdFDjtTEhtMxeBsbEL0zUM1M4oyMOFXHB6+lqcUW7/8yeQcBHe9NH+W0DIeiIerWYy4Q8B6QL2HD2R8dUlZiUgzNOTOXlsOw/jWfx9f9d3BWPk1b4Gton6S0XJqa+zZgGQjellRrmaXDZQrc7sL52juHZmZpA05iYfv9keWuvqxiI4n4mC0a4oS13u43mE/bDjSZQQmJepLyd4R3gCjQleeJR9ShlbA/hi5A+2HnZQYHYiVobsqV42r7/4LxseeDvSQMSS3+KWjkjtnqKfjcaWMXR9F77jw6PWU+fcdkJmbUB/r9BxSkH4kgaIjglrnlu/LIxz8lgeIZHKoBIFe9lxBq/Xlgj/C2X2zfa/zI/EUC2h33XxJndFK7rgKfvqKc4zT2NOWwyJcL7A4GYSb2LFcig3Oe0dQIebMbSX1F/CZYMm+3mny9O4MGuYDc0rqf3FGLXhmwMJKnPC/GeNRVlb12nMyQIwLZZNt+u5DR6YAAAAAAA==",
+kasprowy:"UklGRk4EAABXRUJQVlA4IEIEAAAwFACdASpIAEgAPrVSoE0nJKKiKlQK0OAWiWcAy6uDvfn4/gwxjfhEnI+S8DdLjNX8hmob0qWKFbt+Xsyji+khbBLiR67YtlXhBtX8feKwTrsk/Hd2TJjpWObHZQjzJsxLG7MO+pPctOf+Si+8m8D4qlchy3/WtuQhvDe+78OOAJd0I+Ufk9hPB68r/V1uExFTKgjAnTrUAlUw7P3pA3anv/NDX4Hz5RjQYAD++YivwJK1YXvzbkXSftke3RHMTOBUDSRj3j1wKJ+wqxcbN0dWFc671r2y0p/qQ25qp85h+cuQpyko+yDv7asdTXKjH0IUOYVyFJ+N4rCT5maEpXlgQxfST+NoIISu/QWkTiTrOi447twOfdycd0ac9niqzvon91/i8xsZj0odyII9j814Moreg3eOXIb4PDYhZjg6LqUYnx6VukDJ9wBAn2H6zigsC3i5xyHLFVqH/nVoK4VSZgfhydE0qW8rZ3A+gATdfBOYrMBFv87wE297FFHTn/UesklqVqCeMYk9/q+FXj9S2135GnBbM5dX/3pmK6zXEb4pNjudeqN31HVnjFCGrFYhaVB3BbvzsVcRB57rwDSMaI0I5K3Qmr4JDvE0JmVKg2Zlk9TraJHIQLKTn+ueMqYTYWcW9GIamjvkKgZ5MJ/QZ2/OXyWgqWiHhFR6aUsoH0ct5bBHJGQZR/EIn4uf/aLQ97STJ1kfgHF7VFI2dJNb3Z68JRiv2+NoMCed4zAjJMS2Yw3OsTHQQxutFKtPYqPKzLLxTwOQj3ENiaV0093kGkHt2L2MrXohpRIPB3PoCq/SYCRug+qSJBTpMI59H2Pj5c3c0+/d2ohOj9pgV1Du9XgCgbWbwV0kWAi4dVah+vd9VUkisy3GUGPtpN5uwdGjNpoAGZ/tmD6hne66Skh5qqEqcBfI6dnTbAmj81SbcJFwf9Ezth+EBF/neK2aJLGtQV+AsYCuFEIMjRvFiGUj3E9sjRxbL7IahneSoSTZqfHDuy0DHlVPRZDrRrnrq6Bi+shTNkZuLiwYhSp+zJ1OkjN4tN/JqyvVSChIXXf7/XDnr1UCTTeDnOwvu8MtAhY2XWw8TrSzDwtT72uQy5vesY700W5aulz3eLweNPawLdeqDYre9FRMjGRYljm91MOspz4cB0SxSsynab2ttSEfYgpyGNiJpP8YOHicnb2vL37jRlsQjQpj7jMlcG3IrG+yUb30Qxb6GDCFJ2uCE+G05golnanedAf49n5FJT6PbjwYkF+kpBn1vDt5IkZhpyGXVinRaKcLb1nhvv9gWtUXRE/TZHQDhr2wXAq1gH4qxK27iZzonRJx+Xt5o5+tAd1EV2Nu5F/7Z7EW3iHqjY7oRAcDousDMJMsmdWWuuwLSGFUw64ZYK/I01/YbeYwGVIomgxd2DoWKINUSnaPHQUO1iQ8qDVbZCrbt4CZtmlpagAA",
+golonka:"UklGRkwCAABXRUJQVlA4IEACAADwDgCdASpIAEgAPrVOoksnJCMhpTv9UOAWiWkA0cSrhUaWB3yy7bjHm/TFO5esDGZtJXJH8omqWwO4mD1hn3Vtf8lph2ZWg+l/BM/ZmsT5oO8Q07Rr+p/HwlfGMBX/baIYVN92yryup+uez2QGhWXe0y0cVTwMZU4h+GBd726sgAD+/tRrcjfIVA7BwXVVfu/VgKJXo4kqqbfziZscWaCOY9Sx0+Xgd+xyHycLTnyXQIFDKVWlp4dnZOGSgiQa3FJaaCO2/i9vmPk8HpmJpWO2rDMxR+wIIVgEr+dSZljKDyAd4qoCz6uZbRiDfBPIeb5qGatnVGNCQ1ectuK+rtQ/UvFJCRgEIrchA504XM4mphAxWaGHCloUpw85iVrMAWLz6foMkGossCK4ovJZQNo4YXWE2IFYb1bHlmXsqbZNVz6P1gOH8+zGXdikr7yJ9dP6oQtafE5CmrBY7h5vyrlgnc5vJG2FaXtXBJu2FUJzRg+jNdmUEzwI2NbZYs5lVvNzIzvtiEpmq4hBaT/aqaq0A6Z6DhpjNXqTVeSahZFJjV7N9Kt+2zG9ViWMcmdU5beflmdWdYsjwEcTLRKBAV1yHtRwtiLQg8zxV8IHgk6e2T+mSmycAThZYCe/Ze/C54Kg9KO7QLtagjyPtqG9t9m07mBV2bRl6iY++cd97YkLNUVvQ/1KmsTkGalNhwfmSPtMZHELxyNgmd5UuCdF728xa3icr0As44eREPIFaBrS9aMih7tzJ5kgGteS8f4AAAA=",
+gubalowka:"UklGRloFAABXRUJQVlA4IE4FAADQFwCdASpIAEgAPrVMmkqnJCIhr1lbEOAWiWMAw6RxSijzItO9XvGnHx4R5DwR49O/zwYfet9ywvkarLvV6Hehia+BdYJwZkI6LzgvbCRTvlq0zI9bbCWDknS1Hm/HP/0x4ZDQ95lTXhNSKf0z3kgMI7R4WsTu3493C7CFRnl/aziExALyeiACM8DiyMbgf4lpMdVqv7HCdq028atEQblmEPcq4TZ984ZLOeFeO8zSVgZZoFaW4PF+BNSK2kTmi+yjj4zuGxTAAP7+wiq9gvB6ucJ79r+AglvIso/igQnSSNU05zv1ICzyCUWvVPH9GkCPyBck1HpjHRLuOPJIbpDFfC/XmfSuQhWpLd+dmh1K8/h/6WfxTnm0cm/fkZlQrDJJy5OFYfo4iQI/2fr5TNBydNAMOgg1FMXlAJe6pg6t9RhKPtpLWCq3N+eGuRm0KgAxeK43iCloCz9oVlv+EjCZ3jVw44bGZr9X2FjukqM9mD33SL5ipBd3U+z9ttsUmMzMVQ3PHYsinraQkr7QV6XhmN9s6BFF05lQDxFdjwc0xIO5XRzEhm2FSU10KWTm4+n6vg9/TzbdiqGRl1OuD8nVjGtxKTh42nUe82SdXuULNxUmCjL2+QVLj+VkAfQv70FIDPdaYDzKEFKPvoio8rdxxzrsvz/zv3bTXZaesDIRHjSxNHDppuCzOzT1NIOM92YgHiJC+pDAzL1ttjQigl1GfKCh2PTP625xBH4Xx5U8qdcoQq4DPkzBaQYX6d32fD+BnbrZCb6nwZW7cOJ93L2XwGzdac01RL+bGETpCNMRLZHu7isBms894HPszN9m4W8mQTnjIcR50JM1dorzAtRKRt0cdzqD6nTSvKOvezmVWzy0Sw2E81w9c5bqRu7onFajmCCHrJHqo+QuXXRTM+5pVpTjCr6AeygX/sHtVmxpgYqMFDs9xApAiwDALbaGzw4iLXpYhbqra4F8W7WAPEEYixDHeoPB3K6FITTm2a3iWHHzXKBSEGGTe/1vpzTxDscWAOLSmw4+hLWor6HkBwC2BBymvCOWFAiNO/LIbCAJXShPbxWa5os5qvYnpbQuX5y9Ug7avCDd7BLSgvGh0ipISEypJvd/guwZs258YYa3i3uuHpEiu6+Qm4m8kU3kGSd1/Ipotn/uYW9+UFszq7Qj9EjUWdNJuvGQlVUyKMvusfJF03148HwrnhcL92lx7bCGOrnC7Xzm7CPZdaw8dYjjtNsO6vBrKAOw12eyPBHyNA8NtD4T1EmD9272fS9maxQWzZhRBjHBDrrkC7NPFLEgqqyW1CbJpJuADLoASHRLeVOlwTX2AYZ65whUjoI1/YYj5TNlm7J2AH42nmoz/v80D9yxJdybMZCjilHj2J8jhs0rNxjLyhX5a5FkL52uFG06LtENSyiomyTMUVm4Xn16ZAz8QJ/eVuQWT69+Hr0d/Db7YPyZKcgVbLyF1saFii67ZqH2mifkYSe8VuInLaM/FkPwJMbwcW80wVkwiM4Y+/xC/NYiaTHf/DcsAr+rUuVg31tSVkKHHZEMvx+oQV1TiC7sI+pVmxAPR/nZjWakK4K5URZhnOnggXHnh5BdD3KXrGlj/DEB12F769CrupwzVluZFned0MKQ5oRXpTIwT/RZx0Cr1Ps8BUClNns9Q2J8cfpGlKabPYQwVAVzq2sKkNF5N9BfAf7Wn6iqdZXzat4c7zBCr+R143zOpC5vj2eGRPLIbu0AQ+y9Q0JKhq1sbPl8CQQdVWLCw/jDvLNgmse2+E50rZWsDrRxwAG+9xLx8RvQbBnwPaCwPVAAAA==",
+funicular:"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",
+tatramuseum:"UklGRpwFAABXRUJQVlA4IJAFAACQGACdASpIAEgAPrVSn0ynJKKiKPbcAOAWiWUAwzuCvez5YPj361xF4lNuvsPlnvtfNbjv7/PBN9y34q+LeV/LP9Pb3WVgIktFvgTJREgbOXPSMKmjj3Pk1Yw0Yr9km+ieQicryOdq80FNj3xlA6rSkIlsHikPIs4+11080G4cW2cf5+ALTX70NIKwwtHmh9sjnggS5nnE3iHygLHCF1V8dNIEm9VX83DhRBL6IkMAJhS6BhIMoo/O34cKhJW9nwkH4d1WYeTDPHcZmpmAAP79mQMQZOt/zYMkSomCrJe4vSvZnRReYQbkErGVfgHhQwRoU2RWqDX1A6eRGPMiEIj5Lf0uc0CKOEYrhYw9YvWsmdhzpdLGyKOtmWUhbBBi08gjtqkZLlaLsCRnsjVI+7Xr6dRpSdi2PncFtD37ejKT2xQWR+GFfPfTZw9eHhUZhdMqdwbZAJzzu/e2eAdio+eWb3Qm4X1Rr0tfCzqR8i2yfBCOelUrJUCqDnTcylZXm1n1WODtGue7o2dL763K/FuGSDsXeONv64kdRy0Y2244ooQ1UYugT0JJmgY6oK84P7UCyaqwHkdyXR+IRu76PYCSUprryNsp2Hu02tAGVtdtMRFwcZRPDLJSJtDBJ8Di9Hoih6BIYh0f3C0131raco3PC77TMP3UTnkiotS4me0XfeVBXPLFO5EGTTGT6GKw6FEHcZJoVFQPHawb9F9lo9FdSmiT4C6Ge4wsFjttEorZQYUk5Ds0gYaUCIRESPL6M8OEo5g2OMQjx6qDcmAU/9HiD3HVjSrj8w3nfPyLjeUyUIlpnqpzEKBHFwQovXgDX9NFGX4x8nfflDq0FjcfgucLzkIQpS4nzOF5wawmsnkb02lMekzXzPNRXc8l5LlkIYbf+yiLWnWjyuoLRhK9h7XINZdy89abYTpNWJ6TkfhXpOVssKas3b/Lf34ew5mp7lYqyXy6ZVHS38dGDGIGSV+Ll0Um3m1BkykQSxTDvXFXgJ9ldfkSnZ3IK+UPYilSEX5TqwanVhV/WGpwMZYxSk0xqSdNDxjvmjftY1/Ejf9283Dxx5VbWk/aWm63N6dE9fubAmrk2k+gG9fAXqNQlPFy1zwJpyPOMkYhy/3LgsUk0JQR2lXRKxK5Gg9We2X8JpnhKjfmouVF/FKWAQxt16R7os4qYbB2N3Ht1f8WsnucO2O9CyhhsdhGoBwSru+c0TIdsDYf/EYHsjVqBe4Dg310w8UWvLdAup6OpE/hZsj40YjN4TM1RunEv1eWeCAqAOzp4BTNL1/TxGO7PN5JSvPr/o2dmI9ebTzzbLf6qTy3ZTDRPSy/qO97PmTihL1oi2vt8szadI12lNYVKanXzeUm7XKwzcKhXSeadPCISpyrfQm/Zois9//8FeyQP9Et8C0/EK2G+O0IKZoRYUWvn28BK1+m8bK0d2MapI0tF86x4Bgsx5iQGa+ZJQp1BR+CJGAA2IOpoVhIPdgU4C8qsNsRtisOvUvnXnZ/hKsq0c1R+P8CgxmZvd948XJe1s6BsLVfeG2VCScSqMbo4Jgem1a0osm4bS12yJk+PJ92ruva/27t3hELhz+Te45M+rrbXz/9cRkHga9Xm+q2qrQtgN/yXPlbJZc+lO0KYg90oHcGPtWSNuuhEOcKupCCyI2Zs0YM1IGisfbVV7l2+omYoqcdQxdpAFlQeyECKMMX1O4FmXcPzG5yFDCjQbK/5Mdie9B53Mg/5yq8tL3Fhqc3Y06vORh/LMb/6nKu7+MPR22QYDRN/MNTanGeOHGHeEjNVQRlHTrPrcqpOSLrhanKfLoTEower8znqW5A/8Ryl+ZW5rQiM9YxU6Hq1jrtP/vLHBjS/CQpTEn2k1/Ig+g68VBGpbssiItY6yxd8P0yNtgAAA==",
+placki:"UklGRkgEAABXRUJQVlA4IDwEAABwFQCdASpIAEgAPrFInUmnJCKhL1qrsOAWCUAXIwehnVdddP1oPTu2kxli5FgBEoKz63Oc3JeIo0+WvicYgZ5l8U0K1ubnY/7VL063nY4LBaEi19YlYDnuZ1sRnyfdFEcjxU0UwaKkB7Kas31iuAtXgc342kUUeNeq6O1skKUbjG55lJTQl5FaRJm1nEdx7Qa5ijTwLx2qQTOJQxGX9hgTBUKKrUQYJWhz7X7+k+j+e/bUYoAA/t6VMBxxqMn1mK2+RrCc/+R+/Fm7jCsVDNzgpqd+HkEaPCzKMcJcGoEgIBWXN3mOzW+LJKqdBb+BAj5Fk/nZVIuolRsf9QoMmhEe6WHvXL1QgSFjwhdCUeuyTKWoxc8yR8JBfHa/8LolPrVgO2MuK91StH/R6sVyRbooDXlP8o5TA0u9TJOI9HPIvhrlyNpX88qUCEaDxsEvwFhyle9zOQ0k1Uc3TWFZDapw8GEau09tyRSdmS2ePljpEVXf8QMc6/M/23MYdBq0JgdLNQzb27TVpEreTpl7SLNgKqsaFitfFKLlhvaSroXjQCVjKj0ikUychrv8eSvzjjLInB6RVcjSd2c8AJYYpDAXziug9Rfo9dFSGHBAeFST8/RpgaTERgNfOXkzqhOrUjTS4SyziPlIrGKqJAxF+k9xbQhdBGpUCkGJ7oVMaZZQxEFAHyJY8Q0BsFtKQFdJf4NdHAaZndcB+xMr5UUu7j0sZzisnHqIUW+33hqa4vHzUrmCFmIp0UmYX9TPvFGxN5Iwpbhi0y9+oH0w4MZxvnUTajb3Pey9QHfwUhmpLyb2fTvDn+VAQHyFnPPWFUtTbDjdeLr1a8VUjlJT4RrgqmUF1VDuyLi1xHr5MjkO3CpsuP72EtHfJOLw433gnhTYJr1M+DSY1UHCBqxLKSukLlYYdCmJ04+ZEECufDM8r7QflBXny2DhsNUDkVG+UCmz2D5fcXNinJ0e9tmCdDYU3oFwb0v6KpWkCYMRzXLpD7Bfr13YJOZcIIGVgr/uB9AzFPZyp8GwZgaWy6kXRJtYbyRAK0tOOK5EjgM2ySrh5fHugOVYKo7+N2FsmsO3y5dGUwPI6i9fSAiGi0pp0ZpGH1TP5Dx5rSjGE43FZSQO3fJn3eskNEAhQifUTaKrEKeyGGOgmSw0cEVxvsy7fSwb3ZIvOnYKMB/25CzDUVsKxJ48oopnJWOboJtE06dNbgtVB/Az254S+lv3UqxXoG6wDZztxVbJ+xtW04mZVz1sALVo+2tnd/int2yedLxIMLMMzCbwo/oZeyp5b+KWfwcJBGvM8ckpQf6GDE/2TxjvRqSOa4gBipBrPUKFibG4qyP0Da0sieYMj5L1a4DfDLCGS317GZD5D2bX2BOTMuSXPznbTF+zLBnVa+S5JUoxH67pXA9AFa4Vn4TvBfRcFBiFQqV5hm5ieReQ4ByDwAAA",
+kulig:"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",
+koscieliska:"UklGRo4EAABXRUJQVlA4IIIEAACQFgCdASpIAEgAPrVMn0wnJCKiKln60OAWiWUAwvCxKV9g9enZ19jsusIDyI/wZjHPKd8X9/34a0jxcVI6J45XAD4t7Fvq8AKyTFFQScizJOnt0DWZWDoeAZbhi7+dXrgzDDY44yaqX5Hx23Rh/YshoAZNM1en/FkppSVuU+3nD6vKEye7/75D2ROTVHGpm+8zOXxxJLIEviRUcA/7ejikz/dbHCIMuU5uux4IuU1cKgeGl9RTt/Ki4DvqqAAA/v57IkT8pC6SZJpXkdIcKbe+rCoNdVL+yQ1Cq/V8V8c6A7qlLstfeeAVoU+8dHdZvFcx60izIuS+8ZUzbVQ+v1ojdt4ApBpMBMAkuBm5r711p+lGhH6HTQGV9bk/W0xigqJYeTWTsTBy/fHTtgqaYpK5SA+yIY/1E59q3iNoii+LtToSJacLv/gTh9SuJyFc4qsZ4Sxe698o36nrXm0jNjkzgkuyQ5hrB1axukqDN0ybEVXSu7HZyoJRcDXrTxQeN2cGWSsRDmGl4hsr7AijSxZdmLb5Gfw5VyNwV+JBeMnXM3bvE8ciEBvrFgaES7xCHviQuLvAI7Oia5mpSfVXVP3zxcTPEC6t8142CfNMxxMNhS/9P8hriMf5g2DoDQZ03AhAKim9P9nROvzXLDSiOMOlxN2huZDjSOK2n8orXEtqSodsp1ZCWK9DSJ2c30S2UhaizCX57FmYZasjSQAVAptkD8Tlqe0zAvR6rhGTaY88Eh9+yaM1t/x494fpMwKkP6a97DslyRU9dmExyKQmgtUjfKW7lEqGteXJs9xQFtbXayNV9lxGRvrcSUBxDSJ/3Mxm+8qlyHclfQJDOSjWe8RKN6VyUsXoK6DL2oatHoj7NFRZjBWfMkHxPR3aa9AOL/KoNYlcEz6IwypNNXivSUK+cWfp4eVi61CbX240ILc3NUqnJBcx32Ydd5b7Y+Hdhp53lXOWyFywgwKC+Xy5seKSMmyetZ5z1GqKDdm4BPInv3NdAtaPWhi2glWvxTDj0OAt+v7LDtERi05aLYHQoFbuhtzJy9x82W1AJx/uSs2e/XCa7j23JxOMZTdMeOiZfMnnptPIFAe1/UQH9YADy9nIR1Zd3SFUd9p/nQMx+FPC2na48pvZDBBLchnPVsuoJFo9r/Gb14DfB13sKgwUhrffUX62MTuNGVK7LRHx71MUKRjTKmQE6BvXuQPMVb/a3Ov1JVcGFwPWWotP3/DNRRPUyLzvWBW7gmwj6j6e3ErzFbRWsfvXuPHEPiYRQEcNvku5h0+rFrw2gkoQo1CXl2aCNfV8sca8k4zk8dDtRPg9H0S1XCO0qPQecVqnl4RabzN8ePmU6bCAA7qcoBBHawh6oJh9N2LYq6Cwtlsl/H6zPJuoOczHiE/jXZKo8MuAG7y6V3U9N4uCGD9a0ksieIvC0JtWRSoHMqVRb7RGEmOEX7P59G95Tmoyahu7ianNLU+Bx8ZEkhm48fgqYFwdVkGe2xPbMLeMVA7Rbpz2V86koCsaZxp9FeXb8070uvDJAAAAAA==",
+chocholow:"UklGRnoEAABXRUJQVlA4IG4EAAAwFACdASpIAEgAPrVSnksnJSKhq5ccAOAWiWUcAcfwjR5ib8dcjbw7K5VQP1koLF+/v92WaFYK7XZVbpkMuvRK9/byM+hwtwRzb+0kvzdQFRi0n3hCFzRxMW0cjjVBbM8Rzot0W2b47AsNC+QNV3oDY6woqy1YmSUufefrM+AH8Hw8I38aHMaAboyVNd0j5uWlRRqqYDs8ab45tWrhm+rV4hujVwkcxSHygAD++eAb0+yrm+1+jLYUKuqRbMnDj4Dv23Z+XQKHE3InBhQMtP2yA/BRRaDlJHVB0pAF+MftzNr7og4yhuUp3StB8UAwL94IRiXTf5rH1PJ5C++n1m9444Kpxz8axYoROK4LyJVkRN2Y2XGOVu1x3fVpJkKUWLetxsPPzeIwJoahWPZqNxLDwWH+g0JCVHmIHdlj58Bhpnn6AByXvxY2fH0BsWqg1XJD4n9EyYlV5H3Dxx6eNfpTpycIUTYFJNE9dI7fOZRaip+LhV+rb8ZkIVmEXNnofHlTm3DbE0HZhOMjvMoX4RcJetlwQuJ00kvU9UvZTr+f/n1vu/CiXz3wuaOUQJ6zyH6p9MDXWRPtvbijdlhea/Rnxwwz8ebnHNadopmdkM1ixwm0TowAWwGydEE7/ZzWsrJbUVNjLvbj5DgQkG/BRWhzwUAzyx05d54S59VK0e3gU0ow8LuyfdxjlWQ+AoioUZX2cwjCMflKGZyhuSgmsiWsLP08e6yeCBuyv12uPLYYCNgZDI9hc7naYVsi5iv0XJ3Y1/IMA1WurfYofvjnHeVAffMumaxHo4OsxhpowqMYE8gEVXZ2/V1PTrEA8n5SEFHRzysweqp3Ep+N2TbjB53GLvJKL5Cmz8vtU/7NxM0cDxnBVdJwVJFJsbrb6I7fnZP07uLBamkptptMIm5dPwyJG8fyZhk/bVDoS/hZHsqm7bbEyXpZw6Ba4Lp50xXcKVFpni7NHTzH7d4GUlZb6QL4b7qriIJiQPY6e5nguAxGsRqi0SYzVEJM0W9qjyLIdZC1XF/0UjSfxlyTqR4BdobclPua9WzuAFlG8gRaTcW10EoqFYOTStsf78L+1tLPc4ME3YLa/DEC4xxFcVpk2Fk00BMO5tBiumAqfuIS9jHXNBxPVuuALTfodGQNoQVrJjTqiZVWpVa84Z+Qk+z3gTVs2v7vRJaa5d/njegyOmRhXfYdGSpk/U3rN1TrmcNPpvwjRbICxKqYIl7SgbU/NVXK4GIzyoJ/XQuhWMnwRkFGQNZo0ydb3QcK6LogrPztMWyFoLbDbF/FT86/g2tRVwolt703p+jk9t/bhB0UvQjTsIttRsKEWsDj9wqj/spjbqfPthUyJbMGtqVey403x8/XddJlk/gNBl8eAuC/a90LuDTPrQTRAsh/jTmj0fIBWcRihnKeRkmvtfT8SE5IpMFuEQp1T1YTSs1f5eKpPB7ldEuZf+Yi+WFw4OeYsLB14+YOTB9DyEfT01YiNMC3ZzA1rOw08IVdsEHgPU/GQAA=",
+bigos:"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",
+wawel:"UklGRmgDAABXRUJQVlA4IFwDAAAwEACdASpIAEgAPrVMoEwnJCMlK5cbAOAWiWMAyqxD6afN/ZPMh4H6UdoM1V4u8grzZCLvzbABsWzBNdFl1rFaXx8B1SdB3Qs1umbVkwM+QlgMPDC5gno/oQEa86rOXrWx6ktCCy0/IVR+nD6G1RMtd2uRMxzB1ZdiErQBn95HiDmjMHpaGIkUkAAA/uvEVBQFf/nb4g9sbX/+LfaPyZEJ9zZyEUo7JO+k9M3HrDmhUMJmEYtA6SkiKGtQ3Y2zHI1dXtgPfv0e/SbNvwKkpmIiM/bTwJc8HNjCVFx9xXzWhYhua5AIeyZ7I72L3HIgPbZhUT53tX0ne0x44Ke/fWJx0I8O6/ERT6CaPxuUXtYHRegHGNpgYenGPupW6IZbMl0UUU6VVH92l8ZM6GPw+rbv3MYi16nKVRKdfljK+GAd4A3EzIhGpTFd/RYSQCh4+8DoeK7CKDik4VC/Xu2XIt5Kau8dwpLkFmyjwSaTBbcb0eEAjrLH2A8m2ueZ8e7WWLwILacEJ457kN2m3pPhwak+h9v5rNbQ6x71GrppObSYHimpDMnIFallr+s06h4jy6H9wbRX4bPVIkVJRSpLvfi68i+M2Xia94bNkgd25WOr0EbZbfyqPOf/pfIwsTlWO591cIO4EPlTOe7r16V8NrG8YPctO7NR/+PP8BOqbfBUHV5h7AVAmCT2+pHSV+I4E5J9kFegL1wQHgveX4duokcxYAhfFMCSXPGprua795mkKVAjvFd06175gz+dONNhvu3/yFsZQCP5r1rVbbnlIFcmXIId07YjSBxoPGef9HT2mzCU+D9J+ISgEPx1+58kGBngsoM4QFHuaXY8eVZjD71eUR9Mz1VkpC2196MTfkOCiXXqtZ1Rc84Sq55ABoY+VCmL5JpsYhgldYl9BeCkIBtBvKm2c7eqj+qj0uVvNsg/6hs4kBnDT4H6+YVsfZOiUcxv88NUTfoqA0z5Ndjl3J78dufzJAUAcOmDhutGRUP9+Q0USAeysFG79JZo8HwY1gjNiBsK+/DHnkwHq7KxYFGwA5osAqXYhIES8WGDusQVTtoslZm7dsrmeqngZX6Wvzyotayqxbxdw7SQJInApeBX/ZZC8DdxK9e7aOB2Ae7mJCRcr0w5wr2t3/wAAA==",
+szeroka:"UklGRtwDAABXRUJQVlA4INADAABQEgCdASpIAEgAPrVGnUunIyKvLhdMAeAWiWMAzEqzE4+bPFID1X0ngbxu98jgIqEIQwzP485e9KuoiGSbUAMDtFo3tvDGTd4S4nz3zqRlVh0OAK4I7oAgv9wHaK2557T6eyETL/UYAhAnVv6zlIKnqpEF2tDNfeT704ilgvie/6rEG2byaMUDXMuQY2LA2yxZavJdID6rKVn6AAD+4evY29/6r2w2wk9/oVDB61OO/FYZBr+rqw2eK6B7s0c2IVLYJGYbENMkQ8VpImQJ/MtvbABJs6wKJl7davDH6TG6cdvMf2Rhm80mMds/tdDcERGs8nYq4LXO3MsTOaA4uX6E671QvHgJgwwzyT4tsUkO0Zz4+4rL07imcB5UHA+nQGssjpbPhQZGl5yAKjuR78z2CPjcfM/vnHRBlo4gTBOt1zWShCTNC+YcvFMPfzenRsjIh8qFRD/CpcslCixf9TzhhHnZtHJ83LO6qnneuQypSrt9det48fTc421jz4IK/LZmONX7pd4kJi5GrpCZwGNsapfsxdYZyXzuad+xzF6z8f5MxHzO6PXdASiBLLFJIWNCRB4TwH3yvk/j3k8y4phEo5xINqwEo32j4lEPLPGAMof5KB0Bsd1XXtDbP01dXgX5k0jM2fCHVy9Eh2F9pGbuzdc8UMDmW8TNzYwKyvKimo9szoQUq4W7ooFw1liXev3v2dp0Cbi15QXo0nUbVRVA1gDoR9/+0rUkM28qQl4olctIuvaT97907Xlg+zcbVWsipV5kIFJgms0aHvQOZQZWBmQCnhYUF9hIJALbd1CiUweFa+JqdimIALgw0rJlaic/PF9EBSxknCgFJcEOjPjqxIT9w8Waez0vVUf7Xv28D0bl4XDtiWEJmRAZ2ivKtaXKi9qPyyE30nXToKBsi/3Y1DIog/i1+vLNcNxjtnR9EPBWvI8eIJRdyeuk1WwIE1Ei/9K5S0f9euaau+vs9R5khfbTZ+1vVb8qRp6/vT1fJm72MS7E6CpSAKA948p3Ee47/jNtX4Tg7MFrr8vNY7R0K8UTgqKCWzQKSdTdpPDMtFWkFhLbhHKaYhppGLIFNPoIWDcnCm/mm8c1jOi0T9ON/G/BNbSBgDWiuO/Q9Lt/+jBBwi6zXp0SfKR5GQhk3ujuTdwa2M7+Eah2BIqCpZUSLIfbyzQIeMpR8Z3Th11JGVLFP9EER005ZA1HSRfFNrSisN86bWOiK1CuxpP6T254XOFNDu5Xxa+XdF74CZZVSSQ5rvaU2wE8H2nt2eaupZ8jTBwA3FJE94AT04TzoAAA",
+pierogi:"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",
+hotel:"UklGRhoDAABXRUJQVlA4IA4DAAAwDgCdASpIAEgAPrVOoEqnJCMhrNZruOAWiWdr4qymr4sNnYp2rzDYetpo6LL9qAzG0ioAkNyWSlf9ot/FFFVdiy65OlQfW9SKZysGuv1jdY8QLifLlErfGMOy8D/Xo328nJKcUfT3+/Jt8o5hy9jisGbaJythvteYAAD+8D7DP5Cz9F6hzI/U8g+Zh6argJuw74mPRoEmRBhhXv9QQAXYec5BdFP0f5tUWv1bwLTb+8xDr5MKVGlr89uXE71zUcykbQ+3aU6Dln4v5LtyUliZg9QSYL8tdfImRbdqJRs46A2AdrnVq7yXKJvnyvIUeO/yGexDIyD4Mve0mUS6IXLIMdF+fseuzI4lQwSrtvL4zoK3J0lJCfLaJ7viA153uRlAQRXbMefwt0EGUwehi52yAh9AcRrx+0T9Wd8mrE3aH4heP8D6M1b+jCOS/Y6gp8yUyXz02OmTLo1L4OoHprLD5aNXa8vhbl8uXc8VXieqwdkOhmLfnuINF5vchIe0kYyipOzNW3kYG+cAevAQ15f9YMk3gLEIpUgyJHz6Ckbo8g4qIFdNrsBR97nZcGK+pvlxejfcYQ+c0Rkf+gP39mD+Yckq0HjPaW794PLl0Vuz82yO5dEowPgV3X/45O0koxyHeaWEluu3mnh+zS1Zg/1aSJSEo6/paMjjXv/SQaUxVsbOyLxB5Pqc4e5uq2oxiJDctMbu+ie4f5ifd533c7d6fLQ5P0Wq77kmcFv/iLMdANVnTiB9tDu5ME9FCf76RvivDkLIif1wa10fnn1BK9DAPqZX7wDq4HZXWJ2BjdnZeJiDMcCYoIeKSGumREGB+m7zJgkF1mo+/yWtaMthgeUdXNbTw0DI0brwrM6SNYZ9IGFDWWyO0+V7n5bBKP1EVhE9walrgmQTPQMe3Ppz++nrckymeg3acIObxl/EZYur9HLuvoeQo6IVs3vb/FjKjy5+Vm9uFIZbTnQI3E68wva0P64usr3ipWC7Wl+zso7km8mjWgQy1CptvM9QtTrUKoDjL0Fj4HaMEfpzo9qAAA==",
+kuznice:"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",
+trout:"UklGRkIFAABXRUJQVlA4IDYFAABwFwCdASpIAEgAPrVEmkqnIyIhszZsAOAWiWgAsR890aykLG3dAq+4UW8dsLVKPVXIitvuqfSlVw4oCwPFN3KUqJX9D3cQCsl0abYVaaY/SiA9IsoZxJHE6p5i5y8PA4JHwJiUcXTGh558WcAd0InaZwXaxhzNOWLWU7J8/eDTByfZ/ayTwOvB1RfF4KVYm9ZBzOj3oF4hjuZim9z0CWDYk//2DK6mchp40rtaaim6CNxQqX/YJZBAiB0MDFooK+54Bll0AP74j1K9jcRbv4O3VYwp2y33cNad6UR5DIOCwj7d6ItsFRghJXgb/qNEjkamuQFNgh7COdBtmTWdvAuBpCX5Fp2tP/HI9WDBPY7bAkJu7cKpNP3lUdcatUS377cRdLrSiZZ8/K1ovvfHk4+PGd2pEYEi6Km2ROeLsSG1i31I+5uOo64bvFyEIe//BOslHREDXlKnboG8RAWFuM6+Zd3b9q3DL/CvyzrW0lcRx2LOBntzvVLYdyPA9Wwbwb79mZhDHy9KvQSyJuQN/sZs4FqMD2ysRSxDKL0I56N/qPM9kuPxU3R67rwV6BnGQPNC9Imp2fAjtBQI9xei+ZflkDuit0n7q+/w+27sKy+sjyjr9BLhRMwnroIXASin9sPxv7YiDYlg/AeG2eDiZRoRhI0NMEEYZ+Ky4aU+AM9dKdaJ9rYH4pVqEhGEhhw05ot+LIOlSRrp58V7ac58S9NIPpsSUwDhyg6Qs6B0W9UG/+XbSFDUaFdRH4S/xyO/XlMPwFsw1otqhM2yLMhxC5MuJb3sN1rrMBMzTf9mHQTbrqs29xkEEvgSwFfa8tU+EIU10A4YOBqdisfeeJc+VGYoDlwHay/cOWLNx+ORCCyiwhzNshoGBOheqjW0/Bd2uRq8R5vo/IFi0qtCtJKOruP67dosdVLinArezj5gOHCayyyV9/NL+u/S+sHDPz6sxVJbCgU1bil3it0NdBevldLzEn/VUQjkj34LAdMzJroFkDof7tPJpTafzWv6KZtok+4aCwoeou2oLaQeL0CBVlR4KYzLcYCpFFbViteezsWodl9pUUPmRXMRn381Db9eMx9R17MqEwyMkVLNL3RlXrj3AYc0m6/9XGyMCUah4kNKJslx/dnDf6XTuSThsrJ5A8M+XLbkEnqOcKSyjwfJLEmsvHJMdKYDTNmtOQMPmwu0fCB8J77bqlH+xd2vzmw14QPvBwR8vi/UU67z5HZORIn5M9lLV9f8Amb3tBLbukzjQBJzKxo9D2/iKB/h6bjVhVPPU/0W5h44dVTBjKU3ce11xg33O4kcGYAQoYERx4nNetx8yR8y9ojXzQ1svwueao+kRygnlNVPUS4GLbDDonWCRgNidTihIJW3f2/OzbKTAqZMG6zRPlm2yCcJDSaI5IFLyqh9L5OtX/13NckvSJfOiOiTvPb1Hd9TCYBSatrIMkM35Hm6pHjhZwxQhZnw3cH3dziLknsRyieAU7FllBjZSKIMLSuB/2Cxkc5GY7R7ZbZ0xZLe7+MWiUk+GeAaLuaf+4S34d6Cf8plnJJwBPu8XTxOUh6o07MUcY5YftkpkwtiKVkHfxyzrK9oWnITtrJmcsLIVFSgFp4dBlANhjfinqlEWN+eTWCuALJ5/dlzbtxmI5QybjI+XFoMrss/IgFZV9BV4SK0YNFjow3PyPo5HMcdqkh0fpB4dLwcluAzip3EyG12lP7ObBuInHH6vst24wLHvZ9id4zjzTrSU8fuRCQDQM+INaMmtbUh1dtGC2AAoAAAAA==",
+koliba:"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",
+kosciol:"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",
+termy:"UklGRmgEAABXRUJQVlA4IFwEAADwEwCdASpIAEgAPrVUn0ynJKKip7K9cOAWiWQAx9xBxwP08K3Pxs1uwXXm775YsO/kmq2+5t84zDh64a+1umPmraVzw58Nd1jOphN3RGjiube3YcO1ZrZj+6o8yN+KzmjkKZ4l2f2t1AO2HzPwG7YJf1xFkGPvqAdxkN+sT5oj5VnVF6bGSVgYtVcSstAkfGFF63BXci8qSGH520aF/P6b0CQQJ96yjgAA/v0K8FLROwIUJY//jPL//GeX/9w92/35Ev4d3ZN+yxBOJaWNRRYscarCgZ94Q6gVl0ivc1o9rQMnumyU8x/UCTqu0o5biyf6oKnzEv+3OHyPyrKV3eHl+Yjzdo6kyMh1+SdTkV5IIMTkDvI8R/iMLot/kt5OcNQrRoTdKMZObl0nJZsYArparoTnPGGAE43n1zJfX9SDfUbyXpTB+wS1o+t9hoLAHpqDwvdzOc+OUfL0PfamiHe94/9HEzKU92o5cVoksTSc7X71HkCedvU/mmchD/WuILbcYFCQAwUgi1+dunz31B2lG8vNtOQCLXwSIOXjMSFe1uyZcgIOQL9WbUDQ7yIeRXV7xgA7uc1Mj2fLl2jZSJAi5pwWRIXQ3HftOdDR259cPX8oGiNLTDKb/D4b3oyMgu+kO12D2xqni+b1LBZNKdooo07pwfMulmgeqndkBcEDBqn9gIAtKqps6sZi7W/QaMujXPW9JLXsp6hJ2qQYTld0MExm1cY9APBr9HPwgW0KmoEJDbHJiG94hv4ziaKy2SMMewc4ry6sTOxJdp138dbaycuGkDLTDF72nAx5BANu9OkeUi9pwpM55TOz2j0tYbHiyd9mRffVv6xAOPhI6qj92sGcGwyj8vthxjHYHcm3ZVusgnHBk7eINuIPUiHBQiFXlBsOe+3VNpYPNg8DM6rPC46VAzpCbPvi5eCnZ0lhcOGLnXcr4cfYpZTVLlA6BqrrOSX3WylcaAnOWCtw63h4FkSZmNx/RHw+5LRjMhJSNVmI74+9TsZQj4dNurFt82HYxkbKYqo3ADf6KJymEloua5RCfzZyEHuUvebdz+xGZ6Cf0biSJtpa2cGVo4p7UR4bKGZhx2mmxxYx966IRDICWKNsbRalhBPoTBCAH8h42lp+8O/MveWNw+fgEn+HyvnncHkWlJpClkvOD8PlrGqZ3T9rf2sZ2lM7VQqjuI8/M1N6OZ9fEzygTZJQb8W/IN7TJE3eoFChbn1Iyjr031U3/rXXPfXIsPdQ+ujQXiVlCVJTtuyp8dBAWoLgBIOexQKxpOyPQHaWapdhoDZomRa1YG6kDYrAGakOr/UEW+x2ntCHV1NQDxjLqVK6V/if3W4GhxHPUE9Vg1sdeeC8CWZw/1HlAwNL5onWjgd/Fc8CBAZSicxwBkMpD7N2xx75rEFCkUaLpcV1ud6txNplGoU+8ivqNiKcDNJ2xRVPyTOXBidztDZ8iTzJHc7El1a1JlPM67xR24lDsDGPgAA=",
+wieliczka:"UklGRoIEAABXRUJQVlA4IHYEAAAwFQCdASpIAEgAPrVQm0qnJSIhrhdMkOAWiWcAyn70dey2nOjuVk4yUbyszynfafKsxAFsRP9I5kpy1gTRviE238Es/6LocdrLZBUFux05MV892Shd9AT4Xl2IzXNiSaVMuRz0IOr3MveyZHhoIDfu0zIr2bY437ONlbCs+X6VCvp9U0CcJ8UKzbSQQN35+3igupqvZIbo3viFTN6TqEtwBXfe519An9FbiHeMxr2yVPCAAP773LykumXHaQ4gARByz5cOw5NQrXFmn2Gu62YJV2En81Qsmf7QvwCskpvgh/f2PG6hjPyAyyyJzRdG8x0R4M5Re082QZuow28cYjpIsIfQ7simKvQ00unWl83hf9VisQFNVEI8KvWjLz2ms2XSu/sdi/ad7gSKFzTrbmxMjD89NYQZdozazIemxgdMthrQRaXydP92K3kDumyThxfNWo2kR4vJlXPzr+Z8bbkDa0QPOrU8lhoJU29oYTHYLZtcOlyFPXyzkFoPxskdoyH7t9gHaNtTbLcOD0JfUho2gtTs686KPiIOh4Xus1vzNmlYsedQt/0dicHaxAzIVPeC54Cdm1kiBTR1uBTMzVYHMNoGi6pfzsnr6pdc3t+Y6RaElHO/omslTwEdBKEGi7Vbklm9LqVWvBCFpCe+TbzuVSh/Ssrbwb12HO4IwCzR4kXrW0ffpORF5IGE2rq6HFLZlNOxqPVobiKwumN5szrIp8gN289BnhV7fGRaDK42H80mW5IUTBC+ikIu4UG+f0d3hw0p5d/5C6C1tBmyiw2TyPhvkinYpTnusnBhZ7YM14nzQNZgz5ZBVJXBcHOYvXmYWZrpc3LdkI00skDDTD71P5cVUDYteius1LFPtB9kSW9r0H7INYpUbaIxHy10YRZsnF8DHydVtYodLGqOeFGq7NsXwIKEmlbIkqjPvItRFl6sjWkyYXmvth3or2J1qTQwF+fTu651fJN2AOv4mlxp3qKuBNV5j1mdP2hIvV+2c+7mJnogfjFIR4REDzrYZKcYZc7g7GOM6V5FjXYV8wHdQDv42PNiSR/cXAEooXElH+0H75RJWCq2by7JWVpmOWVjDsxnUjKbesSY3NljZy6C1jVF2jlZpl9jN2lQfeYrmYct9vTL6KBPDq+m2wRhJMpPliHjmWyr30SjnewRjm/z1OnaeeNfH5mULf9SzwKgc4zTf2MiuYcGP/0uPAYogGeD8oXJBtcIOMvecIANAM4tmTu0aWC1zVIY3kXGhg8kv8zJlA3DhRoXO6b52KW6DQw5sg+DT10mBlpanHw4PLMR54Ly0fmdVmvdH2c4cOe2CpRxrGhX3FdEhtmxg/BBOuXCtlmsJqthHhqrguOOk2F0sEP2rwbI/zuMuR8z6dxj8EbuKcGyRe2fzvM3KxbLimyNanawhB6gysbRPmokrPkll+dPOqXhkOMbujuoo+a6Ha7GUpRfHyrZ8tGmwAekVFx1EiqZKvCPaN1JB80YkapT1z3xH9NAVUkZ4Ast32rSITbdRaoAAA==",
+zurek:"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",
+xmas:"UklGRpIDAABXRUJQVlA4IIYDAADQEgCdASpIAEgAPrVOn0onJKKhq5js+OAWiWcAzCNvDwfsC4i7nQ7C8b4cab9ob+6rrJAuOTJtGHYtUWOBija+/Nk1HWVWywMhK3XhS3oO5qkF8qqTVDqQUycqrP67Qm4G09hRTQwOvzc+bFqSF9sXVQeZqVJW971LkZ0MKn3xI5PXEerW5yKIKHqY9+FYwMWzqCgy5ErhxVkygWcJHTAA/vpTO0+FCnQWxC8vpUaHJKMGlLyDkgiyNNGqEm+0mcfMKAOLY77fzslo2CHRNg+JkBpjOzR3yg4G3f6IOCb4p9Xn+ZE+KmQ5dkqDrLydks9cdt53u0OE+fUrAv7MeaAwvO9ACc3gzTQbj+4Q7hH9iodwkMaL3TnTRKfHdgqz56fQOPHA/O2wdBFO6QilUkW/d+Tb745lytm/XAo0hvWwlfYMFLOj3+QQOQMJ/RXXj6rMlX37dRJ3+eMTtst9VJ9fJe3uMhLB3GGocmGKnCFLH4krCPILrMkkuxhqkJWmpIgOhq+33TYcAznfsUEb0RNB8dlDv9Gbc2zNM9IcmTDfT0tkA6Y1bPO55HVNiBOMndsHtMmmDv62WYZ4qFk4/3s2GweHct9hkrSDBxiMnLiyi7A8j0k6lsuHa2bATc4BUnEYmoqb75QNK+wJgxdmZh/Tj6nj1sZTNEiRZYQXDruvNhhJyfUwqgCvi7ufheS/K8YfLyvwXpossGSR8kDZR2Z1SAmnz9m6OinM7h5bXM8OtT7Vw8H0XQgOD3Q/CtBXI2GT6WjpRGl4zJVdEg0hqUvw+gC8OVYniUmUkcR2Ui+WvCWJSruFi0fR/boaNrQCdCe00CmAgoryP9UFSlZ2bhbSHLva/paAzygCamDLrRfPuxL4sKvAQeN+s7v/X1FWtoNWcx2Z6Jit31d0fZbNmtZWuJZsvZITsG7MWqDzSjra7byCTdCQsSMXH1xZcTUWp+V9sVcBqBbL09626uwiSEkbu+hRuYBlLtQkroAwU1yDVkajGQNwPkJD/hKepHu/WtNw4ztBM+9ODsI12EZYxfrnIOt5dZ3GugAN2Mn41P1w3NwWE9JtwBafSmPrtPQCPxKiB458hqrtTC8tpVgxlpmKJ4IGh7uU8w/bQur/vJOYMHAF7yDopwJB+F1OComk2stgMCn7jyU5MFudFhXZU+Tjev59xk+IGuR2TZ+KbYCvT1MA9DAAAA"
+};
+</script>
+<script>
+const M = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const R = (pts, mode="driving") => {
+  const o = pts[0], d = pts[pts.length-1], w = pts.slice(1,-1);
+  return "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(o)+"&destination="+encodeURIComponent(d)+(w.length?"&waypoints="+encodeURIComponent(w.join("|")):"")+"&travelmode="+mode;
+};
+const CAR={c:"c-car",t:"Машина нужна"}, PARK={c:"c-park",t:"Машина стоит"}, TAXI={c:"c-taxi",t:"Такси"};
+const HOTEL = "Bachleda Hotel Kasprowy, Polana Szymoszkowa 1, Zakopane";
+
+/* [время, название, описание, машина, ссылки, что попробовать, картинка] */
+const days = [
+ {id:"d1", timeline:[["08:55", "Аэропорт Кракова"], ["13:00", "Zapiecek и Крупувки"], ["14:00", "К трамплину Wielka Krokiew"], ["14:30", "Droga pod Reglami"], ["16:00", "Bachleda и бассейн"], ["19:00", "Bąkowo Zohylina"]], gear:["🧥 Куртка", "🥾 Зимние ботинки", "🧤 Перчатки", "🩱 Купальник"], clothing:["В самолёт — удобные брюки и джемпер. Для прогулки у трамплина — тёплая куртка, непромокаемые ботинки с рельефной подошвой, шапка и перчатки.", "Зимнюю обувь положите сверху в багаж: прогулка будет до заселения. Для бассейна в отеле возьмите купальники и шлёпанцы."], date:"Пятница, 18 декабря", title:"Прилёт и первый вечер в Закопане",
+  note:"Виген и Таня прилетают в 08:55. После получения машины в Alamo выезжайте прямо в Закопане.",
+  route:R(["Kraków Airport KRK","Krupówki, Zakopane","Wielka Krokiew, Zakopane",HOTEL]), slots:[
+  ["02:45–03:00","Терминал 3, Бен-Гурион","Плановое время прибытия в терминал. LY5119 вылетает в 06:00 по израильскому времени.",PARK,[],"","plane"],
+  ["08:55–10:30","Прилёт и получение машины в Alamo","Время в Польше на час меньше. У Alamo получение забронировано на 09:00, всего через 5 минут после посадки по расписанию. Сообщите номер рейса LY5119 и подтвердите, что машину сохранят до фактического прихода. Выезд из аэропорта запланирован на 10:30.",CAR,[["Где стойка и какие документы", "#logistics"],["Терминал KRK",M("Kraków Airport terminal")]],"","airport"],
+  ["10:30–13:00","Дорога в Закопане","По S7 / DK47 едьте к Крупувкам. На дорогу и парковку отведено 2,5 часа. Зимние ботинки и перчатки держите сверху в багаже: прогулка состоится до заселения.",CAR,[],"","road"],
+  ["13:00–14:00","Обед в Karczma Zapiecek и Крупувки","Начните знакомство с Подгальем с осцыпека — копчёного сыра, который здесь подают с брусникой. После обеда пройдите по пешеходной улице и посмотрите на деревянные фасады над витринами. Поставьте машину на парковке у Крупувок. В 13:00 обед в Karczma Zapiecek, Krupówki 43. После обеда пройдите по Крупувкам обратно к машине.",PARK,[["Парковки",M("parking Krupówki Zakopane")],["Zapiecek",M("Karczma Zapiecek Krupówki 43 Zakopane")]],"Осцыпек с брусникой, квасьница, плацки по-гуральски.","krupowki"],
+  ["14:00–14:30", "Трамплин Wielka Krokiew", "Подойдите к подножию и проследите глазами путь спортсмена: от узкой дорожки разгона наверху до крутого склона приземления. Отойдите немного назад, чтобы весь трамплин вошёл в кадр. После обеда вернитесь к машине. Припаркуйтесь у трамплина и подойдите к его подножию.", PARK,[["На карте","https://www.google.com/maps/search/?api=1&query=Wielka%20Krokiew%20Zakopane"]],"","road"],
+  ["14:30–15:25", "Прогулка по Droga pod Reglami", "Этот отрезок проходит вдоль границы леса. Идите в сторону входа в долину Бялего, останавливаясь для фотографий лесной кромки. Дальнего похода в глубь долины в этот день нет. От трамплина идите вдоль леса в сторону входа в Dolina Białego. В 14:55 развернитесь и вернитесь той же тропой к машине. В 15:25 выезжайте в отель.", PARK,[["На карте","https://www.google.com/maps/search/?api=1&query=Wej%C5%9Bcie%20do%20Doliny%20Bia%C5%82ego%20Zakopane"]],"","road"],
+  ["16:00–18:15","Заселение и бассейн","После перелёта здесь запланирован час спокойного плавания. Купальные вещи пригодятся сразу после заселения. Получите ключи в Bachleda, уточните часы бассейнов и переоденьтесь. К 18:30 выходите к такси на ужин.",PARK,[["Отель",M(HOTEL)]],"","hotel"],
+  ["19:00–21:30","Ужин в Bąkowo Zohylina Wyźnio","Это вечер в деревянной гуральской корчме. Присмотритесь к резным деталям зала; из региональной кухни попробуйте квасьницу — кислый капустный суп с мясом. Из Bachleda выезжайте в 18:30. Адрес корчмы — Piłsudskiego 28A. Попробуйте баранину или квасьницу. Расписание живой музыки на 18 декабря уточните у ресторана.",TAXI,[["Корчма",M("Bąkowo Zohylina Wyźnio Piłsudskiego 28A Zakopane")]],"Баранина, квасьница на рёбрышках, гуральский чай.","kwasnica"]
+ ]},
+ {id:"d2", timeline:[["09:30", "Каспровы Верх"], ["13:00", "Pstrąg Górski"], ["14:10", "Вилла «Колиба» и старый костёл"], ["17:15*", "Кулиг в Буковине"]], gear:["🧥 Термослой и куртка", "🥾 Тёплые ботинки", "🧤 Варежки", "🧦 Сухие носки"], clothing:["На Каспровы Верх — термобельё, флис, ветрозащитная зимняя куртка, тёплые ботинки, шапка и варежки. Для музея удобен флис на молнии.", "На вечерний кулиг приготовьте утеплённые брюки и сухие тёплые носки: в санях вы будете долго сидеть."], date:"Суббота, 19 декабря", title:"Каспровы Верх и кулиг",
+  note:`<strong>Запасной маршрут при плохой погоде — Татранский музей.</strong> В 07:45 проверьте <a href="https://www.pkl.pl/koleje-i-wyciagi.html">статус канатки PKL</a> и веб-камеру. При остановке, задержке без времени запуска или сплошном тумане на вершине выбирайте музей и пропустите поездку в Кузнице. Уже у станции — переходите на этот же маршрут, как только объявят остановку.<br><b>09:30</b> — выезд из Bachleda в центр. <b>10:00–11:40</b> — главное здание Татранского музея, <a href="https://www.google.com/maps/search/?api=1&amp;query=Muzeum+Tatrzanskie+Krupowki+10+Zakopane">Krupówki 10</a>. Посмотрите постоянную экспозицию о природе Татр и быте подгальских горцев. Билеты для самостоятельного осмотра покупают на месте. <a href="https://muzeumtatrzanskie.pl/zwiedzanie/godziny-otwarcia/">Часы и билеты ↗</a><br><b>11:40–12:45</b> — кофе и прогулка по Крупувкам. <b>13:00</b> — обед в Pstrąg Górski по основному расписанию. На вечер отдельно подтвердите у организатора проведение кулига.`,
+  route:R([HOTEL,"Rondo Kuźnickie, Zakopane","Willa Koliba, Kościeliska 18, Zakopane","Długa 124, Bukowina Tatrzańska",HOTEL]), slots:[
+  ["07:45–08:15","Завтрак и проверка канатки","Посмотрите статус PKL, ветер и веб-камеру. В случае остановки из-за сильного ветра PKL предусматривает возврат средств.",PARK,[["Статус PKL","https://www.pkl.pl/koleje-i-wyciagi.html"]],"","hotel"],
+  ["08:15–09:05","К нижней станции в Кузнице","Оставьте машину у Rondo Kuźnickie и пересядьте на маршрутку до Кузнице. Будьте у нижней станции к 09:15 для подъёма в 09:30.",CAR,[["Парковка",M("Rondo Kuźnickie Zakopane parking")],["Правила PKL","https://www.pkl.pl/post/kasprowy-wierch/news-kasprowy/zanim-wyruszysz-na-kasprowy-faq-kopia.html?setlang=2"]],"","kuznice"],
+  ["09:30–12:00","Канатная дорога на Каспровы Верх","Во время подъёма смотрите, как лес внизу сменяется открытым высокогорным склоном. У верхней станции выйдите на панорамную площадку: в ясную погоду отсюда видны гребни Татр по обе стороны польско-словацкой границы. Подъём на канатке занимает около 15 минут с пересадкой. Наверху пройдите к смотровой площадке. Время обратного спуска смотрите в билете.",PARK,[["Билеты PKL","https://www.pkl.pl"],["Каспровы",M("Kasprowy Wierch")]],"","kasprowy"],
+  ["12:00–14:00","В центр и обед в Pstrąg Górski","После горы — обед с форелью: польское слово pstrąg означает именно эту рыбу. Выберите способ приготовления по меню дня. Маршрутка обратно к машине, затем платная парковка у центра. Обед около 13:00.",CAR,[["Ресторан",M("Pstrąg Górski Zakopane")]],"Местная форель.","trout"],
+  ["14:10–15:15","Вилла «Колиба» и старый костёл","У виллы сначала рассмотрите крутые фронтоны и деревянную резьбу снаружи, затем мебель внутри. Это первый дом, спроектированный Станиславом Виткевичем в закопанском стиле. Рядом сравните его богатый декор с простой бревенчатой архитектурой старого костёла. Посвятите около 40 минут резным деревянным интерьерам виллы, затем пройдите к старому костёлу. В 15:15 отправляйтесь в отель.",PARK,[["Музей","https://muzeumtatrzanskie.pl"],["Вилла",M("Willa Koliba Kościeliska 18 Zakopane")]],"","koliba"],
+  ["15:15–17:15","Отель и такси на кулиг","Переоденьтесь в тёплую одежду. Такси от Bachleda закажите на 16:00, пункт назначения — Długa 124, Bukowina Tatrzańska. Заранее согласуйте обратную поездку после ужина.",TAXI,[],"","road"],
+  ["17:15–20:15","Кулиг с факелами в Буковине-Татшаньской","Кулиг — совместная прогулка в конных санях. Здесь впечатление создаёт сама поездка: тёмный лес, свет факелов и ужин после возвращения. Фактические условия и состав вечерней программы подтвердите у организатора. 17:15 — запрошенное время старта. При бронировании подтвердите два места, время сбора и ужин. Вечером — прогулка в санях с факелами.",PARK,[["Организатор и место сбора","https://kuligbukowinatatrzanska.pl/kontakt/"]],"","kulig"]
+ ]},
+ {id:"d3", timeline:[["09:00", "Прокат на Шимошковой"], ["10:00", "Лыжный урок"], ["13:00", "Czarci Jar"], ["16:00", "Термы Bania"], ["19:00", "Novobilski"]], gear:["🎿 Лыжная одежда и маска", "🧤 Перчатки", "🩱 Купальник", "🩴 Шлёпанцы"], clothing:["На лыжи — термобельё, лыжные брюки и куртка, одна пара длинных лыжных носков, непромокаемые перчатки и лыжная маска. Ботинки и шлем возьмите в прокате.", "На Губалувку подойдут зимние прогулочные ботинки. Сумку для Bania соберите с утра: купальники, шлёпанцы, полотенца и сухое бельё. После катания возьмите её в машину перед обедом."], date:"Воскресенье, 20 декабря", title:"Лыжи, Czarci Jar и термы Bania",
+  note:`<strong>Запасной вариант на утро — Губалувка.</strong> В 09:30 — фуникулёр и прогулка по гребню, затем спуск к нижней станции. Программа с обеда общая. <a href="https://www.google.com/maps/search/?api=1&amp;query=Guba%C5%82%C3%B3wka%20funicular%20lower%20station%20Zakopane" target="_blank" rel="noopener">Нижняя станция ↗</a>`,
+  route:R([HOTEL,"Polana Szymoszkowa dolna stacja Zakopane","Karczma Czarci Jar Zakopane","Terma Bania, Białka Tatrzańska","Novobilski Środkowa 182",HOTEL]), slots:[
+  ["08:00–09:00","Завтрак в Bachleda Hotel Kasprowy","В 09:00 подойдите в прокат на Polana Szymoszkowa рядом с отелем.",PARK,[["Отель",M(HOTEL)]],"","hotel"],
+  ["09:00–10:00","Прокат на Polana Szymoszkowa","Примерьте ботинки в тех носках, в которых будете кататься. До выхода из проката попросите проверить крепления и посадку шлема и покажите инструктору, где встречаетесь. Заранее подтвердите открытие учебного склона, урок на двоих и способ оплаты. По правилам школы урок в 10:00 оплачивают до закрытия офиса в субботу 19 декабря. Утром возьмите лыжи, ботинки, палки, шлемы и ски-пассы.",PARK,[["Лыжная школа и прокат","https://szymoszkowa.pl/szkola-narciarska-i-snowboardowa/"],["Нижняя станция",M("Polana Szymoszkowa dolna stacja Zakopane")]],"","mountain"],
+  ["10:00–12:00","Лыжный урок и время на склоне","В начале урока скажите инструктору, какой у каждого опыт. Для начинающих главные задачи — освоить стойку, торможение и первые повороты; оставшееся время используйте для повторения на выбранном инструктором участке. В 10:00 начните урок, после него покатайтесь до полудня. В 12:00 завершите катание и сдайте снаряжение. Переоденьтесь в Bachleda и возьмите машину и заранее собранную сумку для терм.",PARK,[],"","mountain"],
+  ["13:00–14:30","Обед в Karczma Czarci Jar","После лыж здесь удобно согреться горячим обедом. Посмотрите в меню placki po zbójnicku — картофельные драники с мясным соусом. Приезжайте на машине к открытию в 13:00, Małe Żywczańskie 11A. Купальники, шлёпанцы, полотенца и сухая одежда уже в машине. После обеда отправляйтесь прямо в Бялку-Татшаньскую.",PARK,[["Czarci Jar","https://czarcijar.pl/lokalizacja/"],["Карта",M("Czarci Jar Zakopane")]],"","placki"],
+  ["14:30–16:00","Переезд к термам Bania","Выезжайте от ресторана к Terma Bania. До входа в 16:00 есть полтора часа на дорогу, парковку и переодевание.",CAR,[["Термы и парковка",M("Terma Bania Środkowa 181 Białka Tatrzańska")]],"","road"],
+  ["16:00–18:25","Термы Bania","Начните с зоны Fun для активного купания, затем перейдите в Relax. Оставьте больше времени на тёплый открытый бассейн: контраст тёплой воды и холодного горного воздуха — главное удовольствие этого вечера. Посетите зоны Fun и Relax. В 18:25 выходите из воды: до ужина остаётся 35 минут на душ, переодевание и прогулку к Novobilski.",PARK,[["Тарифы Bania","https://www.termabania.pl/en/pricelist"]],"","termy"],
+  ["19:00–20:15","Ужин в Novobilski","После купания переоденьтесь в сухое и пройдите пешком в ресторан рядом с термами. Это спокойный ужин перед обратной дорогой; горячее выбирайте по аппетиту после позднего обеда. Стол на двоих в 19:00, ul. Środkowa 182, рядом с термами.",PARK,[["Novobilski","https://novobilski.pl/restauracja/restauracja-novobilski"]],"","food"],
+  ["20:15–21:05","Обратно в отель","Соберите вещи вечером.",CAR,[],"","road"]
+ ]},
+ {id:"d4", timeline:[["07:30", "Выезд из Закопане"], ["10:15", "Sheraton"], ["10:45", "Флорианские ворота и Королевский путь"], ["11:50", "Алтарь Мариацкого костёла"], ["12:30", "Wesele"], ["14:00", "Сукенницы и ярмарка"], ["14:45", "Rynek Underground"], ["17:45", "Miód Malina"], ["19:30", "Chopin Gallery"]], gear:["🧥 Куртка", "🧣 Шарф", "🥾 Ботинки", "👔 Одежда к концерту"], clothing:["Для прогулки по Кракову и ярмарки — тёплая куртка, шарф, перчатки и удобные ботинки для брусчатки. В базилике плечи и колени должны быть прикрыты.", "К ужину и концерту приготовьте брюки с рубашкой или трикотажное платье с плотными колготками. Переодеться удобно в Sheraton после музея."], date:"Понедельник, 21 декабря", title:"Первый день в Кракове",
+  route:R([HOTEL,"Sheraton Grand Krakow","Rynek Główny, Kraków"]), slots:[
+  ["07:00–10:15","Выселение и дорога в Краков","Завтрак и выселение. Выезд в 07:30. На дорогу до Sheraton Grand Krakow отведено 2 часа 45 минут.",CAR,[],"","road"],
+  ["10:15–10:45","Парковка и багаж в Sheraton Grand Krakow","Оставьте машину в гараже на Powiśle 7, багаж — на стойке. Заранее согласуйте въезд до заселения и утренний выезд до 06:00. В 10:45 выходите в город.",CAR,[["Sheraton Grand Krakow","#hotels"]],"","hotel"],
+  ["10:45–12:25","Королевский путь и Мариацкий костёл","Пройдите через средневековые Флорианские ворота по улице Флорианской: в конце откроется вид на две разные башни базилики. Внутри главное — резной алтарь Вита Ствоша. Займите место заранее, чтобы увидеть, как при открытии створок появляется центральная сцена. От отеля идите к Флорианским воротам и по Флорианской улице к Рынку. К 11:30 подойдите к туристическому входу в базилику, чтобы в 11:50 увидеть открытие створок алтаря Вита Ствоша. При задержке в дороге идите из отеля прямо к базилике.",PARK,[["Посещение костёла","https://mariacki.com/en/tours-of-the-basilica/"]],"","church"],
+  ["12:30–14:00","Обед в Wesele","Попробуйте польские pierogi — вареники с начинкой. Обед проходит прямо на Рыночной площади, поэтому после него удобно сразу выйти к Сукенницам. Обед на двоих на Рыночной площади, Rynek Główny 10. В 14:00 выходите к торговым рядам Сукенниц.",PARK,[["Wesele",M("Restauracja Wesele Rynek Główny 10 Kraków")]],"","pierogi"],
+  ["14:00–14:40","Сукенницы и рождественская ярмарка днём","Сначала пройдите крытым торговым пассажем Сукенниц, затем выйдите к праздничным киоскам. При дневном свете хорошо рассматривать изделия из дерева, ёлочные украшения и детали фасадов вокруг площади. Пройдите через Сукенницы и осмотрите праздничные киоски. К 14:35 подойдите ко входу в Rynek Underground.",PARK,[],"","xmas"],
+  ["14:45–16:15","Подземный музей Rynek Underground","Вы спуститесь под площадь, по которой только что гуляли. Начните с фрагментов средневековых дорог и фундаментов Сукенниц: на срезах грунта видно, как менялся уровень города. В витринах найдите купеческие гирьки, монеты и почти 700-килограммовую свинцовую глыбу — такой груз перевозили краковские торговцы. В конце сравните макет Кракова около 1500 года с сегодняшней площадью. Заранее подтвердите два билета на 14:45. Это третий понедельник месяца, музей по расписанию открыт. После осмотра возвращайтесь пешком в Sheraton.",PARK,[["Rynek Underground","https://muzeumkrakowa.pl/en/branches/rynek-underground%C2%A0"]],"","jama"],
+  ["16:15–17:10","Заселение в Sheraton Grand Krakow","В 16:15 выходите из музея. Дойдите до Sheraton, заберите багаж, заселитесь и переоденьтесь к концерту.",PARK,[["Отель","#hotels"]],"","hotel"],
+  ["17:10–17:45","Вечерние огни рождественской ярмарки","Пройдите по краю площади, чтобы увидеть освещённые киоски на фоне Сукенниц и башен базилики. Здесь запланирована короткая остановка для вечерней фотографии по дороге на ужин. Из отеля пройдите через Рыночную площадь, чтобы увидеть вечерние огни. Продолжайте по Grodzka к ресторану, стол планируйте на 17:45.",PARK,[["Ярмарка","https://krakow.pl/getPdf?dok_id=346609"]],"","xmas"],
+  ["17:45–19:00","Ужин в Miód Malina","Для знакомства с польской кухней посмотрите в меню бигос — тушёную капусту с мясом. Сразу скажите официанту, что у вас билеты на концерт: на ужин отведено 75 минут. Забронируйте стол на 17:45, Grodzka 40. На ужин есть 75 минут. В 19:00 выходите к Chopin Gallery, чтобы прийти к 19:15.",PARK,[["Miód Malina","https://miodmalina.pl/"]],"","bigos"],
+  ["19:30–20:30","Концерт Шопена в Chopin Gallery","Вас ждёт примерно час живой фортепианной музыки в камерном зале. Придите заранее, чтобы спокойно занять места; точную программу произведений смотрите у организатора на дату концерта. Sławkowska 14. Подойдите к 19:15. Запланирован регулярный сеанс в 19:30. Подтвердите наличие двух билетов на 21 декабря перед бронированием ужина.",PARK,[["Концерт и билеты","https://krakville.com/shop/51/chopin-concert-chopin-gallery"],["Карта",M("Chopin Gallery Sławkowska 14 Kraków")]],"","music"]
+ ]},
+ {id:"d5", timeline:[["09:30", "Шахта «Величка»"], ["13:50", "Вавельский собор и двор"], ["15:20", "Pod Aniołami"], ["16:20", "Казимеж и Plac Nowy"], ["18:30", "Starka"]], gear:["🥾 Обувь для лестниц", "🧶 Джемпер", "🧣 Шарф и шапка"], clothing:["Для лестниц Велички — закрытые ботинки с цепкой подошвой и джемпер под курткой. Под землёй около +17…+18 °C, поэтому куртку удобно расстегнуть или снять.", "Шапку, шарф и перчатки оставьте под рукой для Вавельского двора и вечернего Казимежа. Для собора подойдёт та же одежда с закрытыми плечами и коленями."], date:"Вторник, 22 декабря", title:"Величка, Вавель и Казимеж",
+  note:"Будьте у входа в шахту к 09:10. К 13:50 идите в Вавельский собор, обед в 15:20 после осмотра.",
+  route:R(["Sheraton Grand Krakow","Szyb Daniłowicza Wieliczka","Sheraton Grand Krakow","Wawel, Kraków","Szeroka, Kraków"]), slots:[
+  ["08:15–09:10","Выезд из Кракова и парковка в Величке","Машину берём из гаража отеля. Оставьте 45–55 минут на дорогу, парковку и подход ко входу Szyb Daniłowicza, ul. Daniłowicza 10.",CAR,[["Вход в шахту",M("Szyb Daniłowicza Wieliczka")]],"","road"],
+  ["09:30–12:30","Соляная шахта «Величка»","Вы будете переходить из узких выработок в большие подземные камеры. В часовне Святой Кинги рассмотрите вырезанные в соли рельефы и люстры с соляными кристаллами. По дороге обратите внимание на массивные деревянные крепления, поддерживающие выработки. Заранее выберите два билета на Tourist Route с подходящим языком. Главная остановка — подземная часовня Святой Кинги. На маршруте около 800 ступеней, возвращение наверх на лифте. Оставьте до трёх часов на экскурсию.",PARK,[["Экскурсия и билеты","https://www.wieliczka-saltmine.com/individual-tourist/tourist-route"]],"","wieliczka"],
+  ["12:30–13:50","Возвращение в гараж Sheraton","Вернитесь к машине и поезжайте в гараж Sheraton на Powiśle 7. В 80 минут включены парковка и пеший подъём к собору. Пообедаете после Вавеля.",CAR,[["Гараж Sheraton",M("Sheraton Grand Krakow Powisle 7")]],"","parking"],
+  ["13:50–15:05","Вавельский собор и двор замка","Проследите три части визита: королевские надгробия в соборе, подъём к колоколу Сигизмунда и спуск к усыпальницам. После собора выйдите во двор замка и посмотрите на многоярусные аркады. Двор можно осмотреть отдельно от дворцовых залов. Сначала осмотрите собор, королевские гробницы и колокол Сигизмунда. Завершите прогулкой по двору и спуститесь к улице Grodzka. Зимняя касса собора во вторник работает до 15:30.",PARK,[["Собор","https://www.katedra-wawelska.pl/en/"],["Замок","https://wawel.krakow.pl/en"]],"","wawel"],
+  ["15:20–16:20","Обед в Pod Aniołami","Это остановка в Старом городе после собора. Для лёгкого позднего обеда подойдёт журек — суп с характерной кислинкой от ржаной закваски. Поздний обед на двоих, Grodzka 35. На обед отведён час. Рекомендую одно блюдо, поскольку ужин в 18:30.",PARK,[["Pod Aniołami",M("Pod Aniołami Grodzka 35 Kraków")]],"Журек и блюда на гриле.","zurek"],
+  ["16:20–18:20","Прогулка по Казимежу","Начните на широкой улице Szeroka: у её южного конца хорошо виден фасад Старой синагоги. Затем пройдите к круглому павильону в центре Plac Nowy и по улице Józefa — к ресторану. Так вы увидите и историческую часть еврейского квартала, и его сегодняшний вечерний быт. Пройдите к улице Szeroka, осмотрите Старую синагогу с площади. Затем через Plac Nowy идите к улице Józefa на ужин в Starka.",PARK,[["Улица Широкая",M("Szeroka Kazimierz Kraków")]],"","szeroka"],
+  ["18:30–20:00","Ужин в Starka","После прогулки по Казимежу завершите вечер в небольшом ресторане на Józefa. Посмотрите в меню утку и домашние настойки; порцию выбирайте с учётом позднего обеда. Стол на двоих в 18:30, Józefa 14. После ужина возвращайтесь в отель.",PARK,[["Starka",M("Starka Józefa 14 Kraków")]],"Утиная ножка, пироги, домашние настойки.","golonka"],
+  ["20:00–21:00","Отель и подготовка к вылету","Вернитесь в Sheraton, соберите вещи и подготовьте паспорта. Проверьте статус LY5120 и инструкции Alamo. Уточните порядок выезда из гаража в 05:35.",TAXI,[],"","hotel"]
+ ]},
+ {id:"d6", timeline:[["05:35", "Выезд из Sheraton"], ["06:15", "Возврат Alamo"], ["06:40", "Терминал KRK"], ["10:00", "Вылет из Кракова"], ["14:30", "Тель-Авив"]], gear:["👕 Футболка и джемпер", "👖 Удобные брюки", "🧥 Куртка"], clothing:["На ранний выезд — удобные брюки, футболка и джемпер. Куртку наденьте до машины: утром предстоят заправка и возврат автомобиля.", "С вечера оставьте одежду для перелёта отдельно от упакованных вещей. В салоне джемпер можно снять, а куртку держать под рукой до прилёта."], date:"Среда, 23 декабря", title:"Возврат Alamo и вылет LY5120",
+  note:"В брони Alamo стоит возврат в 09:00. Планируем фактически сдать машину около 06:15–06:35. При получении подтвердите ранний возврат и конкретные места на парковке.",
+  route:R(["Sheraton Grand Krakow","Kraków Airport KRK"]), slots:[
+  ["05:35–06:15","Выезд из отеля и заправка","Выезжайте из гаража Sheraton в 05:35. По дороге заправьте полный бак у аэропорта и сохраните чек.",CAR,[],"","road"],
+  ["06:15–06:35","Парковка Alamo и передача ключей","Следуйте инструкции Alamo по раннему возврату, согласованной при получении 18 декабря. Сфотографируйте кузов, уровень топлива, пробег и номер места. Планируйте передачу ключей в 06:30.",CAR,[["Alamo KRK","https://www.alamo.com/en/car-rental-locations/pl/krakow-john-paul-ii-intl-airport-loak.html"]],"","airport"],
+  ["06:40–07:00","В терминале","К 07:00 подойдите к зоне регистрации EL AL — за три часа до вылета. Далее пройдите проверки, паспортный контроль и следуйте к выходу на посадку по табло.",PARK,[["Аэропорт KRK","https://krakowairport.pl/en/passenger/travel"]],"","airport"],
+  ["10:00 → 14:30","LY5120 Краков → Тель-Авив","Вылет по польскому времени, прилёт по израильскому, терминал 3. Тариф Economy Lite, 0PC зарегистрированного багажа по билету.",PARK,[],"","takeoff"]
+ ]}
+];
+
+const POI_PHOTOS = [
+["Прогулка по Droga pod Reglami", "Прогулка по Droga pod Reglami", "Прогулка по Droga pod Reglami", "https://www.zakopane.pl/assets/zakopane25/media/files/4d27b897-ba81-4377-81cd-8009604c3c62/dsc-7749.JPG", "Зимняя тропа Droga pod Reglami", "https://www.zakopane.pl/strefa-turystyczna/turystyka/wycieczki-gorskie-zima/szlaki-zima/droga-pod-reglami", "Город Закопане"],
+["Трамплин Wielka Krokiew", "Трамплин Wielka Krokiew", "Трамплин Wielka Krokiew", "https://www.ontheluce.com/wp-content/uploads/2024/05/Wielka-Krokiew.jpg.webp", "Трамплин Wielka Krokiew зимой", "https://www.ontheluce.com/things-to-do-in-zakopane-in-winter/", "On the Luce"],
+  [
+    "Крупувки",
+    "Крупувки",
+    "Крупувки",
+    "https://upload.wikimedia.org/wikipedia/commons/7/77/Zakopane_ulica_Krupowki_zima_noc-by_Robert_Parma.jpg",
+    "Крупувки зимой",
+    "https://commons.wikimedia.org/wiki/File:Zakopane_ulica_Krupowki_zima_noc-by_Robert_Parma.jpg",
+    "RobertParma · CC BY-SA 3.0"
+  ],
+  [
+    "Заселение и бассейн",
+    "Bachleda Hotel Kasprowy",
+    "Bachleda",
+    "https://ocdn.eu/pulscms-transforms/1/ik4k9kpTURBXy9hMzU5MjYxMWVjZjBlYjJiZmRhZTUxMGZiYmMxYTU1Ni5qcGeSlQMjAM0GE80Da5MFzQSwzQKe3gABoTAB",
+    "Bachleda Hotel Kasprowy зимой",
+    "https://businessinsider.com.pl/lifestyle/podroze/luksus-w-legendarnym-hotelu-u-stop-tatr-obok-stok-i-kapielisko-geotermalne-teraz/rmj2019",
+    "Business Insider Polska"
+  ],
+  [
+    "Канатная дорога на Каспровы Верх",
+    "Канатная дорога на Каспровы Верх",
+    "Каспровы Верх",
+    "https://i.gremicdn.pl/image/free/2c1222db72000872e3dfbf539f7aad19/?t=resize%3Afill%3A1200%3A716%2Cenlarge%3A1",
+    "Канатная дорога зимой",
+    "https://turystyka.rp.pl/turystyka/art1517061-polskie-koleje-linowe-droga-na-szczyt",
+    "Rzeczpospolita"
+  ],
+  [
+    "Вилла «Колиба»",
+    "Вилла «Колиба»",
+    "Колиба",
+    "https://upload.wikimedia.org/wikipedia/commons/8/81/Zakopane%2C_willa_Koliba.jpg",
+    "Вилла «Колиба» зимой",
+    "https://commons.wikimedia.org/wiki/File:Zakopane,_willa_Koliba.jpg",
+    "Wikimedia Commons"
+  ],
+  [
+    "Вилла «Колиба»",
+    "Вилла «Колиба»",
+    "Старый костёл",
+    "https://enklawapolany.pl/img/galeria/folk/Kosciol%20na%20Peksowym%20Brzysku.jpg",
+    "Старый деревянный костёл в Закопане",
+    "https://enklawapolany.pl/",
+    "Enklawa Polany"
+  ],
+  [
+    "Кулиг с факелами",
+    "Кулиг с факелами",
+    "Кулиг",
+    "https://www.kuligtatrzanski.pl/lib/rzuyuj/49February-13-2020-kvxnhx7i.jpg",
+    "Зимний кулиг в Буковине · пример прогулки",
+    "https://www.kuligtatrzanski.pl/kulig-bukowina-tatrzanska",
+    "Kulig Tatrzański"
+  ],
+  [
+    "Прокат на Polana Szymoszkowa",
+    "Polana Szymoszkowa",
+    "Шимошкова",
+    "https://szymoszkowa.pl/wp-content/uploads/2024/12/2021-01-20-13.48.40-HDR.jpg",
+    "Лыжный склон Polana Szymoszkowa",
+    "https://szymoszkowa.pl/14-grudnia-zaczynamy-sezon-narciarski/",
+    "Polana Szymoszkowa"
+  ],
+  [
+    "@gubalowka",
+    "@gubalowka",
+    "Губалувка",
+    "https://www.pelago.com/img/products/PL-Poland/zakopane-thermal-springs-funicular-cheese-tasting/54d640bd-a451-465d-b11a-9bfa8ab769e8_zakopane-thermal-springs-funicular-cheese-tasting-xlarge.jpg",
+    "Фуникулёр на Губалувку зимой",
+    "https://www.pelago.com/en/activity/pwy7xgsq7-zakopane-thermal-springs-funicular-cheese-tasting-krakow/",
+    "Pelago"
+  ],
+  [
+    "Термы Bania",
+    "Термы Bania",
+    "Термы Bania",
+    "https://u.profitroom.pl/2017.termabania.pl/thumb/1200x630/uploads/Strefa_relaksu/tostronazimarelaks.jpg",
+    "Открытые бассейны Bania зимой",
+    "https://www.termabania.pl/wiesci/szczegoly-wiesci?NewsID=84441",
+    "Terma Bania"
+  ],
+  [
+    "Заселение в Sheraton Grand Krakow",
+    "Sheraton Grand Krakow",
+    "Sheraton",
+    "https://cache.marriott.com/marriottassets/marriott/KRKSI/krksi-exterior-0412-hor-wide.jpg?downsize=1440px%3A%2A&interpolation=progressive-bilinear",
+    "Фасад Sheraton Grand Krakow",
+    "https://www.marriott.com/hotels/travel/krksi-sheraton-grand-krakow/",
+    "Marriott"
+  ],
+  [
+    "Королевский путь",
+    "Королевский путь",
+    "Ул. Флорианьская",
+    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/783024889.jpg?k=e67ae5121712ef069a27097e9622b9ff09782e502fd476767c05f0a2613dcfca&o=",
+    "Королевский путь · зимняя Флорианьская",
+    "https://www.booking.com/hotel/pl/cinema-apartment-in-the-heart-of-old-town.html",
+    "Booking.com"
+  ],
+  [
+    "Королевский путь",
+    "Королевский путь",
+    "Мариацкий костёл",
+    "https://mir-s3-cdn-cf.behance.net/project_modules/2800_opt_1/1f5f93131869209.619db6846a71e.jpg",
+    "Мариацкий костёл и Рыночная площадь зимой",
+    "https://www.behance.net/gallery/131869209/Morning-walk-around-Krakow",
+    "Morning walk around Krakow · Behance"
+  ],
+  [
+    "Подземный музей Rynek Underground",
+    "Rynek Underground",
+    "Подземный музей",
+    "https://historichotelsofeurope.com/wp-content/uploads/2024/04/poland-rynek-underground-krakow.jpg",
+    "Экспозиция Rynek Underground",
+    "https://historichotelsofeurope.com/inspire-me/experiences/museums/rynek-underground-museum/",
+    "Historic Hotels of Europe"
+  ],
+  [
+    "Сукенницы и рождественская ярмарка",
+    "Сукенницы и рождественская ярмарка",
+    "Ярмарка",
+    "https://krakow.pl/zalacznik/430152/4.jpg",
+    "Рождественская ярмарка на Главном рынке",
+    "https://krakow.pl/otwarty_na_swiat/media_zagraniczne/264732%2C102%2Ckomunikat%2Ckrakowski_jarmark_wsrod_swiatecznych_propozycji__the_times__.html",
+    "Город Краков"
+  ],
+  [
+    "Концерт Шопена",
+    "Концерт Шопена",
+    "Chopin Gallery",
+    "https://d2mgzmtdeipcjp.cloudfront.net/files/good/2024/05/18/17160280613530.jpg",
+    "Концертный зал Chopin Gallery",
+    "https://www.waug.com/en/activities/106401",
+    "WAUG"
+  ],
+  [
+    "Соляная шахта «Величка»",
+    "Соляная шахта «Величка»",
+    "Величка",
+    "https://images.dominikgehl.com/images/poland/krakow/wieliczka-salt-mine/krakow-wieliczka-salt-mine-01.webp",
+    "Часовня Святой Кинги в Величке",
+    "https://dominikgehl.com/poland/krakow/wieliczka-salt-mine",
+    "Dominik Gehl"
+  ],
+  [
+    "Вавельский собор",
+    "Вавельский собор",
+    "Вавель",
+    "https://cdn.bfldr.com/UTM69Z3S/at/wzhc6mmmv4wtpvqxc2s6n8x/wawel-7672097-LOWRES.jpg?auto=webp&crop=1920%3A1080%2Csmart&disable=upscale&format=pjpg&height=1080&quality=60&width=1920",
+    "Вавельский холм зимой",
+    "https://www.getyourguide.com/explorer/krakow-ttd40/krakow-in-february/",
+    "GetYourGuide"
+  ],
+  [
+    "Прогулка по Казимежу",
+    "Прогулка по Казимежу",
+    "Казимеж",
+    "https://freewalkingtour.com/_ipx/f_webp%26q_80%26s_1090x560/https%3A/fra1.digitaloceanspaces.com/walkative-e9373acb44-cdn/media/main/products/images/Krakow_Old_Synagogue_Snow_47620.webp",
+    "Казимеж зимой · Старая синагога",
+    "https://freewalkingtour.com/de/krakau/judisches-krakau/",
+    "Walkative"
+  ]
+];
+const poiPhotosFor = title => POI_PHOTOS
+  .filter(([slot]) => title.includes(slot))
+  .map(([, , name, url, caption, source, credit]) => [name, url, caption, source, credit]);
+
+const WINTER_RESTAURANT_PHOTOS = [
+  [
+    "Karczma Zapiecek",
+    "https://restauracjezakopane.pl/uploads/places/l/262f126bcd4df1c47fd3a763feff7209.jpg",
+    "Зал Karczma Zapiecek",
+    "https://restauracjezakopane.pl/en/zapiecek",
+    "Restauracje Zakopane"
+  ],
+  [
+    "Bąkowo Zohylina Wyźnio",
+    "https://6sides.pl/wp-content/uploads/2023/04/BZW1.webp",
+    "Зимний фасад",
+    "https://6sides.pl/podhalanskie-karczmy-bakowo-zohylina-niznio-i-wyznio-w-zakopanem/",
+    "Sześć Stron Świata · архив ресторана"
+  ],
+  [
+    "Pstrąg Górski",
+    "https://zdjecianoclegi.pl/imagesfly/large/11803/obiekt_5_r.jpg",
+    "Зимний фасад",
+    "https://www.zakopianski.pl/gastronomia/pstrag-gorski",
+    "Zakopiański"
+  ],
+  [
+    "Czarci Jar",
+    "https://witkiewicz.malopolskanagroda.pl/images/2006/2006_Karczma_Czarci_Jar/img_7470lrg.jpg",
+    "Зимний фасад",
+    "https://witkiewicz.malopolskanagroda.pl/index.php/edycja-2006/karczma-czarci-jar-zakopane",
+    "Małopolska Nagroda im. Stanisława Witkiewicza"
+  ],
+  [
+    "Novobilski",
+    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/807662712.jpg?k=0563dc61a872a7f884434847d412736dc78fde1c9c0f7ba8ff0f72f748dbeb70&o=",
+    "Вход в ресторан зимой",
+    "https://www.booking.com/hotel/pl/pensjonat-novobilski.html",
+    "Booking.com"
+  ],
+  [
+    "Wesele",
+    "https://bezfarmazonu.files.wordpress.com/2022/01/img_9276.jpg",
+    "Интерьер с рождественской ёлкой",
+    "https://bezfarmazonu.pl/2022/01/31/restauracja-wesele-krakow-rynek-glowny/",
+    "Bezfarmazonu"
+  ],
+  [
+    "Miód Malina",
+    "https://goodfoodwithpawel.wordpress.com/wp-content/uploads/2017/01/21_01_2017-221.jpg?w=652",
+    "Фото с январского визита",
+    "https://goodfoodwithpawel.wordpress.com/2017/01/26/miod-malina-polish-not-only-food-impressions-62/",
+    "Good Food with Pawel"
+  ],
+  [
+    "Pod Aniołami",
+    "https://images.myguide-cdn.com/krakow/companies/pod-aniolami/large/pod-aniolami-506845.jpg",
+    "Рождественская сервировка",
+    "https://www.myguidekrakow.com/restaurants/pod-aniolami",
+    "My Guide Krakow"
+  ],
+  [
+    "Starka",
+    "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/32/29/de/1c/caption.jpg?h=600&s=1&w=900",
+    "Зимний фасад",
+    "https://www.tripadvisor.co.uk/Restaurant_Review-g274772-d1749958-Reviews-Restauracja_Starka-Krakow_Lesser_Poland_Province_Southern_Poland.html",
+    "Tripadvisor"
+  ]
+];
+const winterRestaurantPhoto = title => WINTER_RESTAURANT_PHOTOS.find(([name]) => title.includes(name));
+const renderWinterRestaurantPhoto = ([name,src,caption,source,credit]) => `
+  <figure class="restaurant-photo">
+    <a href="${src.replaceAll("&","&amp;")}" target="_blank" rel="noopener">
+      <img src="${src.replaceAll("&","&amp;")}" alt="${name} · ${caption}" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+    </a>
+    <figcaption>${caption} · <a href="${source}" target="_blank" rel="noopener">${credit} ↗</a></figcaption>
+  </figure>`;
+
+const ICON = {
+ plane:'<path d="M12 31l32-11-3 5-12 6 4 11-4 1-7-9-8 2-2-3z"/>',
+ road:'<path d="M22 44l5-30M34 44l-5-30"/><path d="M28 41v-4M28 32v-4M28 23v-3"/>',
+ parking:'<rect x="16" y="13" width="24" height="30" rx="4"/><path d="M24 37V20h6a5 5 0 010 10h-6"/>',
+ food:'<circle cx="29" cy="30" r="8"/><path d="M13 18v8a3 3 0 006 0v-8M16 26v16M41 18c-3 2-3 9 0 10v14"/>',
+ market:'<path d="M14 22l3-8h22l3 8z"/><path d="M14 22c0 3 4 3 4 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0 0 3 5 3 5 0"/><path d="M16 26v16h24V26M24 42v-9h8v9"/>',
+ car:'<path d="M13 34l3-9a3 3 0 013-2h18a3 3 0 013 2l3 9v5H13z"/><circle cx="20" cy="40" r="3"/><circle cx="36" cy="40" r="3"/><path d="M13 34h30"/>',
+ hotel:'<path d="M12 40V18M12 32h32v8M44 32v-4a4 4 0 00-4-4H24v8"/><circle cx="18" cy="27" r="3"/>',
+ cable:'<path d="M8 46l12-16 7 8 9-14 12 22z"/><path d="M8 12l40 10"/><path d="M28 17v6"/><rect x="23" y="23" width="10" height="8" rx="2"/>',
+ mountain:'<path d="M6 44l14-20 8 10 10-16 12 26z"/><path d="M33 26l5-8 5 8-5-2z"/>',
+ spa:'<path d="M10 38c4-3 8-3 12 0s8 3 12 0 8-3 12 0M10 44c4-3 8-3 12 0s8 3 12 0 8-3 12 0"/><path d="M20 30c-3-4 3-6 0-12M28 30c-3-4 3-6 0-12M36 30c-3-4 3-6 0-12"/>',
+ sleigh:'<path d="M14 30h20l4-8"/><path d="M14 30v6h24a6 6 0 006-6"/><path d="M10 42h30a5 5 0 005-5"/><path d="M18 36v6M32 36v6"/><path d="M20 12v6M17 15h6M38 10v4M36 12h4"/>',
+ castle:'<path d="M12 44V20h5v5h5v-5h4v5h4v-5h4v5h5v-5h5v24z"/><path d="M24 44v-8a4 4 0 018 0v8"/>',
+ church:'<path d="M28 8v8M25 11h6"/><path d="M20 44V26l8-10 8 10v18z"/><path d="M12 44V32l8-6M44 44V32l-8-6M12 44h32"/><path d="M26 44v-6h4v6"/>',
+ house:'<path d="M14 44V26l14-12 14 12v18z"/><path d="M14 31h28M14 37h28M14 43h28"/>',
+ synagogue:'<path d="M14 44V24h28v20z"/><path d="M12 25l16-11 16 11"/><path d="M24 44v-8a4 4 0 018 0v8"/><path d="M28 26l3 5h-6z"/>',
+ museum:'<path d="M12 22l16-9 16 9zM12 44h32M14 40h28M17 24v14M24 24v14M32 24v14M39 24v14"/>',
+ mine:'<path d="M28 10l10 12-10 24-10-24z"/><path d="M18 22h20M28 10v36"/>',
+ coffee:'<path d="M14 24h22v8a9 9 0 01-9 9h-4a9 9 0 01-9-9z"/><path d="M36 26h3a4 4 0 010 8h-3"/><path d="M22 19c-2-2 2-4 0-6M28 19c-2-2 2-4 0-6"/>',
+ tree:'<path d="M28 9l10 14h-6l8 11H16l8-11h-6z"/><path d="M28 34v9"/>',
+ key:'<circle cx="20" cy="28" r="7"/><path d="M27 28h17M38 28v5M43 28v4"/>',
+ sun:'<circle cx="28" cy="34" r="7"/><path d="M12 42h32M28 18v4M16 25l3 3M40 25l-3 3M10 34h3M43 34h3"/>',
+ walk:'<ellipse cx="22" cy="20" rx="4" ry="6"/><ellipse cx="34" cy="36" rx="4" ry="6"/><path d="M20 30h4M32 46h4"/>',
+ ticket:'<path d="M12 20h32v5a3 3 0 000 6v5H12v-5a3 3 0 000-6z"/><path d="M24 22v2M24 27v2M24 32v2"/>',
+ takeoff:'<path d="M12 44h32"/><path d="M14 36l28-14-2-4-10 4-10-7-3 1 6 8-7 3-4-2-2 1z"/>'
+};
+const CAT = {food:"t-food",coffee:"t-food",market:"t-food",
+ cable:"t-nat",spa:"t-nat",sleigh:"t-nat",sun:"t-nat",tree:"t-nat",mountain:"t-nat",
+ castle:"t-cult",synagogue:"t-cult",museum:"t-cult",church:"t-cult",house:"t-cult",mine:"t-cult"};
+const photoUrl = links => {
+  const u = links.find(([,x])=>x.includes("/maps/search/"));
+  if(!u) return null;
+  const q = decodeURIComponent(u[1].split("query=")[1]);
+  return "https://www.google.com/search?tbm=isch&q="+encodeURIComponent(q);
+};
+const thumb = (key, photo, pk) => {
+  const img = pk && PHOTOS[pk];
+  const inner = img ? `<img src="${P+img}" alt="" loading="lazy">` : `<svg viewBox="0 0 56 56" aria-hidden="true">${ICON[key]||ICON.walk}</svg>`;
+  const cls = "thumb "+(img?"photo":(CAT[key]||"t-log"));
+  return photo ? `<a class="${cls}" href="${photo}" target="_blank" rel="noopener" title="Фото места">${inner}</a>` : `<div class="${cls}">${inner}</div>`;
+};
+
+const FLOW = [
+ ["d1","Пт 18 · Прилёт",["08:55 · KRK и Alamo","Дорога в Закопане","Крупувки → трамплин и тропа → отель","Ужин"]],
+ ["d2","Сб 19 · Закопане",[["09:30 · Каспровы Верх","10:00 · Татранский музей, запасной вариант"],"Колиба и старый костёл","17:15 · Кулиг"]],
+ ["d3","Вс 20 · Закопане",[["09:00 · Лыжи на Шимошковой","09:30 · Губалувка, запасной вариант"],"13:00 · Czarci Jar","16:00 · Термы Bania","19:00 · Novobilski"]],
+ ["d4","Пн 21 · Переезд",["07:30 · Выезд","11:50 · Алтарь","14:00 · Ярмарка","14:45 · Rynek Underground","17:45 · Miód Malina","19:30 · Концерт Шопена"]],
+ ["d5","Вт 22 · Краков",["09:30 · Величка","13:50 · Вавельский собор","15:20 · Pod Aniołami","Казимеж","18:30 · Starka"]],
+ ["d6","Ср 23 · Вылет",["05:35 · Выезд","Сдача Alamo","До 07:00 · Терминал","10:00 · LY5120"]]
+];
+document.getElementById("flowList").innerHTML = FLOW.map(([id, title, steps]) => `
+ <article class="panel flowcard">
+  <h3><a href="#${id}">${title}</a></h3>
+  <ol class="flowsteps">${steps.map(step => Array.isArray(step)
+   ? `<li class="flowchoice"><div class="branches" aria-label="Два варианта">${step.map(choice => `<span>${choice}</span>`).join("")}</div></li>`
+   : `<li><span>${step}</span></li>`).join("")}</ol>
+ </article>`).join("");
+
+const box = document.getElementById("days");
+
+const places={
+ d1:["Ben Gurion Airport Terminal 3","Alamo Krakow Airport","Krupówki Zakopane","Karczma Zapiecek Zakopane","Wielka Krokiew Zakopane","Droga pod Reglami Dolina Białego Zakopane",HOTEL,"Bąkowo Zohylina Wyźnio"],
+ d2:[HOTEL,"Kuźnice Zakopane","Kasprowy Wierch","Pstrąg Górski Zakopane","Willa Koliba Zakopane",HOTEL,"Długa 124 Bukowina Tatrzańska"],
+ d3:[HOTEL,"Polana Szymoszkowa Zakopane","Polana Szymoszkowa Zakopane","Czarci Jar Zakopane","Terma Bania","Terma Bania","Novobilski Białka Tatrzańska",HOTEL],
+ d4:["Sheraton Grand Krakow","Sheraton Grand Krakow","Brama Floriańska Kraków","Wesele Kraków","Sukiennice Kraków","Rynek Underground Kraków","Sheraton Grand Krakow","Rynek Główny Kraków","Miód Malina Kraków","Chopin Gallery Sławkowska 14 Kraków"],
+ d5:["Szyb Daniłowicza Wieliczka","Szyb Daniłowicza Wieliczka","Sheraton Grand Krakow","Katedra Wawelska","Pod Aniołami Kraków","Szeroka Kraków","Starka Kraków","Sheraton Grand Krakow"],
+ d6:["Kraków Airport","Alamo Krakow Airport","Kraków Airport","Ben Gurion Airport Terminal 3"]
+};
+const railIndex={d1:[1,3,4,5,6,7],d2:[2,3,4,6],d3:[1,2,3,5,6],d4:[0,1,2,2,3,4,5,8,9],d5:[1,3,4,5,6],d6:[0,1,2,3,3]};
+const alternatives={
+ d2:{labels:["Каспровы Верх","Запасной · Татранский музей"],keep:1,remove:3,railCount:2,rail:["10:00","Татранский музей"],places:["Muzeum Tatrzańskie Krupówki 10","Pstrąg Górski Zakopane"],rest:["Willa Koliba Zakopane","Długa 124 Bukowina Tatrzańska"],slots:[
+ ["09:30–12:45","Татранский музей и Крупувки","В исторических и этнографических залах посмотрите, как жили жители Подгалья, затем перейдите к экспозиции о природе Татр. Это знакомство с самим регионом; после обеда в «Колибе» внимание будет уже на архитектуре. Выезд из Bachleda в 09:30, музей в 10:00, затем кофе в центре.",PARK,[],"","museum"],
+ ["13:00–14:00","Обед в Pstrąg Górski","Попробуйте местную форель. После обеда будет время сравнить деревянную виллу Виткевича со старым костёлом. После обеда идите к вилле «Колиба».",PARK,[],"","trout"]]},
+ d3:{labels:["Лыжи на Шимошковой","Запасной · Губалувка"],keep:1,remove:2,railCount:2,rail:["09:30","Губалувка"],places:["Gubałówka dolna stacja Zakopane"],rest:["Czarci Jar Zakopane","Terma Bania","Novobilski Białka Tatrzańska"],slots:[
+ ["09:30–12:00","Губалувка","Фуникулёр поднимет вас от города на гребень. От верхней станции пройдите к открытой панораме: Закопане лежит внизу, а за ним тянется горная цепь Татр. Вернитесь тем же фуникулёром. Поднимитесь на фуникулёре, прогуляйтесь по гребню и спуститесь к обеду.",PARK,[],"","gubalowka"]]}
+};
+const activityKinds={
+ airport:"🛫 Аэропорт",flight:"✈️ Перелёт",drive:"🚗 Переезд",taxi:"🚕 Такси",food:"🍽️ Еда",walk:"🚶 Лёгкая прогулка",view:"📷 Осмотр",hotel:"🏨 Отель",swim:"🏊 Плавание",thermal:"♨️ Термы и плавание",ski:"⛷️ Лыжи",rental:"🎿 Прокат лыж",lift:"🚠 Канатная дорога",funicular:"🚞 Фуникулёр и прогулка",museum:"🏛️ Музей",church:"⛪ Собор",sleigh:"🐴 Сани",market:"🎄 Ярмарка",music:"🎹 Концерт",mine:"⛏️ Подземная экскурсия",park:"🅿️ Парковка"
+};
+const dayKinds={
+ d1:["airport","drive","drive","food","view","walk","swim","food"],
+ d2:["food","drive","lift","food","museum","taxi","sleigh"],
+ d3:["food","rental","ski","food","drive","thermal","food","drive"],
+ d4:["drive","park","church","food","market","museum","hotel","market","food","music"],
+ d5:["drive","mine","park","church","food","walk","food","hotel"],
+ d6:["drive","park","airport","flight"]
+};
+const exitHints={"Прогулка по Droga pod Reglami":"14:55 · Разворот к машине","Отель и такси на кулиг":"16:00 · Выезд из отеля","Лыжный урок и время на склоне":"12:00 · Сдайте снаряжение","Термы Bania":"18:25 · Выход из воды к ужину","Ужин в Miód Malina":"19:00 · Выход в Chopin Gallery","В терминале":"07:00 · У стоек регистрации EL AL"};
+function renderDay(d, alternate=false){
+ const original=d;
+ d={...d,slots:[...d.slots],timeline:[...d.timeline]};
+ let destinations=[...places[d.id]];
+ let indices=[...railIndex[d.id]];
+ let kinds=[...dayKinds[d.id]];
+
+ const variant=alternatives[d.id];
+ if(alternate && variant){
+   const start=variant.keep;
+   const remove=variant.remove;
+   d.slots.splice(start,remove,...variant.slots);
+   destinations.splice(start,remove,...variant.places);
+   kinds.splice(start,remove,...(d.id==="d2"?["museum","food"]:["funicular"]));
+   indices=indices.slice(variant.railCount).map(i=>i-remove+variant.slots.length);
+   indices.unshift(start);
+   d.timeline.splice(0,variant.railCount,variant.rail);
+   if(d.id==="d2"){indices.splice(1,0,2); d.timeline.splice(1,0,["13:00","Pstrąg Górski"]);}
+   if(d.id==="d3"){d.slots[0]=[...d.slots[0]];d.slots[0][2]="После завтрака отправляйтесь к нижней станции фуникулёра.";}
+   d.route=R([HOTEL,...variant.places, ...variant.rest]);
+ }
+
+  const s = document.createElement("section"); s.className="day"; s.id=d.id;
+  s.innerHTML = `<div class="dayhead"><div><div class="date">${d.date}</div><h2>${d.title}</h2></div><a class="route" href="${d.route}" target="_blank" rel="noopener">Маршрут дня на карте ↗</a></div>`+
+    `${variant?`<div class="switches" role="group" aria-label="Утренний маршрут">${variant.labels.map((label,i)=>`<button type="button" data-choice="${i}" aria-pressed="${Boolean(i)===alternate}">${label}</button>`).join("")}</div>`:""}${d.id==="d4" ? `<aside class="note"><strong>Немного о Кракове</strong><p>Краков стоит на Висле и несколько столетий был столицей Польши. В средневековом городе торговля сосредоточилась на Рыночной площади: в Сукенницах продавали ткани, а сегодня под площадью можно увидеть фрагменты старых дорог и торговых построек.</p><p>На холме Вавель над рекой жили польские короли, а в соборе проходили коронации. Дальше по вашему маршруту — Казимеж, когда-то самостоятельный город: о его еврейской истории напоминают синагоги вокруг улицы Широкой.</p></aside>` : ""}<ol class="dayrail" aria-label="Маршрут по времени" tabindex="0">${d.timeline.map(([t,stop],i)=>`<li><a href="#${d.id}-s${indices[i]}"><time>${t}</time>${stop}</a></li>`).join("")}</ol><div class="note"><strong>Что надеть и взять</strong><div class="gearline">${d.gear.map(item=>`<span>${item}</span>`).join("")}</div>${d.clothing[0]}<br>${d.clothing[1]}</div>`+
+    (d.note && (!variant || alternate)?`<div class="note">${d.note}${d.id === "d3" ? `<div class="poi-photo-grid">${poiPhotosFor("@gubalowka").map(renderWinterRestaurantPhoto).join("")}</div>` : ""}</div>`:"")+
+    `<div class="panel" style="padding-block:4px">`+ d.slots.map(([t,ti,p,car,links,tryit,pic],i)=>{ const winterPhoto = winterRestaurantPhoto(ti); const photos = [...poiPhotosFor(ti), ...(winterPhoto ? [winterPhoto] : [])]; const ph = photos.length ? null : photoUrl(links); return `
+      <article class="stopcard" id="${d.id}-s${i}"><header><time>${t}</time><strong>${ti}</strong><span class="activityKind">${activityKinds[kinds[i]]}</span><a href="${M(destinations[i])}" target="_blank" rel="noopener">Маршрут ↗</a></header>
+        ${exitHints[ti]?`<p class="departure">${exitHints[ti]}</p>`:""}
+        <details open><summary>Подробнее</summary>${thumb(pic,ph,photos.length?null:pic)}
+        ${p?`<p>${p}</p>`:""}
+        ${tryit?`<p class="try">${tryit}</p>`:""}
+        ${photos.length ? `<div class="poi-photo-grid">${photos.map(renderWinterRestaurantPhoto).join("")}</div>` : ""}
+          ${links.length?`<div class="links">${links.map(([n,u])=>`<a href="${u}" ${u.startsWith("#")?"":'target="_blank" rel="noopener"'}>${n}${u.startsWith("#")?"":" ↗"}</a>`).join("")}${ph?`<a href="${ph}" target="_blank" rel="noopener">Фото ↗</a>`:""}</div>`:""}
+      </details></article>`;}).join("")+`</div>`;
+  const previous=document.getElementById(d.id);
+ if(previous){previous.replaceWith(s);}else{box.appendChild(s);}
+ s.querySelectorAll('[data-choice]').forEach(btn=>btn.onclick=()=>{renderDay(original,btn.dataset.choice==="1");document.querySelector('#'+d.id+' [aria-pressed=true]').focus({preventScroll:true});});
+ s.querySelectorAll('.dayrail a').forEach(link=>link.onclick=()=>{document.querySelector(link.hash+' details').open=true;});
+}
+days.forEach(d=>renderDay(d));
+
+const dayNav=document.querySelector('nav.days');
+box.prepend(dayNav);
+dayNav.classList.add('stickyDays');
+function markDay(){
+ const edge=dayNav.getBoundingClientRect().height+15;
+ const visible=[...box.querySelectorAll('section.day')].filter(el=>el.getBoundingClientRect().top<=edge).pop();
+ dayNav.querySelectorAll('a').forEach(a=>{if(a.hash==='#'+(visible?.id||'d1'))a.setAttribute('aria-current','date');else a.removeAttribute('aria-current');});
+}
+window.addEventListener('scroll',markDay,{passive:true});markDay();
+const rem = [
+ ["Перед поездкой",`По отелю уточните ранний выезд из гаража и приём багажа до заселения. <a href="#bookings">Сроки бронирования</a>.`],
+ ["Проверка перед выездом",`За сутки проверьте статус PKL, ветер, состояние дорог и время кулига. Закрытие подъёмника и задержки транспорта — основания пересмотреть затронутый участок маршрута.`],
+ ["На машине",`Оставляйте 15–20 минут запаса к горным переездам при осадках. Проверьте 3PMSF, скребок и стеклоомывающую жидкость для мороза. Заправляйтесь подходящим топливом и сохраняйте чек. В центре используйте платную парковку или гараж. Если все хотят глинтвейн, берите такси или трансфер.`],
+ ["Снаряжение и термы",`Непромокаемая обувь с хорошей подошвой, одежда слоями, шапка и перчатки. Для терм — купальник, шлёпанцы, полотенце и сухая смена. Для лыж — шлем и полис с покрытием зимних видов спорта. В шахте пригодится тёплый слой.`],
+ ["Деньги и офлайн",`Возьмите немного наличных PLN для маршруток и мелких расходов. При оплате картой выбирайте PLN. Сохраните офлайн билеты, договор аренды, адреса отелей, парковок и точку сбора кулига.`],
+ ["Откуда взяты данные",`Рейсы сверены по декабрьским маршрут-квитанциям EL AL для Вигена и Тани, аренда — по подтверждению Alamo KRK. Из PDF-маршрута взяты идеи для терм и кулига. Берите актуальные часы и цены с официальных сайтов, на которые ведут ссылки в каждом дне.`]
+];
+document.querySelectorAll(".restaurant-photo img").forEach(img => {
+  const hideUnavailable = () => img.closest(".restaurant-photo").classList.add("unavailable");
+  img.addEventListener("error", hideUnavailable, {once:true});
+  if (img.complete && img.naturalWidth === 0) hideUnavailable();
+});
+
+document.getElementById("remind").innerHTML = rem.map(([h,p])=>`<div class="panel"><h3>${h}</h3><p>${p}</p></div>`).join("");
+
+/* Расходы на двоих, PLN → ₪ */
+const RATE = 0.82;
+const BUDGET = [
+ ["d1","Пт 18 · Прилёт и Закопане",[
+  ["Бензин (дорога KRK → Закопане)",80],["Парковка у Крупувок ~3 ч",30],["Обед в Karczma Zapiecek",160],
+  ["Осцыпек, горячий шоколад, мелочи",50],["Такси туда-обратно на ужин",60],["Ужин в Bąkowo Zohylina с напитками",300]]],
+ ["d2","Сб 19 · Каспровы и кулиг",[
+  ["Канатка на Каспровы, 2 × туда-обратно (высокий сезон 99–165)",290],["Парковка у Ронда Кузницкого",40],["Маршрутки до Кузнице и обратно",20],
+  ["Парковка в центре днём",30],["Обед в Pstrąg Górski",180],["Вилла «Колиба», 2 билета",40],
+  ["Кулиг с факелами и ужином, 2 × ~200",400],["Такси на кулиг и обратно (оценка)",220]]],
+ ["d3","Вс 20 · Лыжи и термы",[
+  ["Грзанец на хребте",30],["Фуникулёр в обе стороны, 2 билета (оценка)",80],
+  ["Обед в Czarci Jar",170],["Такси до фуникулёра и от Czarci Jar до отеля (оценка)",70],["Терма Bania, 2 × ~130 (воскресенье, оценка)",260],
+  ["Ужин в Novobilski",170],["Бензин в Бялку и обратно",45]]],
+ ["d4","Пн 21 · Краков вдвоём",[
+  ["Бензин (Закопане → Краков)",80],["Мариацкий костёл, 2 билета",30],["Обед в Wesele",220],
+  ["Rynek Underground, 2 билета",70],["Ярмарка: грзанец, перекусы",70],
+  ["Ужин в Miód Malina",350],["Концерт Шопена, 2 билета (оценка)",180],["Гараж Sheraton, сутки",125]]],
+ ["d5","Вт 22 · Величка, Вавель, Казимеж",[
+  ["Величка, 2 × ~143 (иностранный язык)",290],["Парковка у шахты",30],["Бензин",15],
+  ["Обед в Pod Aniołami",250],["Вавель: собор, 2 билета",50],
+  ["Plac Nowy: запеканка, кофе",40],["Ужин в Starka с настойками",300],["Такси в отель",30],["Гараж Sheraton, сутки",125]]],
+ ["d6","Ср 23 · Вылет",[
+  ["Бензин до полного бака перед сдачей",80],["Завтрак и кофе в аэропорту",90]]]
+];
+const nis = v => Math.round(v*RATE/10)*10;
+const fmt = v => v.toLocaleString("ru-RU");
+let tot = 0;
+document.getElementById("budgetList").innerHTML = BUDGET.map(([id,title,items])=>{
+  const sum = items.reduce((a,[,v])=>a+v,0); tot += sum;
+  return `<div class="panel bday"><div class="bhead"><h3><a href="#${id}" style="color:inherit;text-decoration:none">${title}</a></h3>
+   <div class="bsum">₪${fmt(nis(sum))} <small>${fmt(sum)} PLN</small></div></div>
+   <div style="overflow-x:auto"><table class="btab"><tbody>${items.map(([n,v])=>`<tr><td>${n}</td><td class="n">${fmt(v)} PLN</td><td class="n nis">₪${fmt(nis(v))}</td></tr>`).join("")}</tbody></table></div></div>`;
+}).join("");
+document.getElementById("budgetTotal").innerHTML = `<div style="color:var(--muted);font-size:14px">Итого за 6 дней на двоих</div>
+ <div class="big">≈ ₪${fmt(nis(tot))}</div>
+ <p style="margin:0">${fmt(tot)} PLN, в среднем ₪${fmt(nis(tot/6))} в день. Заложите сверху 15 % на непредвиденное и сувениры: около ₪${fmt(nis(tot*1.15))}.</p>
+ <p style="margin:0;color:var(--muted);font-size:14px">Отдельно: отель в Кракове на 2 ночи в предрождественскую неделю — обычно от 700 до 1 500 PLN за ночь по ориентировочной оценке (≈ ₪1 150–2 450 за две ночи). Парковка отеля уже учтена в днях выше.</p>`;
+</script>
+<style>[data-book]{width:7em;border:0;border-bottom:1px solid #899b90;background:transparent;font:inherit}.stopcard header time,.dayrail a time{display:inline-block;color:#102e29;background:#c9f2df;border-radius:5px;padding:.15em .45em;font-weight:750;font-variant-numeric:tabular-nums}.dayrail a time{display:table;margin-bottom:.3em}</style><script>document.querySelectorAll('[data-book]').forEach(f=>{try{const k='poland-2026-booking-'+f.dataset.book;f.value=localStorage.getItem(k)||'';f.oninput=()=>localStorage.setItem(k,f.value)}catch{}})</script><script>
+function openReference(hash){const target=document.getElementById(hash.slice(1));const panel=target?.closest('details.endsection');if(panel)panel.open=true;}
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(a)openReference(a.hash);});
+window.addEventListener('hashchange',()=>openReference(location.hash));openReference(location.hash);
+</script></body>
+</html>
