@@ -1,0 +1,1053 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>RadiaFlow on AWS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: left contents rail on wide screens, single column on phones. Content width ~64rem, wide tables scroll inside their own box.
+   Palette: ink-blue text, teal accent, pale yellow for resource names the team will copy. */
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#1a2330; --muted:#566275; --line:#d8dee7; --line-strong:#aab4c2;
+  --accent:#0a6d7e; --accent-weak:#e1f1f4; --code-bg:#edf0f5; --hl:#fff1cf; --hl-line:#e8cd84;
+  --good:#1d7a46; --warn:#9a5a00; --warn-weak:#fff0d9; --crit:#b3261e; --th:#eaeff5;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10151c; --surface:#171e27; --ink:#e5eaf1; --muted:#9aa6b8; --line:#2a3441; --line-strong:#4a5667;
+    --accent:#52c3d4; --accent-weak:#12303a; --code-bg:#1d2632; --hl:#3a3216; --hl-line:#7b6a2a;
+    --good:#58c283; --warn:#f0b35a; --warn-weak:#33280f; --crit:#ff8a80; --th:#1f2833; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10151c; --surface:#171e27; --ink:#e5eaf1; --muted:#9aa6b8; --line:#2a3441; --line-strong:#4a5667;
+  --accent:#52c3d4; --accent-weak:#12303a; --code-bg:#1d2632; --hl:#3a3216; --hl-line:#7b6a2a;
+  --good:#58c283; --warn:#f0b35a; --warn-weak:#33280f; --crit:#ff8a80; --th:#1f2833; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 3rem}
+a{color:var(--accent)}
+.wrap{max-width:82rem;margin:0 auto}
+header.top{padding-block:2.2rem 1.4rem;border-bottom:1px solid var(--line)}
+header.top h1{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.12;margin:.2rem 0 .6rem;font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+header.top p{margin:0;color:var(--muted);max-width:60rem}
+.eyebrow{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+.chip{font-size:.78rem;border:1px solid var(--line-strong);border-radius:999px;padding:.12rem .65rem;background:var(--surface)}
+.layout{display:grid;grid-template-columns:15rem minmax(0,1fr);gap:2.2rem;align-items:start;padding-top:1.6rem}
+nav.toc{position:sticky;top:1rem;font-size:.86rem;max-height:calc(100vh - 2rem);overflow:auto}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:.15rem}
+nav.toc a{display:block;padding:.28rem .6rem;border-left:2px solid var(--line);text-decoration:none;color:var(--muted)}
+nav.toc a:hover{color:var(--ink);border-left-color:var(--accent);background:var(--accent-weak)}
+main{min-width:0}
+section{margin-bottom:3rem;scroll-margin-top:1rem}
+h2{font-size:1.55rem;margin:0 0 .5rem;font-weight:600;letter-spacing:-.005em;text-wrap:balance}
+h3{font-size:1.08rem;margin:1.8rem 0 .4rem;font-weight:600}
+h4{font-size:.95rem;margin:1.3rem 0 .3rem;font-weight:600;color:var(--muted)}
+p{margin:.5rem 0;max-width:68rem}
+.lead{font-size:1.04rem;color:var(--ink);max-width:62rem}
+ul,ol{padding-left:1.25rem;margin:.5rem 0;max-width:68rem}
+li{margin:.2rem 0}
+code{font-family:var(--f-mono);font-size:.84em;background:var(--code-bg);padding:.08em .35em;border-radius:4px;word-break:break-word}
+td.names code,td.hl code,code.n{background:var(--hl);border:1px solid var(--hl-line);cursor:copy}
+td.names,td.hl{background:color-mix(in srgb,var(--hl) 35%,var(--surface))}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface);margin:.8rem 0}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:36rem}
+th,td{text-align:left;vertical-align:top;padding:.5rem .7rem;border-bottom:1px solid var(--line)}
+th{background:var(--th);font-weight:600;font-size:.78rem;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.total td{font-weight:600;border-top:2px solid var(--line-strong);background:var(--th)}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:.9rem 1rem;overflow-x:auto;font-family:var(--f-mono);font-size:.8rem;line-height:1.5;margin:.7rem 0;position:relative}
+pre code{background:none;padding:0;font-size:inherit;word-break:normal}
+.copy{position:absolute;top:.4rem;right:.4rem;font:500 .7rem var(--f-body);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:4px;padding:.15rem .5rem;cursor:pointer}
+details{border:1px solid var(--line);border-radius:6px;background:var(--surface);margin:.8rem 0;padding:.1rem .9rem}
+details summary{cursor:pointer;font-weight:600;padding:.55rem 0}
+.callout{border-left:3px solid var(--accent);background:var(--accent-weak);padding:.7rem 1rem;margin:1rem 0;border-radius:0 6px 6px 0;max-width:68rem}
+.callout.warn{border-left-color:var(--warn);background:var(--warn-weak)}
+.callout p{margin:.25rem 0}
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.7rem;margin:1rem 0}
+.glance div{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:.7rem .9rem}
+.glance b{display:block;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:.15rem}
+.bars{display:grid;gap:.6rem;margin:1rem 0;max-width:46rem}
+.bar{display:grid;grid-template-columns:7.5rem minmax(0,1fr) 5.5rem;gap:.7rem;align-items:center;font-size:.86rem}
+.bar .track{height:1.1rem;background:var(--code-bg);border-radius:3px;overflow:hidden;display:flex}
+.bar .seg-db{background:var(--accent)} .bar .seg-rest{background:var(--line-strong)}
+.bar span.v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.legend{font-size:.78rem;color:var(--muted);display:flex;gap:1rem;flex-wrap:wrap}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:2px;margin-right:.3rem;vertical-align:-1px}
+.diagram{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:.6rem}
+.diagram svg{display:block;width:100%;min-width:640px;height:auto;max-width:900px;margin:0 auto}
+.diagram text{font-family:var(--f-body)}
+.status{font-size:.72rem;border-radius:3px;padding:.05rem .4rem;background:var(--warn-weak);color:var(--warn);font-weight:600;white-space:nowrap}
+#toast{position:fixed;left:50%;bottom:max(1rem,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.4rem .9rem;border-radius:5px;font-size:.82rem;opacity:0;pointer-events:none;transition:opacity .15s}
+#toast.on{opacity:1}
+footer{border-top:1px solid var(--line);padding-top:1rem;color:var(--muted);font-size:.82rem}
+@media (max-width:62rem){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  nav.toc{position:static;max-height:none}
+  nav.toc ol{display:flex;flex-wrap:wrap;gap:.3rem}
+  nav.toc a{border:1px solid var(--line);border-radius:999px;padding:.15rem .7rem;background:var(--surface)}
+  .bar{grid-template-columns:5rem minmax(0,1fr) 4.5rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Technical design · prepared 26 Nov 2026</div>
+  <h1>RadiaFlow on AWS</h1>
+  <p>How the UserAccount service and its platform run on AWS in Israel (il-central-1): architecture, names to create, build order, pipeline, open items and monthly cost for dev and prod.</p>
+  <div class="chips"><span class="chip">Region il-central-1</span><span class="chip">One shared AWS account</span><span class="chip">dev first, then prod</span><span class="chip">RDS for SQL Server 2022</span><span class="chip">Azure Pipelines to AWS</span></div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Contents"><ol>
+<li><a href="#essentials">Developer essentials</a></li>
+<li><a href="#summary">Summary</a></li>
+<li><a href="#cost">Monthly cost</a></li>
+<li><a href="#diagram">Architecture</a></li>
+<li><a href="#todo">Build order: dev</a></li>
+<li><a href="#todo-prod">Build order: prod</a></li>
+<li><a href="#open">Open items</a></li>
+<li><a href="#network">Network and account</a></li>
+<li><a href="#auth">Sign-in and API edge</a></li>
+<li><a href="#data">Database</a></li>
+<li><a href="#devdb">Dev database option</a></li>
+<li><a href="#logging">Logging</a></li>
+<li><a href="#useraccount">UserAccount service</a></li>
+<li><a href="#naming">Naming convention</a></li>
+<li><a href="#s3">S3 buckets</a></li>
+<li><a href="#cicd">CI/CD pipeline</a></li>
+<li><a href="#ops">Security and operations</a></li>
+<li><a href="#sources">Sources</a></li>
+</ol></nav>
+
+<main>
+
+<section id="essentials">
+<h2>Developer essentials <span class="status" style="background:var(--accent-weak);color:var(--accent)">decided</span></h2>
+<p class="lead">What a developer needs to know before touching the skeleton. Everything here is decided; the open items further down are not.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Topic</th><th>Decision</th></tr></thead>
+<tbody>
+<tr><td>Source code (git)</td><td>Azure DevOps Repos, organisation <code>Rads4VetsOrg</code>, project <code>Rads4Vet</code>, repository <code>Rads4Vet</code>, branch <code>main</code>.<br><code class="n">https://dev.azure.com/Rads4VetsOrg/Rads4Vet/_git/Rads4Vet</code><br>No new repository on AWS.</td></tr>
+<tr><td>Codebase layout</td><td>Duplicated codebase: a new project <code>Backend/UserAccount.Aws.Microservice</code> is a copy of <code>Backend/UserAccount.Microservice</code> with the same 17 endpoints and models. The Azure project and <code>Microservices.Common</code> stay untouched. The Dockerfile sits in the new project. The CDK infrastructure lives in a new <code>Infra/</code> folder. The React app stays in <code>Frontend/</code>.</td></tr>
+<tr><td>Pipelines</td><td>Azure Pipelines in the same Azure DevOps project. YAML files live in the repository under <code>Pipelines/</code> (existing folders <code>dev</code>, <code>prod</code>, <code>cre</code>). New AWS pipelines go in <code>Pipelines/aws/</code>: <code class="n">radiaflow-useraccount</code> (<code>Pipelines/aws/radiaflow-useraccount.yml</code>) and <code class="n">radiaflow-portal</code> for the front end. Existing Azure pipelines are not changed. Deploys to AWS use OIDC service connections <code>aws-radiaflow-dev</code> and <code>aws-radiaflow-prod</code>; no stored keys. Dev deploys on every push to <code>main</code>; prod waits for approval.</td></tr>
+<tr><td>Database</td><td>Amazon RDS for SQL Server 2022 in il-central-1. A dedicated instance per environment, each holding its own copy of the existing database: <code class="n">dev-radiaflow-sql</code> and <code class="n">prod-radiaflow-sql</code>. Environments never share a database. To save cost, dev may run SQL Server Developer or Express on an EC2 VM instead of RDS (see the dev database option); prod always uses RDS.</td></tr>
+<tr><td>Existing tables and schemas</td><td>Kept as they are: database <code>RadsForVets</code>, schema <code>dbo</code>, all existing tables and the 11 UserAccount stored procedures, plus the existing logging table <code>log.log_api</code>. No new schemas or tables. Schema and procedure changes are made in <code>Schema.RadsForVetsMain</code> and applied by migration scripts; <code>RadsForVets_PROD</code> is read-only.</td></tr>
+<tr><td>Platforms</td><td>AWS il-central-1 (Tel Aviv): ECS Fargate on ARM64, API Gateway HTTP API, Cognito, RDS for SQL Server, S3, CloudFront, Secrets Manager, CloudWatch. Azure DevOps for repository and pipelines. Namesilo for DNS of <code>medilis.ai</code>. One shared AWS account for dev and prod.</td></tr>
+<tr><td>.NET version</td><td><code>.NET 10</code> (<code>net10.0</code>, SDK 10.x). Docker images <code>mcr.microsoft.com/dotnet/sdk:10.0</code> and <code>aspnet:10.0</code>, built for <code>linux-arm64</code>.</td></tr>
+<tr><td>Node version</td><td><code>Node 24</code> (<code>engines: ">=24"</code> in the front end; pipelines use <code>NodeTool 24.x</code>).</td></tr>
+<tr><td>React version</td><td><code>React 18.2</code> (<code>^18.2.0</code>) with Vite 5 and TypeScript 5, as in <code>Frontend/package.json</code>. Hosted as static files on S3 behind CloudFront.</td></tr>
+<tr><td>Logging</td><td>The existing Serilog setup is reused, nothing new is built. Console output goes to CloudWatch Logs group <code class="n">/dev/radiaflow/ecs/useraccount</code> (30 days); the SQL sink writes to the existing table <code>log.log_api</code> through <code>LoggerConfigurator</code>. Settings arrive as <code>SerilogSettings__*</code> environment variables.</td></tr>
+<tr><td>Configuration and secrets</td><td>Secrets Manager values are injected by ECS as environment variables when a task starts; the code reads ordinary settings. Paths: <code>/{env}/radiaflow/origin-verify</code>, <code>/{env}/radiaflow/db/useraccount</code>, <code>/{env}/radiaflow/db/log</code>. No secrets in <code>appsettings.json</code>.</td></tr>
+<tr><td>Sign-in</td><td>Cognito (invite-only, MFA). The API takes the ID token; claims <code>custom:user_id</code>, <code>custom:company_id</code>, <code>email</code>, <code>name</code>. API Gateway forwards the user id as <code>X-User-Id</code>.</td></tr>
+<tr><td>Code standards that apply</td><td>SQL Server only, all queries through stored procedures with <code>SqlDbHelper</code> and Dapper; controllers inherit <code>BaseController</code> and call <code>InvokeFunctionAsync</code>; constructor injection only; file-scoped namespaces; <code>System.Text.Json</code> in new code.</td></tr>
+<tr><td>Environments</td><td>dev first, then prod, one VPC each (<code>10.0.0.0/16</code>, <code>10.1.0.0/16</code>), no peering. Hostnames <code>radiaflow-dev.medilis.ai</code> and <code>radiaflow.medilis.ai</code>; the API is on the same host under <code>/api/*</code>.</td></tr>
+</tbody></table></div>
+
+<h3>Naming at a glance</h3>
+<p>Every resource is <code class="n">{env}-{sys}-{resource}</code> with <code>env</code> = <code>dev</code> or <code>prod</code> and <code>sys</code> = <code>radiaflow</code>. The system name is one placeholder in <code>cdk.json</code>; change it there and every name follows (only before the first deployment). Full tables are in the <a href="#naming">naming section</a>; examples below are for dev.</p>
+<div class="tw"><table>
+<thead><tr><th>What</th><th>Pattern</th><th>Dev example</th></tr></thead>
+<tbody>
+<tr><td>CloudFormation stack</td><td class="hl"><code>{env}-{sys}-{part}</code></td><td class="hl"><code>dev-radiaflow-compute</code></td></tr>
+<tr><td>VPC, subnet, security group</td><td class="hl"><code>{env}-{sys}-vpc</code>, <code>-app-a</code>, <code>-sg-ecs</code></td><td class="hl"><code>dev-radiaflow-vpc</code></td></tr>
+<tr><td>ECR repository</td><td class="hl"><code>{env}-{sys}/{service}</code></td><td class="hl"><code>dev-radiaflow/useraccount</code></td></tr>
+<tr><td>ECS cluster, service, task definition</td><td class="hl"><code>{env}-{sys}-cluster</code>, <code>-{service}-svc</code>, <code>-{service}</code></td><td class="hl"><code>dev-radiaflow-useraccount-svc</code></td></tr>
+<tr><td>Load balancer, target group</td><td class="hl"><code>{env}-{sys}-alb</code>, <code>-tg-{service}</code></td><td class="hl"><code>dev-radiaflow-tg-useraccount</code></td></tr>
+<tr><td>RDS instance</td><td class="hl"><code>{env}-{sys}-sql</code></td><td class="hl"><code>dev-radiaflow-sql</code></td></tr>
+<tr><td>SQL database, logins</td><td>fixed; <code>{sys}_{service}</code></td><td class="hl"><code>RadsForVets</code>; <code>radiaflow_useraccount</code></td></tr>
+<tr><td>S3 bucket</td><td class="hl"><code>{env}-{sys}-{purpose}-{acct}-{region}</code></td><td class="hl"><code>dev-radiaflow-spa-111122223333-il-central-1</code></td></tr>
+<tr><td>Cognito pool, client</td><td class="hl"><code>{env}-{sys}-users</code>, <code>-spa</code></td><td class="hl"><code>dev-radiaflow-users</code></td></tr>
+<tr><td>API Gateway, VPC Link</td><td class="hl"><code>{env}-{sys}-http-api</code>, <code>-vpclink</code></td><td class="hl"><code>dev-radiaflow-http-api</code></td></tr>
+<tr><td>Secret</td><td class="hl"><code>/{env}/{sys}/db/{service}</code></td><td class="hl"><code>/dev/radiaflow/db/useraccount</code></td></tr>
+<tr><td>Log group</td><td class="hl"><code>/{env}/{sys}/ecs/{service}</code></td><td class="hl"><code>/dev/radiaflow/ecs/useraccount</code></td></tr>
+<tr><td>IAM role</td><td class="hl"><code>{env}-{sys}-role-{purpose}</code></td><td class="hl"><code>dev-radiaflow-role-task-useraccount</code></td></tr>
+<tr><td>Pipeline, environment, connection</td><td class="hl"><code>{sys}-{app}</code>, <code>{sys}-{env}</code>, <code>aws-{sys}-{env}</code></td><td class="hl"><code>radiaflow-useraccount</code>, <code>radiaflow-dev</code>, <code>aws-radiaflow-dev</code></td></tr>
+<tr><td>Hostname</td><td>prod <code>{sys}.medilis.ai</code>, others <code>{sys}-{env}.medilis.ai</code></td><td class="hl"><code>radiaflow-dev.medilis.ai</code></td></tr>
+<tr><td>Tags on everything</td><td><code>Project</code>, <code>Environment</code>, <code>Name</code>, <code>Component</code>, <code>ManagedBy</code>, <code>Owner</code>, <code>CostCenter</code>, <code>DataClass</code></td><td><code>Project=RadiaFlow</code>, <code>Environment=dev</code></td></tr>
+</tbody></table></div>
+</section>
+
+<section id="summary">
+<h2>Summary</h2>
+<p class="lead">The existing UserAccount microservice moves from Azure to AWS with the same 17 endpoints, the same SQL Server database and stored procedures, and the existing Serilog logging. Only the Azure services underneath change.</p>
+<div class="glance">
+<div><b>Compute</b>ECS Fargate (ARM64) behind an internal ALB; more microservices (Study, Radiologist, others) join the same cluster later</div>
+<div><b>Entry point</b>CloudFront, then API Gateway HTTP API with a Cognito JWT authorizer, a VPC Link to the private ALB</div>
+<div><b>Identity</b>Amazon Cognito replaces Azure AD B2C; invite-only, MFA required, admin staff only</div>
+<div><b>Database</b>Amazon RDS for SQL Server 2022, Multi-AZ in prod; the existing <code>RadsForVets</code> schema and 11 stored procedures run unchanged</div>
+<div><b>Email, push, secrets</b>SES (later), AWS IoT Core (recommended), Secrets Manager replace SendGrid, Azure Web PubSub, Key Vault</div>
+<div><b>Delivery</b>Code stays in Azure DevOps; Azure Pipelines deploys to AWS with OIDC, no stored keys</div>
+<div><b>Environments</b>dev and prod in one shared account, separate VPCs, every resource prefixed <code>{env}-radiaflow-</code></div>
+<div><b>Hostnames</b><code>radiaflow-dev.medilis.ai</code> and <code>radiaflow.medilis.ai</code>; DNS stays at Namesilo</div>
+</div>
+<div class="callout">
+<p><b>What changed from the first draft.</b> The draft used PostgreSQL to avoid SQL Server licensing. The service depends on SQL Server features (symmetric-key encryption, <code>AT TIME ZONE</code>, <code>sys.time_zone_info</code>, dynamic SQL) and on tables shared with other services, so SQL Server stays and the licence cost returns. The draft's SQS logging pipeline and Backoffice portal are also dropped: the existing Serilog logging is reused and there is no permission layer in this phase.</p>
+</div>
+</section>
+
+<section id="cost">
+<h2>Monthly cost estimate per environment</h2>
+<p class="lead">Roughly <b>$215 a month for dev</b> if its database runs on a VM with a free SQL Server edition, <b>$960</b> if dev uses RDS, and <b>$3,760 a month for prod</b> as designed. Wherever RDS for SQL Server is used, it is about 90% of the bill.</p>
+<div class="callout warn"><p><b>Estimates, not quotes.</b> Unit prices are US East reference prices from AWS pages and third-party price lists, scaled up 15% for Israel (a 2023 comparison found Tel Aviv 12 to 19% above us-east-1 for EC2 and RDS). I could not retrieve il-central-1 price tables, so confirm every line in the AWS Pricing Calculator before approval. On-demand prices, 730 hours a month, USD, before tax.</p></div>
+
+<div class="bars" role="img" aria-label="Estimated monthly cost: dev on a VM about 215 dollars, dev on RDS about 960 dollars, prod with a smaller database about 2060 dollars, prod as designed about 3760 dollars">
+  <div class="bar"><span>Dev (VM)</span><div class="track"><div class="seg-db" style="width:2.9%"></div><div class="seg-rest" style="width:2.8%"></div></div><span class="v">≈ $215</span></div>
+  <div class="bar"><span>Dev (RDS)</span><div class="track"><div class="seg-db" style="width:22.7%"></div><div class="seg-rest" style="width:2.8%"></div></div><span class="v">≈ $960</span></div>
+  <div class="bar"><span>Prod (smaller DB)</span><div class="track"><div class="seg-db" style="width:45.5%"></div><div class="seg-rest" style="width:9.3%"></div></div><span class="v">≈ $2,060</span></div>
+  <div class="bar"><span>Prod (as designed)</span><div class="track"><div class="seg-db" style="width:90.7%"></div><div class="seg-rest" style="width:9.3%"></div></div><span class="v">≈ $3,760</span></div>
+  <div class="legend"><span><i style="background:var(--accent)"></i>RDS for SQL Server</span><span><i style="background:var(--line-strong)"></i>everything else</span></div>
+</div>
+
+<div class="tw"><table>
+<thead><tr><th>Item</th><th>Assumption</th><th class="num">Dev with RDS / month</th><th class="num">Prod / month</th></tr></thead>
+<tbody>
+<tr><td>RDS for SQL Server (compute and licence)</td><td>Standard edition, license included. Dev: <code>db.m6i.large</code> Single-AZ. Prod: <code>db.m6i.xlarge</code> Multi-AZ (the CDK design). US East reference about $1.00 per hour for the large size, double for xlarge, double again for Multi-AZ</td><td class="num">$853</td><td class="num">$3,300</td></tr>
+<tr><td>RDS storage</td><td>gp3: dev 100 GB Single-AZ, prod 200 GB Multi-AZ; backups within allocated size are free</td><td class="num">incl.</td><td class="num">incl. (about $111 at +15%)</td></tr>
+<tr><td>ECS Fargate (ARM64)</td><td>Dev: 1 task, 0.5 vCPU, 1 GB. Prod: 2 tasks, 1 vCPU, 2 GB. About $0.032 per vCPU-hour and $0.0036 per GB-hour (US East)</td><td class="num">$17</td><td class="num">$66</td></tr>
+<tr><td>Application Load Balancer</td><td>One internal ALB, light traffic</td><td class="num">$24</td><td class="num">$29</td></tr>
+<tr><td>NAT gateways</td><td>Dev: 1 gateway, 20 GB. Prod: 2 gateways, 100 GB. $0.045 per hour plus $0.045 per GB</td><td class="num">$39</td><td class="num">$81</td></tr>
+<tr><td>VPC interface endpoints</td><td>Prod only: ECR (2), CloudWatch Logs, Secrets Manager, plus one more, in 2 AZs. Dev goes through the NAT gateway instead</td><td class="num">$0</td><td class="num">$86</td></tr>
+<tr><td>API Gateway (HTTP API)</td><td>Dev 0.2 million calls, prod 5 million, $1.00 per million</td><td class="num">$0</td><td class="num">$6</td></tr>
+<tr><td>CloudFront</td><td>Dev about 10 GB out, prod about 100 GB</td><td class="num">$2</td><td class="num">$17</td></tr>
+<tr><td>AWS WAF on CloudFront</td><td>Prod only: 1 web ACL, 5 rules, 5 million requests</td><td class="num">$0</td><td class="num">$15</td></tr>
+<tr><td>Cognito</td><td>Admin staff only, under the 10,000 monthly-user free tier</td><td class="num">$0</td><td class="num">$0</td></tr>
+<tr><td>Secrets Manager</td><td>About 5 secrets, $0.40 each</td><td class="num">$2</td><td class="num">$2</td></tr>
+<tr><td>KMS</td><td>3 customer keys, $1 each</td><td class="num">$3</td><td class="num">$3</td></tr>
+<tr><td>CloudWatch</td><td>Logs ingest $0.50 per GB (dev 2 GB, prod 10 GB), alarms, one dashboard</td><td class="num">$7</td><td class="num">$14</td></tr>
+<tr><td>S3</td><td>Dev about 100 GB, prod about 300 GB (backups, SPA, static, logs)</td><td class="num">$5</td><td class="num">$12</td></tr>
+<tr><td>ECR, IoT Core, data transfer out</td><td>Small volumes; data leaving the Israel region to other continents costs about four times the US or EU rate</td><td class="num">$4</td><td class="num">$14</td></tr>
+<tr class="total"><td>Total (rounded)</td><td>With +15% Israel uplift</td><td class="num">≈ $960</td><td class="num">≈ $3,760</td></tr>
+<tr class="total"><td>Prod with <code>db.m6i.large</code> Multi-AZ</td><td>Half the database compute</td><td class="num">n/a</td><td class="num">≈ $2,060</td></tr>
+</tbody></table></div>
+<h3>Dev database choice</h3>
+<p>The dev total depends on where the dev database runs. Every other dev line stays the same ($107 a month); only the database line changes. EC2 prices are US East reference prices (t3.medium Windows about $0.060 per hour, t3.large Linux about $0.083, t3.large Windows about $0.111) plus 100 GB gp3 and snapshots, scaled up 15%.</p>
+<div class="tw"><table>
+<thead><tr><th>Dev database</th><th>Size</th><th class="num">Database line</th><th class="num">Dev total</th></tr></thead>
+<tbody>
+<tr><td>RDS for SQL Server Standard, Single-AZ</td><td><code>db.m6i.large</code></td><td class="num">$853</td><td class="num">≈ $960</td></tr>
+<tr><td>SQL Server Developer on EC2, Windows (recommended VM)</td><td><code>t3.large</code>, 8 GB</td><td class="num">$108</td><td class="num">≈ $215</td></tr>
+<tr><td>SQL Server Developer on EC2, Linux</td><td><code>t3.large</code>, 8 GB</td><td class="num">$85</td><td class="num">≈ $192</td></tr>
+<tr><td>SQL Server Express on EC2, Windows</td><td><code>t3.medium</code>, 4 GB</td><td class="num">$65</td><td class="num">≈ $172</td></tr>
+</tbody></table></div>
+<p>Dev plus prod comes to about $4,700 a month with RDS in both, about $3,975 with dev on a Windows VM, and about $2,275 with dev on a VM and the smaller prod database. See "Dev database option" for what the VM costs in effort and risk.</p>
+
+<h3>Not in these numbers</h3>
+<ul>
+<li>Future microservices: each extra Fargate service adds about $15 to $60 a month, depending on size and task count. The database is shared.</li>
+<li>SES (cents per thousand emails), AWS DMS for the one-time data move, an AWS support plan, Azure DevOps costs, Namesilo, VAT.</li>
+<li>The current Azure SQL bill, which is needed to compare (open item 19).</li>
+</ul>
+<h3>Ways to lower it</h3>
+<ul>
+<li><b>Run the dev database on a VM</b> with SQL Server Developer or Express, which have no licence fee. This saves about $745 a month.</li>
+<li><b>Right-size the prod database.</b> Start with <code>db.m6i.large</code> Multi-AZ and scale up only if the load needs it. This alone saves about $1,700 a month.</li>
+<li><b>Check the newer RDS instance generations.</b> AWS announced in December 2025 SQL Server instances that optimize CPU for up to 55% lower price; the design uses the older M6I class.</li>
+<li><b>Reserved pricing.</b> Reserve the prod database for 1 or 3 years once the size is stable.</li>
+<li><b>Dev schedule.</b> Stop the dev database outside working hours (compute billing stops, storage continues; RDS restarts a stopped instance after 7 days).</li>
+<li><b>Skip interface endpoints in prod</b> if NAT data volume stays low, saving about $86.</li>
+</ul>
+</section>
+
+<section id="diagram">
+<h2>Architecture</h2>
+<p>Every API call is authenticated at the edge before it reaches a private service. The dev VPC is shown in detail; prod has the same layout and is not peered with dev. Dashed orange tiles are future microservices in the same ECS cluster.</p>
+<div class="diagram">
+<svg viewBox="0 0 760 982" role="img" aria-label="Architecture: CloudFront, API Gateway with Cognito JWT check, VPC Link, internal ALB, ECS Fargate cluster with UserAccount and future services, RDS SQL Server; dev VPC in detail and prod VPC with the same layout">
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--line-strong)"/></marker>
+<g id="g-user"><circle cx="20" cy="14" r="5"/><path d="M10 31a10 9 0 0 1 20 0z"/></g>
+<g id="g-cdn"><circle cx="20" cy="20" r="11"/><ellipse cx="20" cy="20" rx="5" ry="11"/><path d="M9 20h22"/></g>
+<g id="g-s3"><ellipse cx="20" cy="13" rx="10" ry="3"/><path d="M10 13l3 16q7 3 14 0l3-16"/></g>
+<g id="g-lock"><rect x="12" y="19" width="16" height="12" rx="2"/><path d="M15 19v-4a5 5 0 0 1 10 0v4"/></g>
+<g id="g-api"><path d="M14 13L7 20l7 7M26 13l7 7-7 7M22 11l-4 18"/></g>
+<g id="g-link"><circle cx="11" cy="20" r="4"/><circle cx="29" cy="20" r="4"/><path d="M15 20h10"/></g>
+<g id="g-alb"><circle cx="10" cy="20" r="3"/><circle cx="30" cy="11" r="3"/><circle cx="30" cy="20" r="3"/><circle cx="30" cy="29" r="3"/><path d="M13 20h14M13 19l14-7M13 21l14 7"/></g>
+<g id="g-box"><rect x="9" y="9" width="22" height="22" rx="3"/><rect x="15" y="15" width="10" height="10" rx="2"/></g>
+<g id="g-db"><ellipse cx="20" cy="11" rx="10" ry="3.5"/><path d="M10 11v18a10 3.5 0 0 0 20 0V11M10 20a10 3.5 0 0 0 20 0"/></g>
+<g id="g-key"><circle cx="14" cy="20" r="5"/><path d="M19 20h14M28 20v5M33 20v4"/></g>
+<g id="g-watch"><circle cx="20" cy="20" r="11"/><path d="M20 12v8l5 4"/></g>
+<style>
+ .gl{fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ .gh{fill:none;stroke:#ED7100;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ .nm{font-size:12.5px;font-weight:600;fill:var(--ink);text-anchor:middle}
+ .sb{font-size:11px;fill:var(--muted);text-anchor:middle}
+ .ed{font-size:11px;fill:var(--muted)}
+ .ln{fill:none;stroke:var(--line-strong);stroke-width:1.25}
+ .vpc{fill:none;stroke:#8C4FFF;stroke-width:1.25;stroke-dasharray:6 4}
+</style>
+</defs>
+<text x="24" y="28" style="font-size:15px;font-weight:600;fill:var(--ink)">Every API call is authenticated at the edge before it reaches a private service</text>
+
+<rect class="vpc" x="24" y="286" width="720" height="474" rx="8"/>
+<text x="40" y="306" style="font-size:11px;font-weight:600;fill:#8C4FFF">dev-radiaflow-vpc 10.0.0.0/16</text>
+<text class="ed" x="40" y="736">Private app subnets 10.0.10.0/24 and 10.0.11.0/24: VPC Link, ALB, ECS tasks</text>
+<text class="ed" x="40" y="750">Private DB subnets 10.0.20.0/24 and 10.0.21.0/24: RDS (Multi-AZ)</text>
+<rect x="470" y="330" width="120" height="388" rx="8" fill="none" stroke="#ED7100" stroke-width="1.25"/>
+<text x="530" y="692" style="font-size:10.5px;font-weight:600;fill:#ED7100;text-anchor:middle">ECS cluster</text>
+<text x="530" y="706" style="font-size:10.5px;fill:#ED7100;text-anchor:middle">dev-radiaflow-cluster</text>
+
+<g class="ln">
+<path d="M114 74H216" marker-end="url(#ar)"/><path d="M264 74H366" marker-end="url(#ar)"/>
+<path d="M70 74H40V206H66" marker-end="url(#ar)"/><path d="M240 150V182" marker-end="url(#ar)"/>
+<path d="M216 206H114" marker-end="url(#ar)"/><path d="M240 284V346" marker-end="url(#ar)"/>
+<path d="M264 370H366" marker-end="url(#ar)"/><path d="M414 370H516" marker-end="url(#ar)"/><path d="M564 370H656" marker-end="url(#ar)"/>
+<path d="M540 346V286" marker-end="url(#ar)" stroke-dasharray="4 3"/><path d="M680 284V318H552V346" marker-end="url(#ar)" stroke-dasharray="4 3"/>
+<path d="M390 446V490H512" marker-end="url(#ar)" stroke="#ED7100" stroke-dasharray="4 3"/><path d="M390 490V600H512" marker-end="url(#ar)" stroke="#ED7100" stroke-dasharray="4 3"/>
+<path d="M264 842H366" marker-end="url(#ar)"/><path d="M414 842H516" marker-end="url(#ar)"/><path d="M564 842H656" marker-end="url(#ar)"/>
+</g>
+
+<g transform="translate(70 54)"><rect width="40" height="40" rx="6" fill="#232F3E"/><use href="#g-user" class="gl"/></g>
+<text class="nm" x="90" y="112">Users</text><text class="sb" x="90" y="127">React SPA</text>
+<g transform="translate(220 54)"><rect width="40" height="40" rx="6" fill="#8C4FFF"/><use href="#g-cdn" class="gl"/></g>
+<text class="nm" x="240" y="112">CloudFront</text><text class="sb" x="240" y="127">dev-radiaflow-</text><text class="sb" x="240" y="142">cdn</text>
+<g transform="translate(370 54)"><rect width="40" height="40" rx="6" fill="#7AA116"/><use href="#g-s3" class="gl"/></g>
+<text class="nm" x="390" y="112">S3 bucket</text><text class="sb" x="390" y="127">dev-radiaflow-spa-</text><text class="sb" x="390" y="142">111122223333-il-central-1</text>
+
+<g transform="translate(70 186)"><rect width="40" height="40" rx="6" fill="#DD344C"/><use href="#g-lock" class="gl"/></g>
+<text class="nm" x="90" y="244">Cognito</text><text class="sb" x="90" y="259">dev-radiaflow-</text><text class="sb" x="90" y="274">users</text>
+<g transform="translate(220 186)"><rect width="40" height="40" rx="6" fill="#E7157B"/><use href="#g-api" class="gl"/></g>
+<text class="nm" x="240" y="244">API Gateway</text><text class="sb" x="240" y="259">dev-radiaflow-</text><text class="sb" x="240" y="274">http-api</text>
+<g transform="translate(520 186)"><rect width="40" height="40" rx="6" fill="#E7157B"/><use href="#g-watch" class="gl"/></g>
+<text class="nm" x="540" y="244">CloudWatch Logs</text><text class="sb" x="540" y="259">/dev/radiaflow/ecs/</text><text class="sb" x="540" y="274">useraccount</text>
+<g transform="translate(660 186)"><rect width="40" height="40" rx="6" fill="#DD344C"/><use href="#g-key" class="gl"/></g>
+<text class="nm" x="680" y="244">Secrets Manager</text><text class="sb" x="680" y="259">/dev/radiaflow/</text><text class="sb" x="680" y="274">origin-verify, db/*</text>
+
+<g transform="translate(220 350)"><rect width="40" height="40" rx="6" fill="#8C4FFF"/><use href="#g-link" class="gl"/></g>
+<text class="nm" x="240" y="408">VPC Link</text><text class="sb" x="240" y="423">dev-radiaflow-</text><text class="sb" x="240" y="438">vpclink</text>
+<g transform="translate(370 350)"><rect width="40" height="40" rx="6" fill="#8C4FFF"/><use href="#g-alb" class="gl"/></g>
+<text class="nm" x="390" y="408">Internal ALB</text><text class="sb" x="390" y="423">dev-radiaflow-</text><text class="sb" x="390" y="438">alb</text>
+<g transform="translate(520 350)"><rect width="40" height="40" rx="6" fill="#ED7100"/><use href="#g-box" class="gl"/></g>
+<text class="nm" x="540" y="408">ECS Fargate</text><text class="sb" x="540" y="423">dev-radiaflow-</text><text class="sb" x="540" y="438">useraccount-svc</text>
+<g transform="translate(660 350)"><rect width="40" height="40" rx="6" fill="#C925D1"/><use href="#g-db" class="gl"/></g>
+<text class="nm" x="680" y="408">RDS SQL Server</text><text class="sb" x="680" y="423">dev-radiaflow-</text><text class="sb" x="680" y="438">sql</text>
+
+<g transform="translate(520 470)"><rect width="40" height="40" rx="6" fill="none" stroke="#ED7100" stroke-width="1.5" stroke-dasharray="4 3"/><use href="#g-box" class="gh"/></g>
+<text class="nm" x="540" y="528" style="fill:#ED7100">Study</text><text class="sb" x="540" y="543">dev-radiaflow-</text><text class="sb" x="540" y="558">study-svc</text>
+<g transform="translate(520 580)"><rect width="40" height="40" rx="6" fill="none" stroke="#ED7100" stroke-width="1.5" stroke-dasharray="4 3"/><use href="#g-box" class="gh"/></g>
+<text class="nm" x="540" y="638" style="fill:#ED7100">Radiologist</text><text class="sb" x="540" y="653">dev-radiaflow-</text><text class="sb" x="540" y="668">radiologist-svc</text>
+<text x="40" y="520" style="font-size:11px;font-weight:600;fill:#ED7100">Future microservices (dashed)</text>
+<text class="ed" x="40" y="536">run in the same ECS cluster behind the same ALB,</text>
+<text class="ed" x="40" y="551">each with its own service, target group and task role.</text>
+<text class="ed" x="40" y="566">More can follow (clinic, media and others).</text>
+
+<text class="ed" x="384" y="778" style="text-anchor:middle">no peering between the two VPCs</text>
+<rect class="vpc" x="24" y="790" width="720" height="146" rx="8"/>
+<text x="40" y="810" style="font-size:11px;font-weight:600;fill:#8C4FFF">prod-radiaflow-vpc 10.1.0.0/16 (same layout as dev)</text>
+<g transform="translate(220 820)"><rect width="40" height="40" rx="6" fill="#8C4FFF"/><use href="#g-link" class="gl"/></g>
+<text class="nm" x="240" y="878">VPC Link</text><text class="sb" x="240" y="893">prod-radiaflow-</text><text class="sb" x="240" y="908">vpclink</text>
+<g transform="translate(370 820)"><rect width="40" height="40" rx="6" fill="#8C4FFF"/><use href="#g-alb" class="gl"/></g>
+<text class="nm" x="390" y="878">Internal ALB</text><text class="sb" x="390" y="893">prod-radiaflow-</text><text class="sb" x="390" y="908">alb</text>
+<g transform="translate(520 820)"><rect width="40" height="40" rx="6" fill="#ED7100"/><use href="#g-box" class="gl"/></g>
+<text class="nm" x="540" y="878">ECS Fargate</text><text class="sb" x="540" y="893">prod-radiaflow-</text><text class="sb" x="540" y="908">useraccount-svc</text>
+<g transform="translate(660 820)"><rect width="40" height="40" rx="6" fill="#C925D1"/><use href="#g-db" class="gl"/></g>
+<text class="nm" x="680" y="878">RDS SQL Server</text><text class="sb" x="680" y="893">prod-radiaflow-</text><text class="sb" x="680" y="908">sql</text>
+
+<text class="ed" x="165" y="66" style="text-anchor:middle">HTTPS</text><text class="ed" x="315" y="66" style="text-anchor:middle">static files</text>
+<text class="ed" x="46" y="166">sign in (PKCE)</text><text class="ed" x="250" y="170">/api/*</text>
+<text class="ed" x="165" y="198" style="text-anchor:middle">validates JWT</text><text class="ed" x="250" y="330">X-User-Id added</text>
+<text class="ed" x="315" y="362" style="text-anchor:middle">HTTP :80</text><text class="ed" x="442" y="362" style="text-anchor:middle">port 8080</text>
+<text class="ed" x="627" y="356" style="text-anchor:middle;font-size:10px">stored procs</text><text class="ed" x="627" y="388" style="text-anchor:middle;font-size:10px">log.log_api</text>
+<text class="ed" x="532" y="318" style="text-anchor:end">console logs</text><text class="ed" x="616" y="310" style="text-anchor:middle">secrets at task start</text>
+<text class="ed" x="24" y="962">Prod also has its own CloudFront, API Gateway, Cognito, S3 and secrets, named prod-radiaflow-*.</text>
+</svg>
+</div>
+<p>ECS injects the origin-verify secret and the database connection strings from Secrets Manager when a task starts, so the backend reads them as ordinary settings and does not call Secrets Manager itself.</p>
+</section>
+
+<section id="todo">
+<h2>Build order and names to create: dev</h2>
+<p>Dev is built first. Steps with the same dependency can run in parallel. Names are pre-filled from the naming convention; click a highlighted name to copy it. The prod table follows this one.</p>
+<div class="tw"><table>
+<thead><tr><th>#</th><th>Step</th><th>Suggested names to create (dev)</th><th>AWS service or tool</th><th>Depends on</th><th>Done when</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>Confirm account, region and service availability</td><td class="names">Nothing to create; existing account, <code>il-central-1</code></td><td>AWS account, il-central-1, Service Quotas</td><td>none</td><td>Cognito, API Gateway VPC Link, ECS Fargate, RDS for SQL Server, SES and IoT Core confirmed, or a fallback region agreed</td></tr>
+<tr><td>1</td><td>Account baseline review (the account already holds other Medilis resources)</td><td class="names">Reuse the existing trail and budgets; add <code>dev-radiaflow-budget-monthly</code></td><td>IAM Identity Center, CloudTrail, AWS Budgets</td><td>0</td><td>Existing trail, budgets and admin access reviewed and reused; only missing items added</td></tr>
+<tr><td>2</td><td>CI/CD access without long-lived keys</td><td class="names"><code>dev-radiaflow-role-deploy</code> (the OIDC provider is one per account; reuse it if present); service connections <code>aws-radiaflow-dev</code>, <code>aws-radiaflow-prod</code></td><td>IAM OIDC provider and deploy role</td><td>1</td><td>Pipeline can assume a deploy role</td></tr>
+<tr><td>3</td><td>CDK bootstrap in il-central-1 and us-east-1 (the CloudFront certificate region)</td><td class="names">Reuse the existing bootstrap stack and qualifier if its version fits; otherwise a new qualifier <code>radiaflow</code></td><td>AWS CDK</td><td>1, 2</td><td><code>cdk bootstrap</code> succeeds in both regions</td></tr>
+<tr><td>4</td><td>DNS and certificates</td><td class="names">Hostname <code>radiaflow-dev.medilis.ai</code>; certificates tagged <code>dev-radiaflow-cert-il-central-1</code> and <code>dev-radiaflow-cert-us-east-1</code></td><td>Namesilo DNS (records by hand, or the two subdomains delegated to Route 53), ACM in il-central-1 and us-east-1</td><td>3</td><td>radiaflow-dev.medilis.ai resolves to the dev environment; certificates issued and validated</td></tr>
+<tr><td>5</td><td>Network (NetworkStack), after checking existing VPC CIDRs and quotas</td><td class="names">Stack <code>dev-radiaflow-network</code>; <code>dev-radiaflow-vpc</code>; subnets <code>dev-radiaflow-public-a</code>, <code>-app-a</code>, <code>-db-a</code> (and <code>-b</code>); <code>dev-radiaflow-igw</code>; <code>dev-radiaflow-nat-a</code>; security groups <code>dev-radiaflow-sg-vpclink</code>, <code>-sg-alb</code>, <code>-sg-ecs</code>, <code>-sg-rds</code>, <code>-sg-endpoints</code>; endpoints <code>dev-radiaflow-vpce-s3</code>, <code>-ecr-api</code>, <code>-ecr-dkr</code>, <code>-logs</code>, <code>-secretsmanager</code>; <code>dev-radiaflow-db-subnets</code></td><td>VPC, subnets, NAT gateways, security groups, S3 gateway and interface endpoints</td><td>3</td><td>Two AZs, three subnet tiers, endpoints reachable</td></tr>
+<tr><td>6</td><td>Container registry</td><td class="names">ECR repository <code>dev-radiaflow/useraccount</code></td><td>ECR repository, image scanning</td><td>3</td><td>Repository for UserAccount exists</td></tr>
+<tr><td>7</td><td>Database (DataStack)</td><td class="names">Stack <code>dev-radiaflow-data</code>; <code>dev-radiaflow-sql</code>, <code>dev-radiaflow-sql-params</code>, <code>dev-radiaflow-sql-options</code>; role <code>dev-radiaflow-role-rds-backup</code>; bucket <code>dev-radiaflow-sql-backups-111122223333-il-central-1</code>; keys <code>alias/dev-radiaflow-rds</code>, <code>alias/dev-radiaflow-s3</code></td><td>RDS for SQL Server 2022, option group, KMS, S3 backup bucket, RDS-managed secret</td><td>5</td><td>Instance available in UTC; reachable from a test task; backups on</td></tr>
+<tr><td>7a</td><td>Dev database on a VM (alternative to step 7 for dev only)</td><td class="names">Instance <code>dev-radiaflow-sqlvm</code>; security group <code>dev-radiaflow-sg-sqlvm</code>; role <code>dev-radiaflow-role-sqlvm</code>; volume <code>dev-radiaflow-sqlvm-data</code>; snapshot policy <code>dev-radiaflow-dlm-sqlvm</code></td><td>EC2 (t3.large), encrypted EBS gp3, Systems Manager Session Manager, Data Lifecycle Manager; SQL Server 2022 Developer or Express</td><td>5</td><td>VM reachable from a test task on port 1433; database size checked against the 10 GB Express limit if Express is used; first snapshot and restore tested</td></tr>
+<tr><td>8</td><td>Database content</td><td class="names">Database <code>RadsForVets</code>; schema <code>log</code> and table <code>log.log_api</code>; logins <code>radiaflow_useraccount</code>, <code>radiaflow_migrator</code>; key and certificate with the existing names <code>UserDetails_Key</code>, <code>Rads4Vets</code> or new ones</td><td>SQL scripts, new symmetric key and certificate, decrypt-and-re-encrypt copy, logins, log table</td><td>7 or 7a</td><td>RadsForVets restored or copied; log table exists; UserSelectById works on RDS</td></tr>
+<tr><td>8a</td><td>Validate the database move on RDS (needed when dev runs on a VM)</td><td class="names">Temporary instance <code>dev-radiaflow-sql-validate</code>, deleted afterwards</td><td>RDS for SQL Server (short-lived), native restore, stored procedures</td><td>8</td><td>Key copy and the 11 stored procedures give the same results on RDS as on the VM; the temporary instance is deleted</td></tr>
+<tr><td>9</td><td>Identity (IdentityStack)</td><td class="names">Stack <code>dev-radiaflow-identity</code>; pool <code>dev-radiaflow-users</code>; client <code>dev-radiaflow-spa</code>; domain prefix <code>dev-radiaflow-auth</code>; attributes <code>custom:user_id</code>, <code>custom:company_id</code></td><td>Cognito user pool, app client, hosted UI domain, MFA</td><td>3</td><td>Test admin user signs in with MFA; ID token carries the custom claims</td></tr>
+<tr><td>10</td><td>Email, planned for later</td><td class="names">Configuration set <code>dev-radiaflow-ses</code>; sender <code>no-reply@radiaflow-dev.medilis.ai</code></td><td>Amazon SES: domain identity, DKIM and SPF, production access, sender</td><td>4</td><td>Test email delivered from the production domain, not sandbox</td></tr>
+<tr><td>11</td><td>Push channel decision and setup</td><td class="names">IoT policy <code>dev-radiaflow-iot-client</code>; topic pattern <code>dev/radiaflow/users/{userId}</code></td><td>AWS IoT Core (recommended) or API Gateway WebSocket with DynamoDB</td><td>5</td><td>Browser receives a test message; URL generation works for 24 hours</td></tr>
+<tr><td>12</td><td>Secrets</td><td class="names"><code>/dev/radiaflow/origin-verify</code>, <code>/dev/radiaflow/db/useraccount</code>, <code>/dev/radiaflow/db/log</code>; settings under <code>/dev/radiaflow/config/</code></td><td>Secrets Manager</td><td>7 or 7a</td><td>Secrets exist and are readable only by the task role</td></tr>
+<tr><td>13</td><td>Compute (ComputeStack)</td><td class="names">Stack <code>dev-radiaflow-compute</code>; <code>dev-radiaflow-cluster</code>; <code>dev-radiaflow-alb</code>; <code>dev-radiaflow-tg-useraccount</code>; service <code>dev-radiaflow-useraccount-svc</code>; task definition <code>dev-radiaflow-useraccount</code>; roles <code>dev-radiaflow-role-task-useraccount</code>, <code>dev-radiaflow-role-exec</code>; log group <code>/dev/radiaflow/ecs/useraccount</code></td><td>ECS cluster, internal ALB, Fargate service (ARM64), task role, autoscaling, log group</td><td>5, 6, 7 or 7a, 9, 12</td><td>/health returns 200 through the ALB; console log reaches CloudWatch; rows appear in log.log_api</td></tr>
+<tr><td>14</td><td>API entry point (ApiStack)</td><td class="names">Stack <code>dev-radiaflow-api</code>; <code>dev-radiaflow-http-api</code>; <code>dev-radiaflow-vpclink</code>; authorizer <code>dev-radiaflow-cognito-jwt</code>; log group <code>/dev/radiaflow/apigw/access</code></td><td>API Gateway HTTP API, VPC Link, JWT authorizer, header mapping, throttling</td><td>9, 13</td><td>Valid ID token reaches the service; missing or expired token returns 401; direct ALB access returns 403</td></tr>
+<tr><td>15</td><td>Front end hosting</td><td class="names">Stack <code>dev-radiaflow-web</code>; buckets <code>dev-radiaflow-spa-111122223333-il-central-1</code>, <code>dev-radiaflow-static-111122223333-il-central-1</code>; CloudFront <code>dev-radiaflow-cdn</code>; access control <code>dev-radiaflow-spa-oac</code>; logs bucket <code>dev-radiaflow-access-logs-111122223333-il-central-1</code></td><td>S3 with Origin Access Control, CloudFront, DNS records</td><td>4, 14</td><td>React build loads over HTTPS and calls /api through one domain</td></tr>
+<tr><td>16</td><td>Monitoring and alerts</td><td class="names">Stack <code>dev-radiaflow-observability</code>; topic <code>dev-radiaflow-alerts</code>; alarms <code>dev-radiaflow-alarm-alb-5xx</code>, <code>-ecs-tasks</code>, <code>-log-errors</code>, <code>-ecs-cpu</code>, <code>-rds-cpu</code>; <code>dev-radiaflow-dashboard</code></td><td>CloudWatch alarms and dashboards, SNS topic, metric filters</td><td>13, 14</td><td>Alarms for 5xx, ECS tasks, RDS and error logs notify the team</td></tr>
+<tr><td>17</td><td>Pipeline and migrations</td><td class="names">Pipeline <code>radiaflow-useraccount</code>; environments <code>radiaflow-dev</code>, <code>radiaflow-prod</code>; deploy role <code>dev-radiaflow-role-deploy</code>; migration task <code>dev-radiaflow-migrator</code></td><td>Azure Pipelines: build, test, image to ECR, cdk deploy, migration task, prod approval</td><td>2, 6, 13</td><td>A commit builds, tests, deploys to dev and runs migrations</td></tr>
+<tr><td>18</td><td>Hardening</td><td class="names">Web ACL <code>dev-radiaflow-waf</code> (us-east-1); policies <code>dev-radiaflow-policy-*</code></td><td>AWS WAF on CloudFront, secret rotation, IAM review, optional GuardDuty and Security Hub</td><td>14, 15</td><td>Findings reviewed; penetration test of ALB and API Gateway boundaries closed</td></tr>
+<tr><td>19</td><td>Data and user migration, cutover</td><td class="names">No new resources; users go into <code>dev-radiaflow-users</code></td><td>Cognito user import, DMS or ETL delta, DNS switch</td><td>8, 9, 18</td><td>Users imported with temporary passwords; production data copied; rollback plan agreed</td></tr>
+<tr><td>20</td><td>Recovery tests and go-live</td><td class="names">Snapshot <code>dev-radiaflow-sql-pre-go-live</code></td><td>RDS snapshot restore test, Multi-AZ failover test, runbook</td><td>19</td><td>Restore and failover tested; RPO and RTO agreed; runbook signed off</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="todo-prod">
+<h2>Build order and names to create: prod</h2>
+<p>Prod is built after dev works end to end, in the same account and with the same CDK code (<code>cdk deploy -c env=prod</code>). Step numbers match the dev table. Account-wide items done once for dev are reused. Click a highlighted name to copy it.</p>
+<div class="callout"><p><b>Gate before any prod step.</b> Dev steps 0 to 20 are done and the pipeline has deployed to dev at least once. The decrypt-and-re-encrypt copy has been rehearsed (step 8 or 8a). Open items 6, 7, 11, 12, 16, 21 and 22 are closed, RPO and RTO are set, and the dev team group is set as approver on <code>radiaflow-prod</code>.</p></div>
+<div class="tw"><table>
+<thead><tr><th>#</th><th>Step</th><th>Suggested names to create (prod)</th><th>AWS service or tool</th><th>Depends on</th><th>Done when</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>Prod capacity check</td><td class="names">Nothing to create; check quotas for 2 NAT gateways, Elastic IPs, VPCs and Fargate vCPUs in <code>il-central-1</code></td><td>Service Quotas</td><td>Gate</td><td>Quota requests approved</td></tr>
+<tr><td>1</td><td>Prod budget and alerts</td><td class="names"><code>prod-radiaflow-budget-monthly</code>; reuse the existing trail</td><td>AWS Budgets, CloudTrail</td><td>Gate</td><td>Budget alert reaches the team</td></tr>
+<tr><td>2</td><td>Prod deploy access</td><td class="names"><code>prod-radiaflow-role-deploy</code> (trusts only <code>aws-radiaflow-prod</code>); service connection <code>aws-radiaflow-prod</code>; environment <code>radiaflow-prod</code> with approval by Vigen and Gera</td><td>IAM role, Azure DevOps service connection and environment</td><td>Gate</td><td>The dev connection cannot assume the prod role; a prod run waits for approval</td></tr>
+<tr><td>3</td><td>CDK bootstrap</td><td class="names">Already done for dev (same account and regions); nothing new</td><td>AWS CDK</td><td>Gate</td><td>Confirmed</td></tr>
+<tr><td>4</td><td>DNS and certificates</td><td class="names">Hostname <code>radiaflow.medilis.ai</code>; certificates tagged <code>prod-radiaflow-cert-il-central-1</code> and <code>prod-radiaflow-cert-us-east-1</code></td><td>Namesilo DNS (records by hand, or the subdomain delegated to Route 53), ACM</td><td>3</td><td>Certificates issued and validated; the hostname is prepared but not yet pointing at prod</td></tr>
+<tr><td>5</td><td>Network</td><td class="names">Stack <code>prod-radiaflow-network</code>; <code>prod-radiaflow-vpc</code> (<code>10.1.0.0/16</code>); subnets <code>prod-radiaflow-public-a</code>, <code>-app-a</code>, <code>-db-a</code> (and <code>-b</code>); <code>prod-radiaflow-igw</code>; NAT in both zones <code>prod-radiaflow-nat-a</code>, <code>-nat-b</code>; security groups <code>prod-radiaflow-sg-vpclink</code>, <code>-sg-alb</code>, <code>-sg-ecs</code>, <code>-sg-rds</code>, <code>-sg-endpoints</code>; endpoints <code>prod-radiaflow-vpce-s3</code>, <code>-ecr-api</code>, <code>-ecr-dkr</code>, <code>-logs</code>, <code>-secretsmanager</code>; <code>prod-radiaflow-db-subnets</code></td><td>VPC, subnets, two NAT gateways, security groups, endpoints</td><td>0, 3</td><td>Two AZs, three subnet tiers, no overlap with dev or other VPCs, no peering</td></tr>
+<tr><td>6</td><td>Container registry</td><td class="names">ECR repository <code>prod-radiaflow/useraccount</code> (images are copied here from the dev repository by digest)</td><td>ECR repository, image scanning</td><td>3</td><td>Repository exists with scanning on</td></tr>
+<tr><td>7</td><td>Database (always RDS in prod)</td><td class="names">Stack <code>prod-radiaflow-data</code>; <code>prod-radiaflow-sql</code> (Multi-AZ), <code>prod-radiaflow-sql-params</code>, <code>prod-radiaflow-sql-options</code>; role <code>prod-radiaflow-role-rds-backup</code>; bucket <code>prod-radiaflow-sql-backups-111122223333-il-central-1</code>; keys <code>alias/prod-radiaflow-rds</code>, <code>alias/prod-radiaflow-s3</code></td><td>RDS for SQL Server 2022 Multi-AZ, deletion protection, KMS, S3 backup bucket, RDS-managed secret</td><td>5</td><td>Instance available in UTC in two zones; failover tested; backups on; instance size decided (large or xlarge)</td></tr>
+<tr><td>8</td><td>Database content</td><td class="names">Database <code>RadsForVets</code> and the log table <code>log.log_api</code>; logins <code>radiaflow_useraccount</code>, <code>radiaflow_migrator</code>; new key and certificate created on this instance</td><td>SQL scripts, decrypt-and-re-encrypt copy of production data from Azure SQL, logins</td><td>7</td><td>Production data copied or ready for the final delta; <code>UserSelectById</code> works on prod RDS</td></tr>
+<tr><td>9</td><td>Identity</td><td class="names">Stack <code>prod-radiaflow-identity</code>; pool <code>prod-radiaflow-users</code>; client <code>prod-radiaflow-spa</code>; domain prefix <code>prod-radiaflow-auth</code>; callback <code>https://radiaflow.medilis.ai/callback</code>; attributes <code>custom:user_id</code>, <code>custom:company_id</code></td><td>Cognito user pool, app client, hosted UI domain, MFA, retained on delete</td><td>3</td><td>Test admin signs in with MFA; ID token carries the custom claims</td></tr>
+<tr><td>10</td><td>Email (needed before go-live if users must get temporary passwords)</td><td class="names">SES identity <code>radiaflow.medilis.ai</code>; configuration set <code>prod-radiaflow-ses</code>; sender <code>no-reply@radiaflow.medilis.ai</code></td><td>Amazon SES: DKIM and SPF records at Namesilo, production access request</td><td>4</td><td>Test email delivered from the production domain, out of the sandbox</td></tr>
+<tr><td>11</td><td>Push channel</td><td class="names">IoT policy <code>prod-radiaflow-iot-client</code>; topic pattern <code>prod/radiaflow/users/{userId}</code></td><td>AWS IoT Core (or the chosen alternative)</td><td>5</td><td>Browser receives a test message</td></tr>
+<tr><td>12</td><td>Secrets</td><td class="names"><code>/prod/radiaflow/origin-verify</code>, <code>/prod/radiaflow/db/useraccount</code>, <code>/prod/radiaflow/db/log</code>; settings under <code>/prod/radiaflow/config/</code></td><td>Secrets Manager</td><td>7</td><td>Secrets exist and only the prod task role can read them</td></tr>
+<tr><td>13</td><td>Compute</td><td class="names">Stack <code>prod-radiaflow-compute</code>; <code>prod-radiaflow-cluster</code>; <code>prod-radiaflow-alb</code>; <code>prod-radiaflow-tg-useraccount</code>; service <code>prod-radiaflow-useraccount-svc</code> (2 tasks); task definition <code>prod-radiaflow-useraccount</code>; roles <code>prod-radiaflow-role-task-useraccount</code>, <code>prod-radiaflow-role-exec</code>; log group <code>/prod/radiaflow/ecs/useraccount</code></td><td>ECS cluster, internal ALB, Fargate service (ARM64), autoscaling, log group</td><td>5, 6, 7, 9, 12</td><td>/health returns 200 through the ALB; logs reach CloudWatch and <code>log.log_api</code></td></tr>
+<tr><td>14</td><td>API entry point</td><td class="names">Stack <code>prod-radiaflow-api</code>; <code>prod-radiaflow-http-api</code>; <code>prod-radiaflow-vpclink</code>; authorizer <code>prod-radiaflow-cognito-jwt</code>; log group <code>/prod/radiaflow/apigw/access</code></td><td>API Gateway HTTP API, VPC Link, JWT authorizer, header mapping, throttling</td><td>9, 13</td><td>Valid ID token reaches the service; missing token returns 401; direct ALB access returns 403</td></tr>
+<tr><td>15</td><td>Front end hosting</td><td class="names">Stack <code>prod-radiaflow-web</code>; buckets <code>prod-radiaflow-spa-111122223333-il-central-1</code>, <code>prod-radiaflow-static-111122223333-il-central-1</code>; CloudFront <code>prod-radiaflow-cdn</code>; <code>prod-radiaflow-spa-oac</code>; logs bucket <code>prod-radiaflow-access-logs-111122223333-il-central-1</code></td><td>S3 with Origin Access Control, CloudFront, DNS records</td><td>4, 14</td><td>React build loads over HTTPS from the prod distribution (tested before the DNS switch)</td></tr>
+<tr><td>16</td><td>Monitoring and alerts</td><td class="names">Stack <code>prod-radiaflow-observability</code>; topic <code>prod-radiaflow-alerts</code> (real recipients); alarms <code>prod-radiaflow-alarm-alb-5xx</code>, <code>-ecs-tasks</code>, <code>-log-errors</code>, <code>-ecs-cpu</code>, <code>-rds-cpu</code>; <code>prod-radiaflow-dashboard</code></td><td>CloudWatch alarms and dashboards, SNS topic</td><td>13, 14</td><td>A test alarm notifies the on-call people</td></tr>
+<tr><td>17</td><td>Pipeline prod stage</td><td class="names">Stage <code>Prod</code> of pipeline <code>radiaflow-useraccount</code>; migration task <code>prod-radiaflow-migrator</code></td><td>Azure Pipelines with approval, cdk deploy, migration task</td><td>2, 6, 13</td><td>An approved run promotes the dev image by digest and passes the smoke test</td></tr>
+<tr><td>18</td><td>Hardening</td><td class="names">Web ACL <code>prod-radiaflow-waf</code> (us-east-1); policies <code>prod-radiaflow-policy-*</code></td><td>AWS WAF on CloudFront, secret rotation, IAM review, GuardDuty and Security Hub if used</td><td>14, 15</td><td>Penetration test closed; admin access reviewed</td></tr>
+<tr><td>19</td><td>Data and user migration, cutover</td><td class="names">Users import into <code>prod-radiaflow-users</code>; DNS switch of <code>radiaflow.medilis.ai</code></td><td>Cognito user import, final data delta, DNS switch</td><td>8, 9, 18</td><td>Users imported with temporary passwords; production data copied; DNS switched; rollback plan ready (Azure service and B2C kept until sign-off)</td></tr>
+<tr><td>20</td><td>Recovery tests and go-live</td><td class="names">Snapshot <code>prod-radiaflow-sql-pre-go-live</code></td><td>RDS snapshot restore test, Multi-AZ failover test, runbook</td><td>19</td><td>Restore and failover tested; RPO and RTO met; runbook signed off</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="open">
+<h2>Open items</h2>
+<p>Everything still undecided or unchecked. "Needed before" refers to the build-order steps above.</p>
+<div class="tw"><table>
+<thead><tr><th>#</th><th>Open item</th><th>Needed before</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Confirm Cognito, API Gateway VPC Link, ECS Fargate, RDS for SQL Server, SES and IoT Core are available in il-central-1, or agree a fallback region</td><td>Step 0</td><td>To assign</td></tr>
+<tr><td>2</td><td>List existing VPC CIDRs, CDK bootstrap stack and qualifier, CloudTrail, Route 53 zones, SES identities and quotas in the shared account; change our ranges <code>10.0.0.0/16</code> and <code>10.1.0.0/16</code> if they overlap</td><td>Steps 1, 3, 5</td><td>To assign</td></tr>
+<tr><td>3</td><td>DNS is at Namesilo: does the plan accept NS records for subdomains (so <code>radiaflow-dev</code> and <code>radiaflow</code> can be delegated to Route 53), or will records be added by hand?</td><td>Step 4</td><td>To assign</td></tr>
+<tr><td>4</td><td>Does an AWS identity provider for Azure DevOps already exist, and what is the Azure DevOps organisation id?</td><td>Step 2</td><td>Vigen, Gera</td></tr>
+<tr><td>5</td><td>Confirm <code>Microservices.Common</code> and the UserAccount project publish for <code>linux-arm64</code></td><td>Step 6</td><td>To assign</td></tr>
+<tr><td>6</td><td>List every table and column encrypted with <code>UserDetails_Key</code> (the creation script is not available, so data is decrypted and re-encrypted)</td><td>Step 8</td><td>To assign</td></tr>
+<tr><td>7</td><td>Plan the Azure SQL to RDS data move: BACPAC or ETL copy, cutover window and acceptable downtime</td><td>Steps 8, 19</td><td>To assign</td></tr>
+<tr><td>8</td><td>Which database holds the schema <code>log</code>, and what schedules <code>SqlArchiveApiLogTable</code> and <code>JobSqlArchiveLogsIfExceedsMaxCount</code> today</td><td>Step 8</td><td>To assign</td></tr>
+<tr><td>9</td><td>Confirm passwords are not stored in logged requests and responses (<code>PacsUserPassword</code>, <code>TemporaryPassword</code>)</td><td>Before go-live</td><td>To assign</td></tr>
+<tr><td>10</td><td>Longer audit retention: <code>log.log_api</code> keeps about two days and CloudWatch 30 days; decide if more is needed</td><td>Before go-live</td><td>To assign</td></tr>
+<tr><td>11</td><td>Push channel: AWS IoT Core (recommended) or API Gateway WebSocket with DynamoDB; the shared <code>WebSocketSubPubHelper</code> affects all services</td><td>Step 11</td><td>To assign</td></tr>
+<tr><td>12</td><td>Keep the legacy user id in <code>custom:user_id</code>, or add a <code>cognito_sub</code> column to <code>mst_user</code></td><td>Step 9</td><td>To assign</td></tr>
+<tr><td>13</td><td>Verify the API Gateway header mapping variable on first deployment, and align <code>claims.sub</code> with <code>custom:user_id</code></td><td>Step 14</td><td>To assign</td></tr>
+<tr><td>14</td><td>Set <code>UserAccountSettings.PasswordLength</code> to 12 or more to match the Cognito password policy</td><td>Step 9</td><td>To assign</td></tr>
+<tr><td>15</td><td>Implement or drop <code>userBillingRemove</code> (currently an empty stub)</td><td>Step 13</td><td>To assign</td></tr>
+<tr><td>16</td><td>Confirm that every signed-in admin-staff user may call every UserAccount action in this phase</td><td>Step 14</td><td>Vigen, Gera</td></tr>
+<tr><td>17</td><td>Review and fix existing code issues (section UserAccount service, findings)</td><td>Before go-live</td><td>To assign</td></tr>
+<tr><td>18</td><td>SES setup is planned for later; until then RegisterUser and ResetPassword cannot email temporary passwords. Decide when</td><td>Step 10</td><td>To assign</td></tr>
+<tr><td>19</td><td>Compare the monthly estimate above with the current Azure SQL cost and confirm instance sizes</td><td>Step 7</td><td>To assign</td></tr>
+<tr><td>20</td><td>Confirm retention periods for S3 buckets against the audit policy</td><td>Step 7</td><td>To assign</td></tr>
+<tr><td>21</td><td>Set RPO and RTO targets</td><td>Step 20</td><td>To assign</td></tr>
+<tr><td>22</td><td>Set the dev team group as approvers on the <code>radiaflow-prod</code> environment with self-approval off</td><td>Step 17</td><td>Vigen, Gera</td></tr>
+<tr><td>23</td><td>Choose the dev database: RDS or a VM with Developer or Express edition; check the size of <code>RadsForVets</code> and the log database against the 10 GB Express limit</td><td>Step 7 or 7a</td><td>To assign</td></tr>
+<tr><td>24</td><td>Agree masked or sample data for dev, because the tables hold personal data</td><td>Step 8</td><td>To assign</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="network">
+<h2>Network and account</h2>
+<p>All workloads run in one VPC per environment across two Availability Zones in il-central-1. Dev and prod share one existing AWS account that also holds other Medilis resources, so isolation comes from naming, IAM and network design.</p>
+<h3>Subnets (dev; prod uses <code>10.1.0.0/16</code>)</h3>
+<div class="tw"><table><thead><tr><th>Tier</th><th>Subnets</th><th>Hosts</th><th>Rules</th></tr></thead><tbody>
+<tr><td>VPC</td><td>10.0.0.0/16, il-central-1a and 1b</td><td>Everything below</td><td>DNS hostnames on</td></tr>
+<tr><td>Public</td><td>10.0.1.0/24, 10.0.2.0/24</td><td>NAT gateway</td><td>Route 0.0.0.0/0 to the internet gateway</td></tr>
+<tr><td>Private app</td><td>10.0.10.0/24, 10.0.11.0/24</td><td>Internal ALB, ECS Fargate tasks, VPC Link</td><td>No public IPs; egress via NAT or endpoints</td></tr>
+<tr><td>Private DB</td><td>10.0.20.0/24, 10.0.21.0/24</td><td>RDS for SQL Server</td><td>Port 1433 from the ECS security group only; no route to the internet</td></tr>
+</tbody></table></div>
+<h3>Security groups</h3>
+<div class="tw"><table><thead><tr><th>Group</th><th>Inbound</th><th>Source</th></tr></thead><tbody>
+<tr><td><code>sg-vpclink</code></td><td>none (egress only)</td><td>API Gateway VPC Link interfaces</td></tr>
+<tr><td><code>sg-alb</code></td><td>80 (inside the VPC)</td><td><code>sg-vpclink</code></td></tr>
+<tr><td><code>sg-ecs</code></td><td>8080</td><td><code>sg-alb</code></td></tr>
+<tr><td><code>sg-rds</code></td><td>1433</td><td><code>sg-ecs</code></td></tr>
+<tr><td><code>sg-endpoints</code></td><td>443</td><td><code>sg-ecs</code></td></tr>
+<tr><td><code>sg-sqlvm</code> (dev VM option only)</td><td>1433</td><td><code>sg-ecs</code></td></tr>
+</tbody></table></div>
+<p><b>VPC endpoints:</b> S3 gateway endpoint; interface endpoints for ECR API, ECR DKR, CloudWatch Logs, Secrets Manager, Cognito IDP and KMS. RDS reaches S3 for native backup and restore through the gateway endpoint.</p>
+<h3>One account, two environments</h3>
+<div class="tw"><table><thead><tr><th>Area</th><th>Rule</th></tr></thead><tbody>
+<tr><td>Shared once per account</td><td>These probably exist already, so reuse them: CDK bootstrap (per region), CloudTrail trail and bucket, OIDC identity provider, GuardDuty and Security Hub, budgets. SES production access is not set up yet. DNS is at Namesilo, not Route 53</td></tr>
+<tr><td>Created per environment</td><td>VPC, RDS instance, Cognito pool, S3 buckets, ECS cluster and services, ALB, API Gateway, CloudFront, WAF, secrets, KMS keys, log groups, alarms</td></tr>
+<tr><td>Network</td><td>Separate VPC per environment with non-overlapping ranges: dev <code>10.0.0.0/16</code>, prod <code>10.1.0.0/16</code>; no peering. Dev may use one NAT gateway, prod one per AZ</td></tr>
+<tr><td>Deploy roles</td><td><code>dev-radiaflow-role-deploy</code> can only act on resources named <code>dev-radiaflow-*</code> or under <code>/dev/radiaflow/</code>; the prod role mirrors it. The pipeline uses the prod role only for the prod stage, behind a manual approval</td></tr>
+<tr><td>Runtime roles</td><td>Task roles are scoped by name prefix (for example <code>arn:aws:s3:::dev-radiaflow-*</code>), so a dev service cannot read a prod bucket or secret even by mistake</td></tr>
+<tr><td>Tag-based guards</td><td>IAM conditions on <code>aws:ResourceTag/Environment</code>; the tag <code>Environment</code> is a cost allocation tag so reports split dev and prod</td></tr>
+<tr><td>Protection in prod</td><td>Deletion protection on RDS, <code>RETAIN</code> on buckets and the user pool; dev stacks may be destroyed and recreated</td></tr>
+<tr><td>Quotas</td><td>VPCs, Elastic IPs, NAT gateways and ENIs are per account and region; compare the planned ranges with existing VPCs and change ours if they overlap. Never edit or re-tag the existing resources</td></tr>
+<tr><td>Blast radius</td><td>A mistake with an admin role can reach both environments and the other Medilis workloads; keep admin access limited, require MFA and review CloudTrail for the prod prefix</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="auth">
+<h2>Sign-in and API edge</h2>
+<p>API Gateway validates the Cognito JWT once at the edge and forwards the verified user id to the service as <code>X-User-Id</code>; services never parse tokens. The portal is for admin staff only: access depends on who is invited to the Cognito pool (self sign-up off, MFA required), and every signed-in user may call every API in this phase.</p>
+<div class="tw"><table><thead><tr><th>Setting</th><th>Value</th></tr></thead><tbody>
+<tr><td>Issuer</td><td><code>https://cognito-idp.il-central-1.amazonaws.com/{UserPoolId}</code></td></tr>
+<tr><td>Audience</td><td>The app client id (matched against <code>client_id</code> for access tokens, <code>aud</code> for ID tokens)</td></tr>
+<tr><td>Token sent by the SPA</td><td>ID token, because it carries <code>email</code>, <code>custom:company_id</code> and <code>custom:user_id</code></td></tr>
+<tr><td>SPA flow</td><td>Authorization Code with PKCE via the Cognito hosted UI; no client secret</td></tr>
+</tbody></table></div>
+<div class="tw"><table><thead><tr><th>Route</th><th>Authorization</th></tr></thead><tbody>
+<tr><td><code>GET /api/public/*</code>, <code>GET /health</code></td><td>None</td></tr>
+<tr><td><code>ANY /api/{proxy+}</code></td><td>JWT authorizer</td></tr>
+</tbody></table></div>
+<h3>Header mapping and defence inside the VPC</h3>
+<ul>
+<li>API Gateway overwrites <code>X-User-Id</code> from the verified token and sets a static <code>X-Origin-Verify</code> secret (generated by CDK, stored in Secrets Manager for the services). Overwriting means a client-supplied <code>X-User-Id</code> is always replaced.</li>
+<li>API Gateway cannot read Secrets Manager at request time, so the origin secret is a static value in the integration; rotating it means redeploying the integration. Verify the exact claims variable (<code>$context.authorizer.claims.&lt;name&gt;</code>) on the first deployment.</li>
+<li>Defence layer 1: the ALB is internal and its security group accepts only the VPC Link group.</li>
+<li>Defence layer 2: a middleware rejects requests without the right <code>X-Origin-Verify</code> value with 403, using a constant-time comparison.</li>
+</ul>
+<pre><button class="copy" type="button">Copy</button><code>// cdk.json context: the only place names and the system name are set
+{ "env": "dev", "sys": "radiaflow", "Sys": "RadiaFlow", "domain": "medilis.ai" }</code></pre>
+</section>
+
+<section id="data">
+<h2>Database</h2>
+<p>One Multi-AZ RDS for SQL Server instance per environment hosts the existing <code>RadsForVets</code> database (schema <code>dbo</code>, unchanged) and the existing logging table <code>log.log_api</code>. No new schema or table is created. Portal users stay in <code>dbo.mst_user</code>. All database access stays on <code>SqlDbHelper</code> with Dapper and stored procedures, as the repository standard requires.</p>
+<h3>Logins</h3>
+<div class="tw"><table><thead><tr><th>Login</th><th>Permissions</th></tr></thead><tbody>
+<tr><td><code>radiaflow_useraccount</code></td><td>Execute on the 11 UserAccount stored procedures; open the <code>UserDetails_Key</code> symmetric key; insert on <code>log.log_api</code></td></tr>
+<tr><td><code>radiaflow_migrator</code></td><td>DDL; used only by the migration task</td></tr>
+</tbody></table></div>
+<h3>RDS settings</h3>
+<ul>
+<li><b>Edition:</b> SQL Server 2022 Standard (Enterprise only if a feature needs it), license included, Multi-AZ in prod. Web and Express editions do not offer Multi-AZ. Compatibility level 160.</li>
+<li><b>Instance class:</b> M6I or R6I family. SQL Server on RDS has no Graviton option, so the database is the one x86 component; the Fargate tasks stay ARM64. Newer optimize-CPU generations may be cheaper (see Monthly cost).</li>
+<li><b>Time zone:</b> set to UTC at creation; it cannot be changed later. The stored procedures use <code>GETDATE()</code> and Azure SQL runs in UTC.</li>
+<li><b>Database name:</b> keep <code>RadsForVets</code>; <code>UserTosSelect</code> reads <code>[RadsForVets].[dbo].[vw_mst_tos_active]</code> by a three-part name.</li>
+<li><b>Symmetric-key encryption:</b> <code>UserDetails_Key</code> and the certificate <code>Rads4Vets</code> live inside the database. The creation script and certificate backup are not available, so production data moves by a one-time decrypt-and-re-encrypt copy: create a new key and certificate on RDS, read each encrypted column through the existing key on Azure SQL, write it back with the new key. About 84 stored procedures and scripts reference this key (users, clinics, physicians, radiologists, studies, chat, billing), so this is a database-wide job. This is the biggest technical risk.</li>
+<li><b>Backups:</b> automated backups with point-in-time recovery (up to 35 days) plus a manual snapshot before each production migration. The <code>SQLSERVER_BACKUP_RESTORE</code> option with an IAM role for an S3 bucket supports native backups from the test SQL Server; production Azure SQL Database cannot write native backups and needs a BACPAC or ETL copy.</li>
+<li><b>Encryption at rest:</b> KMS storage encryption. <b>Credentials:</b> RDS-managed master secret with rotation; service logins stored as separate secrets.</li>
+<li><b>Migrations:</b> versioned, idempotent T-SQL scripts (<code>CREATE OR ALTER</code>) run by a one-off ECS task in the pipeline, never at application start-up.</li>
+</ul>
+</section>
+
+<section id="devdb">
+<h2>Dev database option: SQL Server on a VM</h2>
+<p class="lead">Yes, it is possible. Dev can run SQL Server on an EC2 virtual machine with a free edition instead of RDS, which cuts the dev bill from about $960 to about $215 a month. The catch is that the team then runs the database server itself.</p>
+
+<h3>Which free edition</h3>
+<div class="tw"><table>
+<thead><tr><th></th><th>Developer edition (recommended)</th><th>Express edition</th></tr></thead>
+<tbody>
+<tr><td>Licence</td><td>Free, for non-production use only. Dev counts as non-production</td><td>Free, including production use</td></tr>
+<tr><td>Size limit</td><td>None</td><td>10 GB per database (data files)</td></tr>
+<tr><td>Memory and CPU</td><td>No edition limit</td><td>About 1.4 GB buffer pool and 4 cores</td></tr>
+<tr><td>SQL Server Agent (scheduled jobs)</td><td>Yes</td><td>No, so the log archive job needs another scheduler</td></tr>
+<tr><td>Encryption functions, <code>AT TIME ZONE</code>, dynamic SQL</td><td>Yes</td><td>Yes (the 11 stored procedures use only these)</td></tr>
+<tr><td>How to get it</td><td>Install from Microsoft's media on a Windows or Linux VM</td><td>AWS publishes Windows Server images with SQL Server Express preinstalled; confirm one is offered in il-central-1</td></tr>
+<tr><td>Fits when</td><td>The copy of <code>RadsForVets</code> is over 10 GB, or jobs are needed</td><td>The dev copy is small (under about 8 GB) and a trimmed copy is acceptable</td></tr>
+</tbody></table></div>
+<p>Check the size of <code>RadsForVets</code> and the log database first. If either is close to 10 GB, Express will stop accepting data. The simplest safe choice is Developer edition on Windows Server, which is closest to RDS.</p>
+
+<h3>RDS versus a VM for dev</h3>
+<div class="tw"><table>
+<thead><tr><th></th><th>RDS for SQL Server (as for prod)</th><th>EC2 VM with Developer or Express</th></tr></thead>
+<tbody>
+<tr><td>Monthly cost</td><td>≈ $853 for the database</td><td>≈ $65 to $108</td></tr>
+<tr><td>Patching, backups, failover</td><td>Managed by AWS</td><td>Done by the team: Windows and SQL updates, snapshots, restore tests</td></tr>
+<tr><td>Same behaviour as prod</td><td>Identical</td><td>Close, not identical: RDS has no sysadmin rights, runs in UTC, and uses its own backup procedures and option groups</td></tr>
+<tr><td>Real data</td><td>Copy of production possible</td><td>Same, but use masked or sample data in dev either way (the tables hold personal data)</td></tr>
+</tbody></table></div>
+
+<h3>How to set it up</h3>
+<ol>
+<li>Create one EC2 instance in a private DB subnet with no public IP: <code class="n">dev-radiaflow-sqlvm</code>, <code>t3.large</code> (Developer) or <code>t3.medium</code> (Express), encrypted gp3 volume of at least 100 GB.</li>
+<li>Use security group <code class="n">dev-radiaflow-sg-sqlvm</code> that allows port 1433 only from <code>dev-radiaflow-sg-ecs</code>. Reach the machine for administration through AWS Systems Manager Session Manager, not RDP or SSH over the internet.</li>
+<li>Give the machine the role <code class="n">dev-radiaflow-role-sqlvm</code> (Session Manager, read and write on the dev backup bucket, read on its own secret).</li>
+<li>Install SQL Server 2022 (Developer or Express), set the Windows time zone to UTC, collation to match the current database, and enable TCP on 1433.</li>
+<li>Restore or copy <code>RadsForVets</code> and create the <code>log</code> schema; create the logins <code>radiaflow_useraccount</code> and <code>radiaflow_migrator</code>; copy the encryption key set-up used on RDS.</li>
+<li>Store the connection strings in the existing secrets <code>/dev/radiaflow/db/useraccount</code> and <code>/dev/radiaflow/db/log</code>, pointing at the VM's private address. The service code does not change.</li>
+<li>Back up: a daily snapshot policy <code class="n">dev-radiaflow-dlm-sqlvm</code> for the volume, plus a native backup to <code>dev-radiaflow-sql-backups-…</code> before each pipeline migration run. Stop the VM outside working hours if you want to save more.</li>
+</ol>
+
+<div class="callout warn">
+<p><b>Parity risk.</b> If dev runs on a VM, the pipeline never exercises RDS before prod. Before the prod cutover, validate the migration once on a temporary RDS instance (create it, run the key copy and the 11 stored procedures, delete it). It costs a few dollars and removes the biggest surprise. This is step 8a in the build order.</p>
+</div>
+<p>Prod stays on Multi-AZ RDS in every case. Run only one dev database at a time: either RDS or the VM, not both.</p>
+</section>
+
+<section id="logging">
+<h2>Logging</h2>
+<p>The UserAccount service keeps the logging the platform already has, so no new logging code, table, queue or worker is built. <code>LoggerConfigurator.ConfigureLogger</code> in <code>Microservices.Common</code> writes every event to the console and, when <code>SerilogSettings:WriteLogToDataBase</code> is true, to the table <code>log.log_api</code> through Serilog.Sinks.MSSqlServer. <code>BaseController</code> logs each API call with its request, response, user, duration and transaction id.</p>
+<div class="tw"><table><thead><tr><th>Sink</th><th>Today</th><th>On AWS</th></tr></thead><tbody>
+<tr><td>Console</td><td>Console output</td><td>The ECS awslogs driver ships it to CloudWatch Logs group <code>/dev/radiaflow/ecs/useraccount</code>, retention 30 days</td></tr>
+<tr><td>SQL <code>log.log_api</code></td><td>Batched MSSqlServer sink with the standard columns plus ServiceName, FunctionName, Request, Response, UserName, Duration, TransactionId, FriendlyErrorResponse</td><td>Same code and table; <code>SerilogSettings:LogDBConnectionString</code> comes from Secrets Manager and points to RDS</td></tr>
+<tr><td>File</td><td>Optional rolling file</td><td>Off; containers are stateless</td></tr>
+</tbody></table></div>
+<h3>What to do on AWS</h3>
+<ol>
+<li>Set <code>SerilogSettings__WriteLogToDataBase=true</code>, <code>SerilogSettings__WriteLogToFile=false</code>, <code>SerilogSettings__RestrictedToMinimumLevel=Information</code>; store <code>SerilogSettings__LogDBConnectionString</code> in the secret <code>/dev/radiaflow/db/log</code>.</li>
+<li>Confirm which database holds the schema <code>log</code>. The sink runs with <code>AutoCreateSqlTable = false</code>, so the table must exist first. <code>SqlArchiveApiLogTable</code> creates it (renames the current table to <code>log_api_archive</code> and builds a new one); run it once on RDS. <code>EmailLogInsert</code> also uses this connection string.</li>
+<li>Re-create whatever schedules <code>SqlArchiveApiLogTable</code> and <code>JobSqlArchiveLogsIfExceedsMaxCount</code> today. SQL Server Agent is available on RDS; find out what runs them now.</li>
+<li>Give the service login insert permission on <code>log.log_api</code>.</li>
+<li>Review sensitive data: the full request and response JSON is logged; <code>RegisterUser</code> carries <code>PacsUserPassword</code> and <code>ResetPasswordByEmail</code> returns <code>TemporaryPassword</code>. Confirm they are masked before go-live.</li>
+<li>Make the logged user id match the new token: <code>ContextHelper</code> must read <code>custom:user_id</code>.</li>
+</ol>
+<h3>Limits to accept</h3>
+<ul>
+<li><code>log.log_api</code> keeps only today's rows plus the previous day, because the archive procedure drops the older archive each run. CloudWatch keeps 30 days and is the longer history.</li>
+<li>The SQL sink batches in memory and retries; while RDS is unreachable, events can be missing from the table (never from CloudWatch).</li>
+<li>If a durable queue is needed later, a Serilog SQS batch sink and a worker writing into the same table can be added; it is not part of the first release.</li>
+</ul>
+</section>
+
+<section id="useraccount">
+<h2>UserAccount service on AWS</h2>
+<p>The AWS version is a new project, <code>UserAccount.Aws.Microservice</code>, with the same 17 business endpoints, request and response models and stored procedures. It swaps only the Azure services: Azure AD B2C to Cognito, SendGrid to SES, Azure Web PubSub to an AWS push channel, Key Vault to Secrets Manager. The Azure project and <code>Microservices.Common</code> stay untouched; the new service implements the existing <code>IGraphHelper</code> and <code>IEmailNotificationHelper</code> interfaces so <code>UserAccountService</code> changes very little.</p>
+<h3>Endpoints</h3>
+<p>All routes are under <code>/api/UserAccount</code>. <code>IsAlive</code> and <code>FlushCache</code> come from <code>BaseController</code> and are unchanged.</p>
+<div class="tw"><table><thead><tr><th>#</th><th>Route</th><th>Today</th><th>On AWS</th></tr></thead><tbody>
+<tr><td>1</td><td>POST <code>saveUserTos</code></td><td><code>UserTosInsert</code></td><td>No change. Take the user id from the validated token, not the body</td></tr>
+<tr><td>2</td><td>GET <code>getUserTos</code></td><td><code>UserTosSelect</code>, base64 of the document</td><td>No change</td></tr>
+<tr><td>3</td><td>POST <code>IsUserExists</code></td><td>B2C lookup by mail and UPN, then <code>UserSearchByEmail</code></td><td>Cognito <code>ListUsers</code> with filter <code>email = "x"</code>, then the stored procedure</td></tr>
+<tr><td>4</td><td>POST <code>CheckIsUserExists</code></td><td>Same, with a message</td><td>Same</td></tr>
+<tr><td>5</td><td>POST <code>IsUserExistsInDb</code></td><td><code>UserSearchByEmail</code> only</td><td>No change</td></tr>
+<tr><td>6</td><td>POST <code>RegisterUser</code></td><td>B2C create, <code>UserInsertUpdate</code>, SendGrid temporary password</td><td><code>AdminCreateUser</code> (message suppressed), <code>UserInsertUpdate</code>, SES email</td></tr>
+<tr><td>7</td><td>GET <code>GetUserById</code></td><td><code>UserSessionInsert</code>, <code>UserSelectById</code>, <code>UserClinicsConnection</code> for type 6, Web PubSub URL</td><td>Same procedures; token expiry from the validated JWT; push-channel URL from AWS</td></tr>
+<tr><td>8</td><td>POST <code>DisableUser</code></td><td>B2C disable, <code>UserEnableDisableUpdate</code>, <code>GetUserById</code></td><td><code>AdminDisableUser</code> plus <code>AdminUserGlobalSignOut</code>, then the same procedure</td></tr>
+<tr><td>9</td><td>POST <code>EnableUser</code></td><td>B2C enable, procedure</td><td><code>AdminEnableUser</code>, same procedure</td></tr>
+<tr><td>10</td><td>POST <code>DeleteUser</code></td><td><code>UserDelete</code>, then B2C delete</td><td>Same order, <code>AdminDeleteUser</code></td></tr>
+<tr><td>11</td><td>POST <code>ResetPassword</code></td><td>New temporary password in B2C, email</td><td><code>AdminSetUserPassword</code> with <code>Permanent = false</code>, SES email</td></tr>
+<tr><td>12</td><td>POST <code>ResetPasswordByEmail</code></td><td>Find by mail, identity or UPN; temporary password returned to the UI</td><td><code>ListUsers</code> by email, <code>AdminSetUserPassword</code> with <code>Permanent = false</code>; no email</td></tr>
+<tr><td>13</td><td>POST <code>GetUsers</code> (query string)</td><td><code>UserSelect</code></td><td>No change</td></tr>
+<tr><td>14</td><td>PUT (root)</td><td>B2C PATCH, <code>UserInsertUpdate</code></td><td><code>AdminUpdateUserAttributes</code> (name, email, <code>custom:company_id</code>, enabled), same procedure</td></tr>
+<tr><td>15</td><td>POST <code>userClinicRemove</code></td><td><code>ClinicUserRemoveConnection</code></td><td>No change</td></tr>
+<tr><td>16</td><td>POST <code>userBillingRemove</code></td><td>Empty stub</td><td>Open: implement or drop</td></tr>
+<tr><td>17</td><td>GET <code>GetEmptyCompanyUsers</code></td><td>B2C filter <code>jobTitle eq 000…0</code></td><td>Cognito cannot filter on custom attributes; read from SQL Server (<code>mst_user.company_id</code> = empty GUID) with a new stored procedure</td></tr>
+</tbody></table></div>
+<h3>Azure dependencies and their AWS replacements</h3>
+<div class="tw"><table><thead><tr><th>Today</th><th>Used for</th><th>AWS replacement</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Azure AD B2C through Microsoft Graph (<code>GraphHelper</code>)</td><td>Create, find, update, enable, disable, reset, delete users</td><td>Cognito user pool through <code>AWSSDK.CognitoIdentityProvider</code></td><td>New <code>CognitoHelper : IGraphHelper</code>; same <code>UserInfo</code> result type</td></tr>
+<tr><td>SendGrid (<code>EMailHelper</code>)</td><td>Temporary password and reset emails</td><td>Amazon SES (<code>AWSSDK.SimpleEmailV2</code>)</td><td>Verify the sender domain; leave the sandbox before cutover; keep <code>EmailLogInsert</code></td></tr>
+<tr><td>Blob static content</td><td>HTML email template</td><td>S3 object or file in the image</td><td>Removes one dependency</td></tr>
+<tr><td>Azure Web PubSub (<code>WebSocketSubPubHelper</code>)</td><td><code>WssMessagesChannelUrl</code>, server push by user id</td><td>AWS IoT Core over WebSocket (recommended) or API Gateway WebSocket with DynamoDB</td><td>Shared by many services, so the change reaches beyond UserAccount</td></tr>
+<tr><td>Key Vault (<code>SECRET-</code> placeholders)</td><td>Connection strings, B2C secrets, API keys</td><td>Secrets Manager injected as ECS environment variables</td><td>The placeholder convention can stay; only the loader changes</td></tr>
+<tr><td>Serilog log database</td><td>Logs</td><td>Keep: console to CloudWatch plus <code>log.log_api</code></td><td>Only the connection string changes</td></tr>
+<tr><td>App Service Zip Deploy</td><td>Hosting</td><td>ECS Fargate (ARM64) behind the internal ALB</td><td>See Network and CI/CD</td></tr>
+</tbody></table></div>
+<h3>Identity and token claims</h3>
+<p><code>ContextHelper</code> reads the B2C token without validating it. The AWS version validates Cognito tokens with JWT bearer middleware (issuer and signing keys from the pool) and reads these claims from the <b>ID token</b>.</p>
+<div class="tw"><table><thead><tr><th>B2C claim today</th><th>Meaning</th><th>Cognito ID token claim</th></tr></thead><tbody>
+<tr><td><code>sub</code> (object id)</td><td>User id, equals <code>mst_user.user_id</code></td><td><code>custom:user_id</code> (legacy GUID for migrated users, equal to <code>sub</code> for new users)</td></tr>
+<tr><td><code>name</code></td><td>Display name</td><td><code>name</code></td></tr>
+<tr><td><code>emails</code></td><td>Email</td><td><code>email</code></td></tr>
+<tr><td><code>given_name</code>, <code>family_name</code></td><td>First and last name</td><td><code>given_name</code>, <code>family_name</code></td></tr>
+<tr><td><code>jobTitle</code></td><td>Company id, default <code>22222222-2222-2222-2222-222222222222</code></td><td><code>custom:company_id</code></td></tr>
+<tr><td><code>exp</code></td><td>Stored by <code>UserSessionInsert</code></td><td><code>exp</code></td></tr>
+</tbody></table></div>
+<p>Cognito generates <code>sub</code> and it cannot be set, but <code>mst_user.user_id</code> and every foreign key to it are the B2C object ids. The design stores the legacy id in <code>custom:user_id</code> and forwards it as <code>X-User-Id</code>; the alternative is a <code>cognito_sub</code> column on <code>mst_user</code>. Passwords cannot be exported from B2C: at cutover, users are created in Cognito with state <code>FORCE_CHANGE_PASSWORD</code> and receive a temporary password by email. Set <code>UserAccountSettings.PasswordLength</code> to at least 12 to match the pool policy.</p>
+<h3>Stored procedures</h3>
+<p>All eleven run unchanged on RDS for SQL Server 2022 as far as the code shows, subject to the checks below.</p>
+<div class="tw"><table><thead><tr><th>Procedure</th><th>Called by</th><th>SQL Server features</th><th>Check on RDS</th></tr></thead><tbody>
+<tr><td><code>UserTosInsert</code></td><td>saveUserTos</td><td><code>GETDATE</code>, error log procedure</td><td>None</td></tr>
+<tr><td><code>UserTosSelect</code></td><td>getUserTos</td><td>Three-part name <code>[RadsForVets].[dbo]</code></td><td>Database must be named <code>RadsForVets</code></td></tr>
+<tr><td><code>UserSearchByEmail</code></td><td>exists checks</td><td><code>OPEN SYMMETRIC KEY</code>, <code>DecryptByKey</code></td><td>Key opens after the copy; decrypts every row, so watch latency</td></tr>
+<tr><td><code>UserDelete</code></td><td>DeleteUser</td><td>Symmetric key, transaction; calls <code>RadiologistLinkDelete</code></td><td>Same</td></tr>
+<tr><td><code>UserSessionInsert</code></td><td>GetUserById</td><td>None</td><td>None</td></tr>
+<tr><td><code>UserSelectById</code></td><td>GetUserById</td><td><code>DecryptByKey</code>, <code>AT TIME ZONE</code>, <code>sys.time_zone_info</code>, two DST functions</td><td>Compare time zone output with Azure SQL; instance time zone UTC</td></tr>
+<tr><td><code>UserClinicsConnection</code></td><td>GetUserById (type 6)</td><td>None</td><td>None</td></tr>
+<tr><td><code>UserEnableDisableUpdate</code></td><td>enable, disable</td><td><code>RAISERROR</code>, transaction</td><td>None</td></tr>
+<tr><td><code>UserSelect</code></td><td>GetUsers</td><td><code>DecryptByKey</code>, dynamic SQL with sort whitelist</td><td>See finding 2</td></tr>
+<tr><td><code>ClinicUserRemoveConnection</code></td><td>userClinicRemove</td><td>Transaction</td><td>None</td></tr>
+<tr><td><code>UserInsertUpdate</code></td><td>register, update (through <code>UserHelper</code>)</td><td><code>EncryptByKey</code>, entity code function, <code>OUTPUT INTO</code></td><td>Key; function present</td></tr>
+</tbody></table></div>
+<h3>Findings in the current code (not changed here)</h3>
+<ol>
+<li><code>UserDelete</code>: when the procedure does nothing (the address contains <code>medilis.ai</code>) or fails in its CATCH block, it returns no row, the C# call yields 0, and the service then deletes the identity user and reports success. The database row can survive while the login is gone.</li>
+<li><code>UserSelect</code>: the final <code>OR c.company_code LIKE '%' + @q + '%'</code> sits outside the parentheses of the search block, so a search term that matches another company's code can return that company's users despite the <code>@company_id</code> filter. A tenant-isolation bug worth confirming and fixing in <code>Schema.RadsForVetsMain</code>.</li>
+<li><code>GetUserById</code> reads the bearer token with <code>ReadJwtToken</code> and no signature check; the repository standard forbids this. The AWS version fixes it through bearer middleware.</li>
+<li>The controller has no <code>[Authorize]</code>; actions need at least an authenticated caller in this phase (every signed-in admin-staff user may call them); revisit before access widens.</li>
+<li><code>saveUserTos</code> accepts <code>UserID</code> in the body, so any caller can record terms acceptance for another user.</li>
+<li><code>GetUserTos</code> throws a null reference if no active terms row exists.</li>
+<li><code>EmailNotificationHelper</code> blocks on <code>.Wait()</code> for SendGrid and the log insert; the SES version is fully async.</li>
+</ol>
+<h3>Migration and rollout</h3>
+<ol>
+<li>Provision the stacks in staging.</li>
+<li>Move the database. The test SQL Server 2022 can use a native <code>.bak</code> through S3. Production is Azure SQL Database, which cannot write native backups: use a BACPAC or an ETL copy, and because a BACPAC does not carry certificates and the key script is not available, use the decrypt-and-re-encrypt copy described under Database.</li>
+<li>Run <code>UserSelectById</code>, <code>UserSearchByEmail</code> and <code>UserSelect</code> on RDS and compare with Azure SQL for a sample of users.</li>
+<li>Create the Cognito pool with custom attributes <code>custom:user_id</code> and <code>custom:company_id</code> (immutable after creation, so decide names first), then import users from B2C with <code>FORCE_CHANGE_PASSWORD</code>.</li>
+<li>Deploy <code>UserAccount.Aws.Microservice</code> behind API Gateway; point the SPA at the Cognito hosted UI.</li>
+<li>Run the regression checklist in staging, then cut over; keep the Azure service and B2C available for rollback until sign-off.</li>
+</ol>
+<h3>Regression checklist</h3>
+<ul>
+<li>Register a user: Cognito user, <code>mst_user</code> row, SES email received, first sign-in forces a password change.</li>
+<li>Exists checks: known email, unknown email, email only in SQL Server.</li>
+<li><code>GetUserById</code>: session row created, clinics returned for type 6, push-channel URL works.</li>
+<li>Disable then enable: sign-in blocked and restored; active sessions revoked on disable.</li>
+<li>Update user: name, email and company change appear in Cognito and <code>mst_user</code>.</li>
+<li>Reset password (with and without email), delete user, clinic link removal.</li>
+<li><code>GetUsers</code>: paging, sorting, each filter, company scoping.</li>
+<li>Token validation: expired, wrong issuer and tampered tokens return 401.</li>
+</ul>
+<h3>Service start-up (sketch)</h3>
+<pre><button class="copy" type="button">Copy</button><code>var builder = WebApplication.CreateBuilder(args);
+LoggerConfigurator.ConfigureLogger(builder.Configuration);   // existing: console + log.log_api
+builder.Logging.AddSerilog();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
+builder.Services.AddControllers();
+builder.Services.AddScoped&lt;ISqlDbHelper&gt;(_ =&gt;
+    new SqlDbHelper(builder.Configuration.GetConnectionString("MainDBConnectionString")));
+builder.Services.AddScoped&lt;IGraphHelper, CognitoHelper&gt;();
+builder.Services.AddScoped&lt;IEmailNotificationHelper, SesEmailNotificationHelper&gt;();
+builder.Services.AddAWSService&lt;IAmazonCognitoIdentityProvider&gt;();
+builder.Services.AddAWSService&lt;IAmazonSimpleEmailServiceV2&gt;();
+builder.Services.AddHealthChecks();
+
+var app = builder.Build();
+app.UseMiddleware&lt;OriginVerifyMiddleware&gt;();
+app.MapHealthChecks("/health");
+app.MapControllers();
+try { app.Run(); } finally { Log.CloseAndFlush(); }</code></pre>
+</section>
+
+<section id="naming">
+<h2>Naming convention</h2>
+<p class="lead">Every resource is named <code class="n">{env}-{sys}-{resource}</code>, with the environment first so dev and prod sort apart in every console. <code>{sys}</code> is a placeholder set to <code>radiaflow</code>; every name below is built from it by one helper, so changing the placeholder renames everything at the next deploy.</p>
+<div class="callout warn"><p><b>Renaming warning.</b> Names are fixed at creation. Changing <code>{sys}</code> or <code>{env}</code> after a stateful resource exists makes CloudFormation replace it (database, buckets, user pool), which destroys data. Choose the final system name before the first dev deployment.</p></div>
+<h3>Placeholders</h3>
+<div class="tw"><table><thead><tr><th>Placeholder</th><th>Meaning</th><th>Value now</th><th>Rule</th></tr></thead><tbody>
+<tr><td><code>{env}</code></td><td>Environment code</td><td><code>dev</code>, later <code>prod</code></td><td>Lowercase, 3 to 4 letters</td></tr>
+<tr><td><code>{sys}</code></td><td>System slug in resource names</td><td><code>radiaflow</code></td><td>Lowercase letters and digits, starts with a letter, 3 to 12 characters</td></tr>
+<tr><td><code>{Sys}</code></td><td>Display name for tags, descriptions, construct ids</td><td><code>RadiaFlow</code></td><td>Same word in PascalCase</td></tr>
+<tr><td><code>{domain}</code></td><td>Public DNS domain</td><td><code>medilis.ai</code></td><td>Existing domain; each environment gets a subdomain</td></tr>
+<tr><td><code>{acct}</code></td><td>12-digit AWS account id</td><td>from the account</td><td>Only in globally unique names (S3)</td></tr>
+<tr><td><code>{region}</code>, <code>{az}</code></td><td>Region, zone letter</td><td><code>il-central-1</code>, <code>a</code>/<code>b</code></td><td>Region only in S3 names</td></tr>
+<tr><td><code>{service}</code></td><td>Workload name</td><td><code>useraccount</code></td><td>Lowercase, no separators</td></tr>
+</tbody></table></div>
+<pre><button class="copy" type="button">Copy</button><code>public sealed record Naming(string Env, string Sys, string Acct, string Region)
+{
+    public string Name(string resource)  =&gt; $"{Env}-{Sys}-{resource}";            // dev-radiaflow-vpc
+    public string Path(string resource)  =&gt; $"/{Env}/{Sys}/{resource}";           // /dev/radiaflow/origin-verify
+    public string Alias(string key)      =&gt; $"alias/{Name(key)}";                 // alias/dev-radiaflow-rds
+    public string Bucket(string purpose) =&gt; $"{Env}-{Sys}-{purpose}-{Acct}-{Region}";
+    public string LogGroup(string svc)   =&gt; $"/{Env}/{Sys}/ecs/{svc}";
+    public string Stack(string part)     =&gt; Name(part);                           // dev-radiaflow-network
+}  // validates sys against ^[a-z][a-z0-9]{2,11}$ at start-up</code></pre>
+<h3>Rules</h3>
+<ul>
+<li>Dev and prod share one AWS account, so the <code>{env}</code> prefix is the only thing that keeps their resources apart: never create a resource without it, and scope IAM policies to the prefix.</li>
+<li>Lowercase with hyphens wherever a service allows it; underscores only in SQL Server logins; PascalCase only for CDK construct ids.</li>
+<li>Slash paths (<code>/{env}/{sys}/...</code>) for Secrets Manager, Parameter Store and log groups, so one IAM prefix grants one environment.</li>
+<li>Keep <code>{sys}</code> at 12 characters or fewer; ALB and target group names cap at 32.</li>
+<li>No region in names except S3; no account id anywhere else.</li>
+</ul>
+<h3>Tags on every resource</h3>
+<div class="tw"><table><thead><tr><th>Tag</th><th>Value</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>Project</code></td><td><code>{Sys}</code></td><td>RadiaFlow</td></tr>
+<tr><td><code>Environment</code></td><td><code>{env}</code></td><td>dev</td></tr>
+<tr><td><code>Name</code></td><td>the full resource name</td><td>dev-radiaflow-vpc</td></tr>
+<tr><td><code>Component</code></td><td>network, data, identity, compute, api, web, observability</td><td>data</td></tr>
+<tr><td><code>ManagedBy</code></td><td>cdk</td><td>cdk</td></tr>
+<tr><td><code>Owner</code>, <code>CostCenter</code></td><td>team or mailbox, finance code</td><td>to be set</td></tr>
+<tr><td><code>DataClass</code></td><td><code>restricted</code> for database and backups, otherwise <code>internal</code></td><td>restricted</td></tr>
+</tbody></table></div>
+<h3>Resource names</h3>
+<p>Examples use <code>env = dev</code>, <code>sys = radiaflow</code>, <code>acct = 111122223333</code>. For prod, replace <code>dev</code> with <code>prod</code>.</p>
+<div class="tw"><table><thead><tr><th>Group</th><th>Resource</th><th>Pattern</th><th>Example (dev)</th></tr></thead><tbody>
+<tr><td>Stacks and pipeline</td><td>CloudFormation stacks</td><td class="hl"><code>{env}-{sys}-{part}</code></td><td class="hl"><code>dev-radiaflow-network</code>, <code>-data</code>, <code>-identity</code>, <code>-compute</code>, <code>-api</code>, <code>-web</code>, <code>-observability</code></td></tr>
+<tr><td></td><td>CDK construct ids</td><td class="hl"><code>{Sys}{Part}</code></td><td class="hl"><code>RadiaFlowNetwork</code></td></tr>
+<tr><td></td><td>CI deploy role (OIDC)</td><td class="hl"><code>{env}-{sys}-role-deploy</code></td><td class="hl"><code>dev-radiaflow-role-deploy</code></td></tr>
+<tr><td></td><td>Cost budget</td><td class="hl"><code>{env}-{sys}-budget-monthly</code></td><td class="hl"><code>dev-radiaflow-budget-monthly</code></td></tr>
+<tr><td>Network</td><td>VPC, internet gateway</td><td class="hl"><code>{env}-{sys}-vpc</code>, <code>-igw</code></td><td class="hl"><code>dev-radiaflow-vpc</code>, <code>dev-radiaflow-igw</code></td></tr>
+<tr><td></td><td>Subnets</td><td class="hl"><code>{env}-{sys}-public|app|db-{az}</code></td><td class="hl"><code>dev-radiaflow-app-a</code></td></tr>
+<tr><td></td><td>NAT gateway and Elastic IP</td><td class="hl"><code>{env}-{sys}-nat-{az}</code>, <code>-eip</code></td><td class="hl"><code>dev-radiaflow-nat-a</code></td></tr>
+<tr><td></td><td>Route tables</td><td class="hl"><code>{env}-{sys}-rt-public</code>, <code>-rt-app-{az}</code>, <code>-rt-db</code></td><td class="hl"><code>dev-radiaflow-rt-app-a</code></td></tr>
+<tr><td></td><td>Security groups</td><td class="hl"><code>{env}-{sys}-sg-{role}</code></td><td class="hl"><code>dev-radiaflow-sg-alb</code>, <code>-sg-ecs</code>, <code>-sg-rds</code></td></tr>
+<tr><td></td><td>VPC endpoints</td><td class="hl"><code>{env}-{sys}-vpce-{service}</code></td><td class="hl"><code>dev-radiaflow-vpce-s3</code>, <code>-ecr-api</code>, <code>-logs</code></td></tr>
+<tr><td></td><td>DB subnet group</td><td class="hl"><code>{env}-{sys}-db-subnets</code></td><td class="hl"><code>dev-radiaflow-db-subnets</code></td></tr>
+<tr><td>Compute</td><td>ECR repository</td><td class="hl"><code>{env}-{sys}/{service}</code></td><td class="hl"><code>dev-radiaflow/useraccount</code></td></tr>
+<tr><td></td><td>ECS cluster</td><td class="hl"><code>{env}-{sys}-cluster</code></td><td class="hl"><code>dev-radiaflow-cluster</code></td></tr>
+<tr><td></td><td>ECS service, task definition</td><td class="hl"><code>{env}-{sys}-{service}-svc</code>, <code>{env}-{sys}-{service}</code></td><td class="hl"><code>dev-radiaflow-useraccount-svc</code></td></tr>
+<tr><td></td><td>Internal ALB, target group (max 32)</td><td class="hl"><code>{env}-{sys}-alb</code>, <code>{env}-{sys}-tg-{service}</code></td><td class="hl"><code>dev-radiaflow-tg-useraccount</code></td></tr>
+<tr><td></td><td>Task role, execution role</td><td class="hl"><code>{env}-{sys}-role-task-{service}</code>, <code>-role-exec</code></td><td class="hl"><code>dev-radiaflow-role-task-useraccount</code></td></tr>
+<tr><td>Data and storage</td><td>RDS identifier, parameter group, option group</td><td class="hl"><code>{env}-{sys}-sql</code>, <code>-sql-params</code>, <code>-sql-options</code></td><td class="hl"><code>dev-radiaflow-sql</code></td></tr>
+<tr><td></td><td>Dev database VM (option)</td><td class="hl"><code>{env}-{sys}-sqlvm</code>, <code>-sg-sqlvm</code>, <code>-role-sqlvm</code>, <code>-sqlvm-data</code>, <code>-dlm-sqlvm</code></td><td class="hl"><code>dev-radiaflow-sqlvm</code></td></tr>
+<tr><td></td><td>RDS backup-restore role</td><td class="hl"><code>{env}-{sys}-role-rds-backup</code></td><td class="hl"><code>dev-radiaflow-role-rds-backup</code></td></tr>
+<tr><td></td><td>SQL databases, logins</td><td>fixed by the app; <code>{sys}_{service}</code></td><td class="hl"><code>RadsForVets</code>, <code>log</code>; <code>radiaflow_useraccount</code>, <code>radiaflow_migrator</code></td></tr>
+<tr><td></td><td>S3 buckets</td><td class="hl"><code>{env}-{sys}-{purpose}-{acct}-{region}</code></td><td class="hl"><code>dev-radiaflow-sql-backups-111122223333-il-central-1</code>; purposes <code>spa</code>, <code>static</code>, <code>access-logs</code></td></tr>
+<tr><td>Identity, email, push</td><td>Cognito pool, client, hosted UI prefix</td><td class="hl"><code>{env}-{sys}-users</code>, <code>-spa</code>, <code>-auth</code></td><td class="hl"><code>dev-radiaflow-users</code>, <code>dev-radiaflow-auth</code></td></tr>
+<tr><td></td><td>Cognito custom attributes</td><td>fixed by design</td><td class="hl"><code>custom:user_id</code>, <code>custom:company_id</code></td></tr>
+<tr><td></td><td>SES configuration set, sender</td><td class="hl"><code>{env}-{sys}-ses</code>; <code>no-reply@</code> plus the portal hostname</td><td class="hl"><code>dev-radiaflow-ses</code>; <code>no-reply@radiaflow-dev.medilis.ai</code></td></tr>
+<tr><td></td><td>IoT client policy, topic</td><td class="hl"><code>{env}-{sys}-iot-client</code>; <code>{env}/{sys}/users/{userId}</code></td><td class="hl"><code>dev-radiaflow-iot-client</code></td></tr>
+<tr><td>Edge, API, DNS</td><td>HTTP API, VPC Link, JWT authorizer</td><td class="hl"><code>{env}-{sys}-http-api</code>, <code>-vpclink</code>, <code>-cognito-jwt</code></td><td class="hl"><code>dev-radiaflow-http-api</code></td></tr>
+<tr><td></td><td>CloudFront, access control, WAF ACL (us-east-1)</td><td class="hl"><code>{env}-{sys}-cdn</code>, <code>-spa-oac</code>, <code>-waf</code></td><td class="hl"><code>dev-radiaflow-cdn</code></td></tr>
+<tr><td></td><td>ACM certificates (tag <code>Name</code>)</td><td class="hl"><code>{env}-{sys}-cert-{region}</code></td><td class="hl"><code>dev-radiaflow-cert-us-east-1</code></td></tr>
+<tr><td></td><td>Hostname</td><td>prod <code>{sys}.{domain}</code>, others <code>{sys}-{env}.{domain}</code>; API on the same host under <code>/api/*</code></td><td class="hl"><code>radiaflow-dev.medilis.ai</code> (prod: <code>radiaflow.medilis.ai</code>)</td></tr>
+<tr><td>Security and config</td><td>KMS aliases</td><td class="hl"><code>alias/{env}-{sys}-{use}</code></td><td class="hl"><code>alias/dev-radiaflow-rds</code>, <code>-logs</code>, <code>-s3</code>, <code>-secrets</code></td></tr>
+<tr><td></td><td>Secrets</td><td class="hl"><code>/{env}/{sys}/origin-verify</code>, <code>/{env}/{sys}/db/{service}</code></td><td class="hl"><code>/dev/radiaflow/db/useraccount</code>, <code>/dev/radiaflow/db/log</code></td></tr>
+<tr><td></td><td>Parameter Store, IAM policies, IAM path</td><td class="hl"><code>/{env}/{sys}/config/{key}</code>; <code>{env}-{sys}-policy-{purpose}</code>; <code>/{sys}/{env}/</code></td><td class="hl"><code>/dev/radiaflow/config/…</code></td></tr>
+<tr><td>Observability</td><td>Log groups</td><td class="hl"><code>/{env}/{sys}/ecs/{service}</code>, <code>/{env}/{sys}/apigw/access</code></td><td class="hl"><code>/dev/radiaflow/ecs/useraccount</code></td></tr>
+<tr><td></td><td>SNS topic, alarms, dashboard</td><td class="hl"><code>{env}-{sys}-alerts</code>, <code>-alarm-{what}</code>, <code>-dashboard</code></td><td class="hl"><code>dev-radiaflow-alarm-alb-5xx</code>, <code>-ecs-tasks</code>, <code>-log-errors</code></td></tr>
+</tbody></table></div>
+<h3>Service limits that shape the names</h3>
+<div class="tw"><table><thead><tr><th>Resource</th><th>Limit</th><th>Longest name (prod)</th></tr></thead><tbody>
+<tr><td>ALB and target group</td><td>32 characters</td><td><code>prod-radiaflow-tg-useraccount</code> (30)</td></tr>
+<tr><td>S3 bucket</td><td>63, lowercase, globally unique</td><td><code>prod-radiaflow-access-logs-111122223333-il-central-1</code> (52)</td></tr>
+<tr><td>RDS identifier</td><td>63, starts with a letter</td><td><code>prod-radiaflow-sql-options</code> (26)</td></tr>
+<tr><td>IAM role</td><td>64</td><td><code>prod-radiaflow-role-task-useraccount</code> (36)</td></tr>
+<tr><td>ECS service name</td><td>255</td><td><code>prod-radiaflow-useraccount-svc</code> (30)</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="s3">
+<h2>S3 buckets per system and environment</h2>
+<p>Give every purpose its own bucket per environment, created by one shared CDK construct (<code>PortalBucket</code>) so each bucket gets the same safe baseline. Never share a bucket between dev and prod or mix purposes in one bucket.</p>
+<div class="tw"><table><thead><tr><th>Purpose</th><th>Name (dev)</th><th>Holds</th><th>Versioning</th><th>Encryption</th><th>Lifecycle (dev / prod, to confirm)</th><th>Access</th></tr></thead><tbody>
+<tr><td>SPA</td><td class="hl"><code>dev-radiaflow-spa-111122223333-il-central-1</code></td><td>React build</td><td>On</td><td>SSE-S3</td><td>Expire old versions after 14 / 30 days</td><td>CloudFront (origin access control) reads; pipeline role writes</td></tr>
+<tr><td>Static content</td><td class="hl"><code>dev-radiaflow-static-111122223333-il-central-1</code></td><td>Email templates and other app files</td><td>On</td><td>SSE-S3</td><td>Expire old versions after 14 / 30 days</td><td>UserAccount task role, read only</td></tr>
+<tr><td>SQL backups</td><td class="hl"><code>dev-radiaflow-sql-backups-111122223333-il-central-1</code></td><td>Native <code>.bak</code> files, migration copies</td><td>Off</td><td>SSE-KMS, <code>alias/dev-radiaflow-s3</code></td><td>Infrequent Access after 30 days; expire after 14 / 90 days</td><td>RDS backup-restore role and migration role only</td></tr>
+<tr><td>Access logs</td><td class="hl"><code>dev-radiaflow-access-logs-111122223333-il-central-1</code></td><td>ALB, CloudFront, S3 access logs</td><td>Off</td><td>SSE-S3 (required by ALB log delivery)</td><td>Expire after 30 / 90 days</td><td>Log delivery services; security role reads</td></tr>
+<tr><td>Shared, per account</td><td class="hl"><code>cdk-hnb659fds-assets-…</code>, <code>radiaflow-trail-…</code></td><td>CDK assets, CloudTrail</td><td>Trail: on</td><td>SSE-S3 or KMS</td><td>Trail: per audit policy</td><td>Deploy role; security role</td></tr>
+</tbody></table></div>
+<h3>Baseline for every bucket</h3>
+<ul>
+<li>Block Public Access at account and bucket level; ACLs disabled (bucket owner enforced).</li>
+<li>Bucket policy denies requests without TLS and, for private buckets, any principal outside the environment's roles.</li>
+<li>Default encryption on; SSE-KMS with the environment's key for sensitive data (backups).</li>
+<li>Lifecycle rule that aborts incomplete multipart uploads after 7 days, plus the expiry rules above.</li>
+<li>Tags as above; <code>DataClass = restricted</code> for SQL backups.</li>
+<li>Removal policy <code>RETAIN</code> in prod and for SQL backups everywhere; dev SPA and static buckets may auto-delete.</li>
+<li>Data stays in il-central-1: no cross-region replication.</li>
+<li>Turn on IAM Access Analyzer for S3 and review findings monthly.</li>
+</ul>
+<p><b>Key layout:</b> SPA build at the bucket root; static content under <code>email-templates/</code>; backups under <code>RadsForVets/{yyyy}/{mm}/</code>; access logs under <code>alb/</code>, <code>cloudfront/</code>, <code>s3/</code>. Retention values are proposals to confirm against the audit policy.</p>
+</section>
+
+<section id="cicd">
+<h2>CI/CD pipeline</h2>
+<p class="lead">Keep the code in Azure DevOps Repos and use Azure Pipelines to build, test and deploy to AWS. Do not open a new repository on AWS.</p>
+<div class="tw"><table><thead><tr><th>Option</th><th>What it takes</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>Azure DevOps Repos plus Azure Pipelines (today)</td><td>An AWS service connection per environment signing in by OIDC; one multi-stage YAML file</td><td><b>Recommended.</b> No code move, same review and permissions</td></tr>
+<tr><td>AWS CodeCommit, CodePipeline, CodeBuild</td><td>A second copy of the repository, new build definitions and permissions. AWS announced in November 2025 that CodeCommit accepts new customers again; confirm in the console</td><td>Not needed unless the company later leaves Azure DevOps</td></tr>
+<tr><td>GitHub Actions</td><td>Move the repository to GitHub</td><td>Not used here</td></tr>
+</tbody></table></div>
+<h3>Flow</h3>
+<p>One multi-stage pipeline, <code>radiaflow-useraccount</code>, runs on pushes to <code>main</code> that touch the UserAccount project, <code>Microservices.Common</code> or the infrastructure folder. Dev deploys automatically; prod needs a manual approval, so no separate <code>prod</code> branch is required (existing Azure pipelines on a <code>prod</code> branch stay as they are).</p>
+<div class="tw"><table><thead><tr><th>Stage</th><th>What it does</th><th>Runs with</th></tr></thead><tbody>
+<tr><td>Build and test</td><td>.NET 10 restore, build, unit tests; build the <code>linux/arm64</code> image once and push it to ECR tagged with the commit SHA</td><td>Ubuntu agent; AWS role <code>dev-radiaflow-role-deploy</code> for the push</td></tr>
+<tr><td>Dev</td><td><code>cdk diff</code> and <code>cdk deploy -c env=dev</code>; run migration task <code>dev-radiaflow-migrator</code>; smoke test <code>/health</code> through API Gateway and one authenticated call</td><td>Connection <code>aws-radiaflow-dev</code>; environment <code>radiaflow-dev</code></td></tr>
+<tr><td>Prod</td><td>Wait for approval; promote the same image (same digest, copied to <code>prod-radiaflow/useraccount</code>); <code>cdk deploy -c env=prod</code>; migration task; smoke test</td><td>Connection <code>aws-radiaflow-prod</code>; environment <code>radiaflow-prod</code> with an approval check</td></tr>
+</tbody></table></div>
+<p>The front end uses a second, shorter pipeline: build the React app, sync it to the SPA bucket, invalidate CloudFront. The database migration runs inside AWS as an ECS task because RDS has no public access; the pipeline only starts the task and waits for its exit code.</p>
+<h3>Authentication without stored keys</h3>
+<ol>
+<li>In AWS, create an IAM OpenID Connect provider for Azure DevOps (one per account; reuse it if it exists).</li>
+<li>Create one deploy role per environment, <code>dev-radiaflow-role-deploy</code> and <code>prod-radiaflow-role-deploy</code>. Each trust policy accepts only the matching service connection, so the dev connection cannot assume the prod role.</li>
+<li>In Azure DevOps, create the AWS service connections <code>aws-radiaflow-dev</code> and <code>aws-radiaflow-prod</code> with the OIDC option and the role ARN. This needs the AWS Toolkit for Azure DevOps extension.</li>
+<li>No access keys or secrets are stored in the pipeline.</li>
+</ol>
+<div class="tw"><table><thead><tr><th>Deploy role may</th><th>Why</th></tr></thead><tbody>
+<tr><td>Assume the CDK bootstrap roles</td><td><code>cdk deploy</code> creates the stacks through them</td></tr>
+<tr><td>Push and read ECR repository <code>{env}-radiaflow/useraccount</code></td><td>Image publish and promotion</td></tr>
+<tr><td><code>ecs:RunTask</code> for <code>{env}-radiaflow-migrator</code>, <code>iam:PassRole</code> for its roles</td><td>Database migration</td></tr>
+<tr><td><code>s3:PutObject</code> on the SPA bucket, <code>cloudfront:CreateInvalidation</code></td><td>Front end publish</td></tr>
+<tr><td>Read parameters under <code>/{env}/radiaflow/config/</code></td><td>Look up stack outputs and settings</td></tr>
+</tbody></table></div>
+<h3>Names</h3>
+<div class="tw"><table><thead><tr><th>Object</th><th>Name</th></tr></thead><tbody>
+<tr><td>Pipelines</td><td class="hl"><code>radiaflow-useraccount</code>, <code>radiaflow-portal</code> (front end)</td></tr>
+<tr><td>Pipeline file</td><td class="hl"><code>Pipelines/aws/radiaflow-useraccount.yml</code></td></tr>
+<tr><td>Azure DevOps environments</td><td class="hl"><code>radiaflow-dev</code>, <code>radiaflow-prod</code> (approval check on prod)</td></tr>
+<tr><td>AWS service connections</td><td class="hl"><code>aws-radiaflow-dev</code>, <code>aws-radiaflow-prod</code></td></tr>
+<tr><td>Migration task definitions</td><td class="hl"><code>dev-radiaflow-migrator</code>, <code>prod-radiaflow-migrator</code></td></tr>
+<tr><td>Image tag</td><td>short commit SHA, plus <code>dev</code> and <code>prod</code> marker tags</td></tr>
+</tbody></table></div>
+<h3>Building the ARM64 image the easy way</h3>
+<p>Use Microsoft-hosted Ubuntu agents and a two-stage Dockerfile: compile on the agent's own x64 architecture with <code>-r linux-arm64</code>, and make the final stage only <code>COPY</code> files onto the ARM64 runtime image. Nothing runs under emulation, so the build is as fast as an x64 build and no self-hosted agent is needed. Do not add <code>RUN</code> commands to the final stage. Check that <code>Microservices.Common</code> publishes cleanly for <code>linux-arm64</code> (open item 5).</p>
+<pre><button class="copy" type="button">Copy</button><code>FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY . .
+RUN dotnet publish UserAccount.Aws.Microservice/UserAccount.Aws.Microservice.csproj \
+    -c Release -r linux-arm64 --self-contained false -o /app
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+COPY --from=build /app .
+USER app
+ENV ASPNETCORE_HTTP_PORTS=8080
+ENTRYPOINT ["dotnet", "UserAccount.Aws.Microservice.dll"]</code></pre>
+<details><summary>Pipeline sketch (illustrative, not run)</summary>
+<pre><button class="copy" type="button">Copy</button><code>trigger:
+  branches: { include: [main] }
+  paths:
+    include:
+      - Backend/UserAccount.Aws.Microservice/**
+      - Backend/Microservices.Common/**
+      - Infra/**
+
+stages:
+- stage: Build
+  pool: { vmImage: ubuntu-latest }
+  jobs:
+  - job: build_test_push
+    steps:
+    - task: UseDotNet@2
+      inputs: { packageType: sdk, version: 10.x }
+    - script: dotnet test Backend/UserAccount.Aws.Microservice.Tests -c Release
+    - task: AWSShellScript@1
+      inputs:
+        awsCredentials: aws-radiaflow-dev
+        regionName: il-central-1
+        scriptType: inline
+        inlineScript: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin $(AcctId).dkr.ecr.il-central-1.amazonaws.com
+          docker buildx build --platform linux/arm64 -f Backend/UserAccount.Aws.Microservice/Dockerfile \
+            -t $(AcctId).dkr.ecr.il-central-1.amazonaws.com/dev-radiaflow/useraccount:$(Build.SourceVersion) --push Backend
+
+- stage: Dev
+  dependsOn: Build
+  jobs:
+  - deployment: deploy_dev
+    environment: radiaflow-dev
+    pool: { vmImage: ubuntu-latest }
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: AWSShellScript@1
+            inputs:
+              awsCredentials: aws-radiaflow-dev
+              regionName: il-central-1
+              scriptType: inline
+              inlineScript: |
+                npx cdk deploy --all -c env=dev -c imageTag=$(Build.SourceVersion) --require-approval never
+                # start dev-radiaflow-migrator, wait for exit code 0, then smoke test
+
+- stage: Prod
+  dependsOn: Dev
+  jobs:
+  - deployment: deploy_prod
+    environment: radiaflow-prod      # approval check configured on this environment
+    pool: { vmImage: ubuntu-latest }
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AWSShellScript@1
+            inputs:
+              awsCredentials: aws-radiaflow-prod
+              regionName: il-central-1
+              scriptType: inline
+              inlineScript: |
+                # copy the image to prod-radiaflow/useraccount, then:
+                npx cdk deploy --all -c env=prod -c imageTag=$(Build.SourceVersion) --require-approval never</code></pre>
+</details>
+<h3>Quality gates and rollback</h3>
+<ul>
+<li>Pull requests build and test but do not deploy.</li>
+<li><code>cdk diff</code> output is attached to the run so a reviewer sees infrastructure changes before the prod approval.</li>
+<li>ECS rolling deployment with the circuit breaker rolls back a failing release; a failed migration stops the pipeline before prod.</li>
+<li>To roll back, redeploy the previous image tag; migrations are idempotent and forward-only, so database changes are corrected by a new migration.</li>
+<li>The pipeline fails on critical image scan findings and on vulnerable NuGet packages.</li>
+<li>Decided: the dev team group (Vigen, Gera) creates the AWS service connections, installs the AWS Toolkit extension and approves prod deployments, with self-approval off so the other person signs off.</li>
+</ul>
+</section>
+
+<section id="ops">
+<h2>Security and operations</h2>
+<h3>Security controls</h3>
+<div class="tw"><table><thead><tr><th>Area</th><th>Control</th></tr></thead><tbody>
+<tr><td>Encryption</td><td>KMS at rest for RDS, S3, Secrets Manager; TLS in transit; HTTPS only at CloudFront and API Gateway</td></tr>
+<tr><td>Identity</td><td>MFA required for portal users; 30-minute access tokens; refresh tokens revoked on disable</td></tr>
+<tr><td>Least privilege</td><td>Separate task roles per service; database roles per schema; CDK-generated IAM scoped to named resources</td></tr>
+<tr><td>Perimeter</td><td>Internal ALB, security-group chaining, origin verification header, throttling on API Gateway</td></tr>
+<tr><td>Audit</td><td>Every API call is logged with user id, request, response and duration</td></tr>
+<tr><td>Dependencies</td><td>ECR image scanning, <code>dotnet list package --vulnerable</code> and <code>npm audit</code> in the pipeline</td></tr>
+<tr><td>Data residency</td><td>All data stores in il-central-1; CloudFront edge caches only static SPA assets</td></tr>
+</tbody></table></div>
+<h3>Alarms</h3>
+<div class="tw"><table><thead><tr><th>Alarm</th><th>Condition</th></tr></thead><tbody>
+<tr><td>API errors</td><td>ALB 5xx count and API Gateway 5xx rate above threshold</td></tr>
+<tr><td>Task health</td><td>ECS running count below desired; CPU above 80% for 10 minutes</td></tr>
+<tr><td>Database</td><td>CPU, free storage, connections; Multi-AZ failover event</td></tr>
+<tr><td>Log volume</td><td>Metric filter on <code>Level = Error</code> in CloudWatch</td></tr>
+<tr><td>Log table</td><td>SQL sink errors in the console log (for example <code>Invalid object name 'log.log_api'</code>)</td></tr>
+</tbody></table></div>
+<h3>Availability and recovery</h3>
+<ul>
+<li>Two AZs for ALB, tasks and RDS Multi-AZ (automatic failover).</li>
+<li>RDS automated backups with point-in-time recovery; restore test into a scratch instance each quarter.</li>
+<li>RPO and RTO targets are not set yet; agree them with the business before go-live.</li>
+</ul>
+<h3>Risks</h3>
+<div class="tw"><table><thead><tr><th>Risk or question</th><th>Impact</th><th>Mitigation or next step</th></tr></thead><tbody>
+<tr><td>SQL Server licensing returns (license-included RDS price per vCPU)</td><td>The database is about 90% of the monthly bill</td><td>Compare with the current Azure SQL bill; right-size; evaluate newer instance generations and reserved pricing</td></tr>
+<tr><td>Symmetric key and certificate do not open after the copy</td><td>Encrypted columns unreadable, service down</td><td>Create a new key on RDS, rehearse the decrypt-and-re-encrypt copy on a staging copy of production, run <code>UserSelectById</code> and <code>UserSearchByEmail</code> before cutover</td></tr>
+<tr><td>Azure SQL to RDS data migration</td><td>Downtime window and data drift</td><td>Native <code>.bak</code> restore for the test database only; production uses BACPAC or an ETL copy, then AWS DMS for the delta; agree the cutover window</td></tr>
+<tr><td>RDS for SQL Server limits</td><td>No sysadmin, no Graviton, failover of one to two minutes, storage scaling limits</td><td>Design for retry (<code>SqlDbHelper</code> retries 5 times); test failover in staging</td></tr>
+<tr><td>A required service is unavailable in il-central-1</td><td>Blocks the foundation phase</td><td>Verify the service list and quotas in week 1; agree a fallback region with compliance</td></tr>
+<tr><td>Static origin secret inside the API Gateway integration</td><td>Weak if configuration leaks</td><td>Rely on network isolation first; redeploy to rotate; restrict who can read API config</td></tr>
+<tr><td>Logs lost while the log database is unreachable</td><td>Missing API call history in <code>log.log_api</code></td><td>CloudWatch keeps every console event; add the SQS sink later if a durable queue is needed</td></tr>
+<tr><td>Every authenticated user can call every API</td><td>Any signed-in admin-staff user can disable, delete or reset any other user</td><td>Invite only admin staff; keep MFA on; add a permission model before access widens</td></tr>
+<tr><td>Dev database on a VM instead of RDS</td><td>The team patches, backs up and restores it; behaviour differs slightly from RDS; Express has a 10 GB limit and no SQL Server Agent</td><td>Prefer Developer edition; validate once on a temporary RDS instance (step 8a); snapshot daily</td></tr>
+<tr><td>NAT gateway cost</td><td>Monthly fixed cost per AZ</td><td>Interface endpoints for AWS APIs; one NAT in dev</td></tr>
+<tr><td>Short log history in <code>log.log_api</code></td><td>The table keeps only today plus the previous day</td><td>CloudWatch keeps 30 days; decide if longer audit retention is needed</td></tr>
+</tbody></table></div>
+<h3>Delivery roadmap</h3>
+<div class="tw"><table><thead><tr><th>Phase</th><th>Week</th><th>Deliverables</th><th>Exit criteria</th></tr></thead><tbody>
+<tr><td>1 Cloud foundation</td><td>1</td><td>Region check; VPC, RDS for SQL Server, Secrets Manager, ECR via CDK</td><td>Stacks deploy to staging; RDS reachable from a test task</td></tr>
+<tr><td>2 Database and identity</td><td>2</td><td>Restore RadsForVets to staging RDS from an Azure SQL backup; verify the symmetric key; Cognito pool and client; shared Security package; local docker-compose</td><td><code>UserSelectById</code> returns decrypted data on RDS</td></tr>
+<tr><td>3 UserAccount</td><td>3</td><td>UserAccount.Aws.Microservice</td><td>All 17 endpoints pass the regression checklist; invite and disable verified against Cognito</td></tr>
+<tr><td>4 Gateway and SPA</td><td>4</td><td>Fargate service, internal ALB, HTTP API with JWT authorizer and <code>X-User-Id</code> mapping; React app on S3 and CloudFront</td><td>Login to API call works end to end; direct ALB access returns 403</td></tr>
+<tr><td>5 Hardening and go-live</td><td>5</td><td>Load test; log archive job check; backup restore test; failover test; penetration test; production data migration and cutover</td><td>Findings closed; RPO and RTO agreed; runbook signed off</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="sources">
+<h2>Sources</h2>
+<ul>
+<li><a href="https://aws.amazon.com/blogs/modernizing-with-aws/how-to-federate-into-aws-from-azure-devops-using-openid-connect">How to federate into AWS from Azure DevOps using OpenID Connect</a> (AWS)</li>
+<li><a href="https://aws.amazon.com/blogs/devops/aws-codecommit-returns-to-general-availability">AWS CodeCommit returns to general availability</a> (AWS)</li>
+<li><a href="https://aws.amazon.com/rds/sqlserver/pricing/">Amazon RDS for SQL Server pricing</a> and <a href="https://aws.amazon.com/fargate/pricing/">AWS Fargate pricing</a> (AWS; region tables load interactively and were not retrievable here)</li>
+<li><a href="https://migrationcost.com/amazon-rds-sql-server-pricing">Amazon RDS for SQL Server pricing (2026)</a> (third-party price summary)</li>
+<li><a href="https://www.doit.com/blog/aws-region-in-tel-aviv-israel-price-comparison-versus-other-regions">AWS region in Tel Aviv: price comparison versus other regions</a> (DoiT, 2023; source of the +12 to 19% uplift)</li>
+<li><a href="https://aws.amazon.com/about-aws/whats-new/2025/12/amazon-rds-sql-server-optimize-cpu-lower-prices">Amazon RDS for SQL Server optimize-CPU instances at lower prices</a> (AWS, December 2025)</li>
+</ul>
+</section>
+
+<footer>This page is a summary of the working design document. CDK stack listings and the full change history stay in the source document. Cost figures are estimates; confirm them in the AWS Pricing Calculator.</footer>
+</main>
+</div>
+</div>
+<div id="toast" role="status" aria-live="polite">Copied</div>
+<script>
+(function(){
+  var toast=document.getElementById('toast'),t;
+  function say(m){toast.textContent=m;toast.classList.add('on');clearTimeout(t);t=setTimeout(function(){toast.classList.remove('on')},1300)}
+  function copy(text){
+    try{ if(navigator.clipboard&&navigator.clipboard.writeText){ return navigator.clipboard.writeText(text).then(function(){say('Copied')},function(){fallback(text)}) } }catch(e){}
+    fallback(text);
+  }
+  function fallback(text){
+    try{ var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=document.execCommand('copy');document.body.removeChild(ta);say(ok?'Copied':'Select the text and copy it') }catch(e){say('Select the text and copy it')}
+  }
+  document.querySelectorAll('pre .copy').forEach(function(b){
+    b.addEventListener('click',function(){var c=b.parentNode.querySelector('code');copy(c?c.innerText:'')});
+  });
+  document.querySelectorAll('td.names code, td.hl code, code.n').forEach(function(c){
+    c.title='Click to copy';
+    c.addEventListener('click',function(){copy(c.textContent)});
+  });
+})();
+</script>
+
+</body></html>
